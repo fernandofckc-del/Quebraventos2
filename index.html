@@ -24,7 +24,8 @@
 @media (prefers-color-scheme:dark){:root{--paper:#0f1411;--sheet:#151c17;--ink:#e3eae4;--mut:#93a397;--rule:#2b3830;--tom:#a7b3aa;--okbg:#14301c;--warnbg:#3a2f12;--badbg:#3a1714;--ok:#69db7c;--warn:#ffc078;--bad:#ff8787;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-head)}
-nav{position:sticky;top:0;z-index:2000;background:var(--brand);color:#fff;padding:8px 16px calc(8px);display:flex;gap:6px;align-items:center;overflow-x:auto;white-space:nowrap}
+nav{position:sticky;top:0;z-index:2000;background:var(--brand);color:#fff;padding:8px 16px;display:flex;gap:4px 6px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){nav{position:static}nav b{width:100%;font-size:1rem}nav a{padding:5px 8px;font-size:.88rem;background:rgba(255,255,255,.08)}}
 nav b{margin-right:8px;font-size:1.05rem}
 nav a{color:#dfeee3;text-decoration:none;font-size:.92rem;padding:6px 10px;border-radius:6px}
 nav a:hover,nav a:focus-visible{background:rgba(255,255,255,.14);outline:none}
@@ -37,6 +38,11 @@ h1{font-size:1.4rem;margin:0;text-wrap:balance}
 .rg{background:#ff3b30;color:#fff;border:2px solid #111;border-radius:4px;font:700 11px var(--f-head);text-align:center;line-height:16px}
 .legend{background:rgba(20,26,22,.9);color:#eee;padding:10px 12px;border-radius:6px;font-size:13px;line-height:1.55}
 .legend i{display:inline-block;width:30px;vertical-align:middle;margin-right:8px}
+.legend button{background:none;border:none;color:#fff;padding:0;font-size:13px;font-weight:700}
+.legend.fechada .itens{display:none}
+.leaflet-control-layers-toggle{background-image:none!important;width:auto!important;height:auto!important;padding:8px 12px;font:700 14px var(--f-head);color:#1c2620;text-decoration:none}
+.leaflet-control-layers-toggle::before{content:"Camadas"}
+.leaflet-touch .leaflet-control-layers-toggle{width:auto!important;height:auto!important}
 .mapbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 button,.btn{font:600 .92rem var(--f-head);padding:8px 12px;border-radius:7px;border:1.5px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer}
 button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
@@ -241,9 +247,9 @@ G.segs.forEach(g=>{
 [lSet,lLbl,lTubo,lF1,lF2,lTom,lNos,lReg].forEach(l=>l.addTo(map));
 L.control.layers({'Satélite Google':goo,'Satélite Esri':esri},{'Setores 7,5 ha':lSet,'Nomes':lLbl,'Tubulação':lTubo,'Registros':lReg,'Fita linha 1':lF1,'Fita linha 2':lF2,'Tomadas':lTom,'Conexões':lNos,'Montagem (toque p/ marcar)':lMon},{collapsed:window.innerWidth<800}).addTo(map);
 const lg=L.control({position:'bottomleft'});
-lg.onAdd=()=>{const d=L.DomUtil.create('div','legend');d.innerHTML=
+lg.onAdd=()=>{const d=L.DomUtil.create('div','legend'+(window.innerWidth<700?' fechada':''));L.DomEvent.disableClickPropagation(d);d.innerHTML='<button type="button" aria-label="Mostrar ou esconder a legenda">Legenda ▾</button><div class="itens">'+
  Object.keys(DC).sort((a,b)=>b-a).map(k=>`<div><i style="height:${W[k]-1}px;background:${DC[k]}"></i>${DL(k)} mm</div>`).join('')+
- `<div><i style="height:3px;background:#2ecc40"></i>Fita linha 1</div><div><i style="height:3px;background:#00e5ff"></i>Fita linha 2</div><div><i style="border-top:2px dashed #fff"></i>Tomada</div><div><i style="height:12px;background:#ff3b30;border:2px solid #111"></i>Registro de linha</div>`;return d};
+ `<div><i style="height:3px;background:#2ecc40"></i>Fita linha 1</div><div><i style="height:3px;background:#00e5ff"></i>Fita linha 2</div><div><i style="border-top:2px dashed #fff"></i>Tomada</div><div><i style="height:12px;background:#ff3b30;border:2px solid #111"></i>Registro de linha</div></div>`;d.querySelector('button').onclick=()=>d.classList.toggle('fechada');return d};
 lg.addTo(map);
 const home=L.featureGroup([lSet,...lTubo.getLayers()]).getBounds().pad(0.05);map.fitBounds(home);
 // ---------- turnos no mapa
