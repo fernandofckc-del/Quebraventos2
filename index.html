@@ -12,6 +12,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 <style>
 /* Layout: barra fixa com atalhos; mapa no topo; painéis técnicos em cartões abaixo */
 :root{
@@ -89,7 +92,12 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 .plhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 #plBody th{text-transform:none;letter-spacing:0;white-space:normal;font-size:.8rem;line-height:1.2;min-width:58px}
 #plBody td{white-space:nowrap}
-.vh{background:#fff;border:2px solid #111;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.vh{background:#fff;border:2px solid #111;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.6);cursor:move}
+.vh.sel{background:#ff3b30;box-shadow:0 0 0 4px rgba(255,59,48,.45)}
+.movendo .leaflet-container,.movendo #map{cursor:crosshair!important}
+#sync{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;margin-left:auto}
+#sync i{width:9px;height:9px;border-radius:50%;background:#aaa;display:inline-block}
+#sync.ok i{background:#51cf66}#sync.pend i{background:#ffd43b}#sync.err i{background:#ff6b6b}
 .vh.pt{background:#2f80ff;border-color:#fff;border-radius:50%;box-shadow:0 0 0 2px #111}
 .vh.mid{background:#ffe600;border:1.5px solid #111;border-radius:50%;opacity:.7}
 .edbar{display:flex;flex-direction:column;gap:8px;padding:12px 14px}
@@ -99,7 +107,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot</b><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot</b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -160,7 +168,8 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </section>
 
 <section class="card">
-  <h2>Salvar progresso</h2>
+  <h2>Sincronização e cópia de segurança</h2>
+  <p class="note" id="syncInfo" style="margin-top:0"></p>
   <p class="note" style="margin-top:0">O progresso fica salvo neste aparelho. Para passar para outro celular, copie o código e cole no outro.</p>
   <div class="mapbar" style="margin:8px 0"><button id="bExp">Copiar código</button><button id="bImp">Carregar código colado</button><button id="bReset">Zerar progresso</button><span id="bkMsg" class="note" style="margin:0"></span></div>
   <label for="bk" class="note" style="margin:0">Código do progresso</label>
@@ -233,6 +242,62 @@ const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.inst)ST=s}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
+// ---------- sincronização entre aparelhos (Firebase / Firestore do projeto registroocorrencia)
+// Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
+// Cada caixinha e cada número vão como campo separado: duas pessoas mexendo ao mesmo tempo não apagam o trabalho uma da outra.
+const FB_CFG={apiKey:"AIzaSyAzsUSbMQsjMkADnOToZ3fMWEsPgbAOatg",authDomain:"registroocorrencia-94e27.firebaseapp.com",projectId:"registroocorrencia-94e27",storageBucket:"registroocorrencia-94e27.firebasestorage.app",messagingSenderId:"597413327398",appId:"1:597413327398:web:d6a87eaa7872203434ace7"};
+const SY={ref:null,ok:false,fila:{},first:true,adiado:false,err:''};
+const DEV=(()=>{try{let d=localStorage.getItem('peirot_dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('peirot_dev',d)}return d}catch(e){return 'x'}})();
+function syncSt(cls,tx,info){const s=document.getElementById('sync');if(!s)return;s.className=cls;document.getElementById('syncTx').textContent=tx;const i=document.getElementById('syncInfo');if(i&&info!==undefined)i.innerHTML=info}
+// envia campos: {'inst.H2-3':true,'arr.D-100':120,'ed':'...'}; null = apagar o campo
+function sync(campos){Object.assign(SY.fila,campos);if(SY.ok)flush();else if(!SY.err)syncSt('pend','Aguardando conexão…')}
+function flush(){if(!SY.ref)return;const F=firebase.firestore.FieldValue,up={};
+  Object.entries(SY.fila).forEach(([k,v])=>up[k]=v===null?F.delete():v);SY.fila={};
+  up.atualizadoEm=F.serverTimestamp();up.por=DEV;
+  SY.ref.update(up).catch(e=>{
+    if(e&&e.code==='not-found'){const base={};Object.entries(up).forEach(([k,v])=>{if(k.includes('.')){const[a,b]=k.split(/\.(.+)/);(base[a]=base[a]||{})[b]=v}else base[k]=v});return SY.ref.set(base,{merge:true})}
+    throw e}).catch(syncErr)}
+function syncErr(e){const c=(e&&e.code)||String(e);SY.err=c;
+  syncSt('err',c==='permission-denied'?'Sem permissão no Firebase':'Erro de sincronização',
+   c==='permission-denied'?'O Firebase recusou: falta liberar a coleção <b>quebravento</b> nas regras do Firestore. Enquanto isso, o progresso fica salvo só neste aparelho.':'Não foi possível sincronizar ('+c+'). O progresso continua salvo neste aparelho.')}
+function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr'))}
+function aplicaRemoto(d){
+  const inst=d.inst||{},arr=d.arr||{};const ed=d.ed?JSON.parse(d.ed):null;
+  const mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null);
+  ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};
+  if(ed)ST.ed=ed;else delete ST.ed;save();
+  if(ocupado()){SY.adiado=true;return}
+  SY.adiado=false;renderMont();renderArr();
+  if(mudouEd){D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();hist=[];redraw()}else{renderMat();renderPl()}
+}
+function depoisDeOcupado(){if(SY.adiado&&!ocupado()){SY.adiado=false;D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();renderMont();renderArr();redraw()}}
+function iniciarSync(){
+  if(typeof firebase==='undefined'){syncSt('err','Sem sincronização','Abra o app com internet uma vez para ativar a sincronização entre aparelhos.');return}
+  try{firebase.initializeApp(FB_CFG,'quebravento')}catch(e){}
+  const app=firebase.app('quebravento'),db=app.firestore();
+  try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
+  syncSt('pend','Conectando…','Conectando ao Firebase…');
+  const auth=app.auth();
+  (auth.currentUser?Promise.resolve():new Promise(r=>{const u=auth.onAuthStateChanged(x=>{u();r(x)})}).then(u=>u||auth.signInAnonymously()))
+  .then(()=>{SY.ref=db.collection('quebravento').doc('peirot');
+    SY.ref.onSnapshot({includeMetadataChanges:true},snap=>{
+      const d=snap.exists?snap.data():null;
+      if(SY.first){SY.first=false;SY.ok=true;SY.err='';
+        // primeira conexão: junta o que já existe aqui com o que está na nuvem (não perde nada)
+        const loc={};Object.keys(ST.inst||{}).forEach(k=>{if(!(d&&d.inst&&d.inst[k]))loc['inst.'+k]=true});
+        Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
+        if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);
+        Object.assign(SY.fila,loc);if(Object.keys(SY.fila).length)flush();
+        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
+      }else if(d)aplicaRemoto(d);
+      const pend=snap.metadata.hasPendingWrites,cache=snap.metadata.fromCache;
+      if(SY.err)return;
+      if(pend)syncSt('pend','Enviando…','Enviando suas mudanças. Sem internet, elas ficam guardadas e sobem sozinhas quando o sinal voltar.');
+      else if(cache)syncSt('pend','Sem internet','Sem internet agora. O que você marcar fica guardado e sobe sozinho quando o sinal voltar.');
+      else syncSt('ok','Sincronizado','Tudo o que for marcado aqui (montagem, arranque e desenho) aparece sozinho nos outros aparelhos com o app aberto, e vice-versa.'+(d&&d.atualizadoEm?' Última mudança: '+d.atualizadoEm.toDate().toLocaleString('pt-BR')+(d.por===DEV?' (este aparelho).':'.'):''));
+    },syncErr);
+  }).catch(syncErr);
+}
 // ---------- mapa
 const map=L.map('map',{preferCanvas:true});
 const goo=L.tileLayer('https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{subdomains:'0123',maxZoom:21,maxNativeZoom:20,attribution:'Google'}).addTo(map);
@@ -325,7 +390,7 @@ function renderTurnos(){
 }
 document.getElementById('dur').addEventListener('input',renderTurnos);
 // ---------- montagem
-function toggleSeg(id){ST.inst[id]=!ST.inst[id];if(!ST.inst[id])delete ST.inst[id];save();renderMont()}
+function toggleSeg(id){ST.inst[id]=!ST.inst[id];if(!ST.inst[id])delete ST.inst[id];save();sync({['inst.'+id]:ST.inst[id]?true:null});renderMont()}
 function renderMont(){
   const done=G.segs.filter(g=>ST.inst[g.id]);const Lt=G.segs.reduce((a,g)=>a+g.L,0),Ld=done.reduce((a,g)=>a+g.L,0);
   const fit=G.fitas.filter(f=>ST.inst[f.s]).reduce((a,f)=>a+f.L,0);
@@ -342,7 +407,8 @@ function renderArr(){
   const rows=G.enterrado.map((e,k)=>{const key=e.b+'-'+e.dn;const v=Math.min(+ST.arr[key]||0,e.barras);
     return `<tr><td>${e.b.length>1?e.b+' (cacau)':'Bloco '+e.b+' (coco)'}</td><td>DN ${e.dn==150?'160':e.dn}</td><td class="n">${e.barras}</td><td class="n"><input type="number" min="0" max="${e.barras}" id="ar-${key}" data-k="${key}" value="${v||''}" placeholder="0" aria-label="Barras arrancadas ${key}"></td><td class="n" id="rs-${key}">${e.barras-v}</td></tr>`}).join('');
   document.getElementById('tArr').innerHTML=`<tr><th>Local</th><th>Tubo</th><th class="n">Enterradas</th><th class="n">Arrancadas</th><th class="n">Faltam</th></tr>${rows}`;
-  document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('change',()=>{const mx=+i.max;const v=Math.min(mx,Math.max(0,+i.value||0));ST.arr[i.dataset.k]=v;if(+i.value!==v)i.value=v||'';document.getElementById('rs-'+i.dataset.k).textContent=mx-v;save();renderBal();renderPl()}));
+  document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('change',()=>{const mx=+i.max;const v=Math.min(mx,Math.max(0,+i.value||0));ST.arr[i.dataset.k]=v;sync({['arr.'+i.dataset.k]:v||null});if(+i.value!==v)i.value=v||'';document.getElementById('rs-'+i.dataset.k).textContent=mx-v;save();renderBal();renderPl()}));
+  document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50)));
   renderBal();
 }
 function renderBal(){
@@ -357,9 +423,9 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;D=ST.ed||base();hist=[];save();renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;D=ST.ed||base();hist=[];save();sync({inst:{...ST.inst},arr:{...ST.arr},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  ST={inst:{},arr:{},ed:ST.ed};save();renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  ST={inst:{},arr:{},ed:ST.ed};save();sync({inst:{},arr:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(){const t={...G.tot};if(!ST.ed)return t;
@@ -459,27 +525,36 @@ function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs
   return best}
 const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
 function redraw(){drawNet();drawEd();renderMat();renderBal();renderPl();edMsg()}
-function commit(){cleanup();ST.ed=D;save();redraw()}
-function edMsg(){eMsg.innerHTML=DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
-  'Arraste os quadradinhos brancos para mudar os pontos; tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
+function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));save();sync({ed:JSON.stringify(D)});redraw();setTimeout(depoisDeOcupado,50)}
+function edMsg(){eMsg.innerHTML=MV?'<b>Movendo ponto:</b> clique (ou toque) no lugar novo do mapa. Perto de outro ponto ou de uma linha, ele encaixa ali. Para desistir, aperte Esc ou clique de novo no ponto vermelho.':DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
+  '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'||' tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
   (ST.ed?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; a vazão e a perda dos turnos continuam as do projeto original.':'');
   document.getElementById('eUndo').disabled=!hist.length}
 function wireDrag(m,getRefs){let refs=[];
   m.on('dragstart',()=>{map.closePopup();push();refs=getRefs()});
   m.on('drag',()=>{setRefs(refs,fromLL(m.getLatLng()));new Set(refs.filter(r=>r.k=='t').map(r=>r.i)).forEach(i=>tubeP[i]&&tubeP[i].setLatLngs(ll(D.tubos[i].q)))});
   m.on('dragend',()=>{const s=snap(m.getLatLng(),refs),p=s?s.p:fromLL(m.getLatLng());setRefs(refs,p);if(s&&s.seg)insertOn(p);commit()})}
-function drawEd(){lEd.clearLayers();if(!ED)return;
-  D.tubos.forEach((t,i)=>{for(let j=0;j<t.q.length-1;j++){const a=t.q[j],b=t.q[j+1];
+function drawEd(){lEd.clearLayers();if(!ED)return;const zMid=map.getZoom()>=17;
+  D.tubos.forEach((t,i)=>{if(!zMid)return;for(let j=0;j<t.q.length-1;j++){const a=t.q[j],b=t.q[j+1];
     const m=L.marker(LL(mid(a,b)),{draggable:true,icon:L.divIcon({className:'vh mid',iconSize:[13,13]}),title:'Arraste para criar uma curva'}).addTo(lEd);
     wireDrag(m,()=>{t.q.splice(j+1,0,mid(a,b));t.mod=1;return [{k:'t',i,j:j+1}]});m.on('click',()=>{if(DR)drawAdd(m.getLatLng())})}});
   groups().forEach(g=>{const isP=g.refs.some(r=>r.k=='P');
     const m=L.marker(LL(g.p),{draggable:true,icon:L.divIcon({className:'vh'+(isP?' pt':''),iconSize:isP?[22,22]:[16,16]}),zIndexOffset:isP?1000:500}).addTo(lEd);
-    wireDrag(m,()=>g.refs);m.on('click',()=>{if(DR)drawAdd(m.getLatLng());else vertPop(g)})})}
+    if(MV&&MV.k===KY(g.p))L.DomUtil.addClass(m._icon,'sel');
+    wireDrag(m,()=>g.refs);m.on('click',e=>{L.DomEvent.stop(e);if(DR)drawAdd(m.getLatLng());else if(MV){if(MV.k===KY(g.p))moveEnd();else moveTo(m.getLatLng())}else vertPop(g)})})}
+// mover clicando: escolhe o ponto, depois clica onde ele vai ficar (funciona com mouse, touchpad e dedo)
+let MV=null;
+function moveStart(g){MV={refs:g.refs,k:KY(g.p)};map.closePopup();document.body.classList.add('movendo');drawEd();edMsg()}
+function moveTo(at){if(!MV)return;push();const s=snap(at,MV.refs),p=s?s.p:fromLL(at);setRefs(MV.refs,p);if(s&&s.seg)insertOn(p);moveEnd();commit()}
+function moveEnd(){MV=null;document.body.classList.remove('movendo');drawEd();edMsg()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MV)moveEnd()});
+map.on('zoomend',()=>{if(ED)drawEd()});
 function vertPop(g){const d=document.createElement('div');d.className='pop';
   const nm=g.refs.map(r=>r.k=='P'?'Ponto '+(r.i+1):r.k=='r'?'Registro R-'+G.linhas[r.i].id:r.k=='n'?G.nos[r.i].nm:null).filter(Boolean);
   const tr=g.refs.filter(r=>r.k=='t'),meio=tr.filter(r=>r.j>0&&r.j<D.tubos[r.i].q.length-1);
   d.innerHTML=`<b>${nm.length?[...new Set(nm)].join('<br>'):'Ponto da linha'}</b><br>${tr.length} linha(s) passam aqui<br>`;
   const bt=(txt,fn)=>{const b=document.createElement('button');b.textContent=txt;b.onclick=()=>{map.closePopup();push();fn();commit()};d.appendChild(b)};
+  {const b=document.createElement('button');b.textContent='Mover este ponto';b.className='on';b.onclick=()=>moveStart(g);d.appendChild(b);d.appendChild(document.createElement('br'))}
   if(tr.length)bt('Apagar este ponto',()=>tr.slice().sort((a,b)=>b.j-a.j).forEach(r=>D.tubos[r.i].q.splice(r.j,1)));
   if(meio.length)bt('Dividir a linha aqui',()=>meio.slice().sort((a,b)=>b.i-a.i).forEach(r=>{const t=D.tubos[r.i];
     D.tubos.push({...t,q:t.q.slice(r.j),mod:1,L0:null});t.q=t.q.slice(0,r.j+1);t.mod=1}));
@@ -504,9 +579,9 @@ function drPaint(){lDr.clearLayers();L.polyline(ll(DR.q),{color:DC[+document.get
 function drMode(on){DR=on?{q:[]}:null;lDr.clearLayers();if(on)lDr.addTo(map);else lDr.remove();
   ['eFim','eVolta','eCan'].forEach(id=>document.getElementById(id).hidden=!on);['eNova','eUndo','eKml','eOrig','eSair'].forEach(id=>document.getElementById(id).hidden=on);
   map.closePopup();if(on)drPaint();else edMsg()}
-map.on('click',e=>{if(DR)drawAdd(e.latlng)});
+map.on('click',e=>{if(DR)drawAdd(e.latlng);else if(MV)moveTo(e.latlng)});
 document.getElementById('eNova').onclick=()=>drMode(true);
-document.getElementById('eCan').onclick=()=>drMode(false);
+document.getElementById('eCan').onclick=()=>{drMode(false);setTimeout(depoisDeOcupado,50)};
 document.getElementById('eVolta').onclick=()=>{DR.q.pop();drPaint()};
 document.getElementById('eDm').onchange=()=>{if(DR)drPaint()};
 document.getElementById('eFim').onclick=()=>{if(DR.q.length<2)return;push();const q=DR.q;q.forEach(insertOn);
@@ -514,7 +589,7 @@ document.getElementById('eFim').onclick=()=>{if(DR.q.length<2)return;push();cons
 document.getElementById('eUndo').onclick=()=>{if(!hist.length)return;D=JSON.parse(hist.pop());map.closePopup();commit()};
 let orArm=false;document.getElementById('eOrig').onclick=()=>{const b=document.getElementById('eOrig');
   if(!orArm){orArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{orArm=false;b.textContent='Voltar ao original'},4000);return}
-  orArm=false;b.textContent='Voltar ao original';push();D=base();delete ST.ed;save();map.closePopup();redraw()};
+  orArm=false;b.textContent='Voltar ao original';push();D=base();delete ST.ed;save();sync({ed:null});map.closePopup();redraw()};
 document.getElementById('eKml').onclick=()=>{
   const col=h=>{const c=h.slice(1);return 'ff'+c.slice(4,6)+c.slice(2,4)+c.slice(0,2)},esc=x=>String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const pm=D.tubos.map(t=>`<Placemark><name>${esc(`${t.d} · ${DL(t.dm)} mm · ${tLen(t)} m`)}</name><Style><LineStyle><color>${col(DC[t.dm])}</color><width>${W[t.dm]/1.5}</width></LineStyle></Style><LineString><tessellate>1</tessellate><coordinates>${t.q.map(p=>p[0]+','+p[1]+',0').join(' ')}</coordinates></LineString></Placemark>`).join('\n')+
@@ -522,10 +597,11 @@ document.getElementById('eKml').onclick=()=>{
   const x=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Quebra-vento Peirot - tubulação</name>\n${pm}\n</Document></kml>`;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([x],{type:'application/vnd.google-earth.kml+xml'}));a.download=`Peirot_tubulacao_${new Date().toISOString().slice(0,10)}.kml`;document.body.appendChild(a);a.click();a.remove()};
 function edMode(on){ED=on;document.getElementById('edBar').hidden=!on;document.getElementById('bEd').classList.toggle('on',on);
-  document.getElementById('bEd').textContent=on?'Editando…':'Editar desenho';if(!on&&DR)drMode(false);map.closePopup();
+  document.getElementById('bEd').textContent=on?'Editando…':'Editar desenho';if(!on&&DR)drMode(false);if(!on&&MV)moveEnd();if(!on)setTimeout(depoisDeOcupado,50);map.closePopup();
   if(on){showTurno(null);[lTubo,lNos,lReg].forEach(l=>l.addTo(map));lEd.addTo(map)}else lEd.remove();drawNet();drawEd();edMsg()}
 document.getElementById('bEd').onclick=()=>edMode(!ED);
 document.getElementById('eSair').onclick=()=>edMode(false);
+iniciarSync();
 // ---------- PWA (funciona quando publicado em https, ex.: GitHub Pages)
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
