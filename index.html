@@ -89,6 +89,13 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 .plhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 #plBody th{text-transform:none;letter-spacing:0;white-space:normal;font-size:.8rem;line-height:1.2;min-width:58px}
 #plBody td{white-space:nowrap}
+.vh{background:#fff;border:2px solid #111;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.vh.pt{background:#2f80ff;border-color:#fff;border-radius:50%;box-shadow:0 0 0 2px #111}
+.vh.mid{background:#ffe600;border:1.5px solid #111;border-radius:50%;opacity:.7}
+.edbar{display:flex;flex-direction:column;gap:8px;padding:12px 14px}
+.edbar select,.pop select,.pop input[type=text]{font:500 .92rem var(--f-head);padding:6px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
+.pop input[type=text]{width:150px}
+.pop button+button{margin-left:6px}
 </style>
 </head>
 <body>
@@ -98,7 +105,17 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 <div class="mapbar">
   <button id="bGps">Minha posição</button>
   <button id="bAll" class="on">Tudo</button><button data-t="0">Turno 1</button><button data-t="1">Turno 2</button><button data-t="2">Turno 3</button>
+  <button id="bEd">Editar desenho</button>
   <span class="note" id="gpsMsg" style="margin:0"></span>
+</div>
+<div class="card edbar" id="edBar" hidden>
+  <div class="mapbar">
+    <button id="eNova">Nova linha</button>
+    <label for="eDm">Diâmetro</label><select id="eDm"><option value="160">150/160 mm</option><option value="125">125 mm</option><option value="100">100 mm</option><option value="75" selected>75 mm</option><option value="50">PE 50 mm</option></select>
+    <button id="eFim" class="on" hidden>Concluir linha</button><button id="eVolta" hidden>Tirar último ponto</button><button id="eCan" hidden>Cancelar</button>
+    <button id="eUndo">Desfazer</button><button id="eKml">Baixar KML</button><button id="eOrig">Voltar ao original</button><button id="eSair">Sair da edição</button>
+  </div>
+  <p class="note" id="eMsg" style="margin:0"></p>
 </div>
 <div id="map"></div>
 
@@ -209,8 +226,8 @@ const G={"setores":[{"n":1,"c":[-43.0428926,-10.9297258],"H":[[-43.0451473,-10.9
 const fmt=n=>Math.round(n).toLocaleString('pt-BR');
 const f1=(n)=>n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
 const pad=n=>String(n).padStart(2,'0');
-const DC={160:'#b3261e',125:'#f59f00',100:'#4dabf7',75:'#da77f2'};const DL=k=>k==160?'150/160':k;
-const W={160:8,125:6,100:4.5,75:3};
+const DC={160:'#b3261e',125:'#f59f00',100:'#4dabf7',75:'#da77f2',50:'#ffffff'};const DL=k=>k==160?'150/160':k==50?'PE 50':k;
+const W={160:8,125:6,100:4.5,75:3,50:2.5};
 // ---------- estado salvo
 const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
@@ -221,7 +238,7 @@ const map=L.map('map',{preferCanvas:true});
 const goo=L.tileLayer('https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{subdomains:'0123',maxZoom:21,maxNativeZoom:20,attribution:'Google'}).addTo(map);
 const esri=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,attribution:'Esri'});
 const ll=q=>q.map(p=>[p[1],p[0]]);
-const lSet=L.featureGroup(),lLbl=L.layerGroup(),lTubo=L.layerGroup(),lNos=L.layerGroup(),lF1=L.layerGroup(),lF2=L.layerGroup(),lTom=L.layerGroup(),lMon=L.layerGroup(),lReg=L.layerGroup();
+const lSet=L.featureGroup(),lLbl=L.layerGroup(),lTubo=L.layerGroup(),lNos=L.layerGroup(),lF1=L.layerGroup(),lF2=L.layerGroup(),lTom=L.layerGroup(),lMon=L.layerGroup(),lReg=L.layerGroup(),lEd=L.layerGroup();
 const segBy={};G.segs.forEach(g=>segBy[g.id]=g);
 const qvName=g=>`Quebra-vento ${g.id} · ${g.adj.length>1?'entre '+g.adj.map(n=>'S'+pad(n)).join(' e '):'borda externa de S'+pad(g.adj[0])}`;
 G.setores.forEach(s=>{
@@ -230,14 +247,27 @@ G.setores.forEach(s=>{
     return `<div class="pop"><b>Setor S${pad(s.n)} · 7,5 ha</b><br>Quebra-vento em volta:<table>${rows}</table></div>`},{maxHeight:300});
   L.marker([s.c[1],s.c[0]],{icon:L.divIcon({className:'sl',html:'S'+pad(s.n),iconSize:[44,18]}),interactive:false}).addTo(lLbl);
 });
-const tuboL=[],fitaL=[],tomL=[];
-G.tubos.slice().sort((a,b)=>b.dm-a.dm).forEach(t=>{const p=L.polyline(ll(t.q),{color:DC[t.dm],weight:W[t.dm],lineCap:'round'}).bindTooltip(`${DL(t.dm)} mm · ${t.d} · ${t.L} m`,{sticky:true}).addTo(lTubo);p._d=t;tuboL.push(p)});
+const fitaL=[],tomL=[];
 G.fitas.forEach(f=>{const p=L.polyline(ll(f.q),{color:f.r==1?'#2ecc40':'#00e5ff',weight:2.5}).bindTooltip(`${qvName(segBy[f.s])}<br>Fita linha ${f.r} · ${f.de} → ${f.ate} · ${f.L} m<br>Alimentada pela linha ${G.linhas[f.ln].id}`,{sticky:true}).addTo(f.r==1?lF1:lF2);p._d=f;fitaL.push(p)});
 G.tom.forEach(t=>{const p=L.polyline(ll(t.q),{color:'#ffffff',weight:1.5,dashArray:'3 3'}).bindTooltip(`Tomada ${t.s} · ${t.f} · linha ${G.linhas[t.ln].id}`,{sticky:true}).addTo(lTom);p._d=t;tomL.push(p)});
 const NC={tee:'#ff3b30',curva:'#ff3b30',red:'#ffe600',fim:'#ff4dff',saida:'#2f80ff'};
-G.nos.filter(n=>n.t!=='tee'&&!(n.t==='curva'&&n.nm.includes('registro'))).forEach(n=>L.circleMarker([n.p[1],n.p[0]],{radius:n.t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[n.t],fillOpacity:1}).bindTooltip(n.nm).addTo(lNos));
-G.linhas.forEach(l=>L.marker([l.reg[1],l.reg[0]],{icon:L.divIcon({className:'rg',html:'R-'+l.id,iconSize:[38,18]})}).bindTooltip(`Registro da linha ${l.id} · ${f1(l.Q)} m³/h · Ponto ${l.ponto[1]}`).addTo(lReg));
-G.P.forEach((p,i)=>L.marker([p[1],p[0]],{icon:L.divIcon({className:'sl',html:'Ponto '+(i+1),iconSize:[70,18],iconAnchor:[-10,9]}),interactive:false}).addTo(lNos));
+// ---------- desenho editável (tubulação, conexões, registros e pontos)
+const LL=p=>[p[1],p[0]],fromLL=l=>[+l.lng.toFixed(7),+l.lat.toFixed(7)];
+const base=()=>({tubos:G.tubos.map(t=>({o:t.o,d:t.d,dm:t.dm,q:t.q.map(p=>p.slice()),ln:t.ln,L0:t.L})),nos:G.nos.map(n=>n.p.slice()),reg:G.linhas.map(l=>l.reg.slice()),P:G.P.map(p=>p.slice())});
+let D=ST.ed||base();
+const hav=q=>{let s=0;for(let k=1;k<q.length;k++){const a=q[k-1],b=q[k],r=Math.PI/180;s+=6371008.8*Math.hypot((b[0]-a[0])*r*Math.cos((a[1]+b[1])/2*r),(b[1]-a[1])*r)}return s};
+const tLen=t=>t.mod||t.L0==null?Math.round(hav(t.q)):t.L0;
+let tuboL=[],tubeP=[];
+function drawNet(){
+  lTubo.clearLayers();lNos.clearLayers();lReg.clearLayers();tuboL=[];tubeP=[];
+  D.tubos.map((t,i)=>[t,i]).sort((a,b)=>b[0].dm-a[0].dm).forEach(([t,i])=>{
+    const p=L.polyline(ll(t.q),{color:DC[t.dm],weight:W[t.dm],lineCap:'round'}).bindTooltip(()=>`${DL(t.dm)} mm · ${t.d} · ${tLen(t)} m`,{sticky:true}).addTo(lTubo);
+    p._d=t;p.on('click',e=>{if(!ED)return;L.DomEvent.stop(e);if(DR)drawAdd(e.latlng);else tubePop(i,e.latlng)});tuboL.push(p);tubeP[i]=p});
+  G.nos.forEach((n,i)=>{if(n.t==='tee'||(n.t==='curva'&&n.nm.includes('registro')))return;L.circleMarker(LL(D.nos[i]),{radius:n.t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[n.t],fillOpacity:1,interactive:!ED}).bindTooltip(n.nm).addTo(lNos)});
+  G.linhas.forEach((l,i)=>L.marker(LL(D.reg[i]),{icon:L.divIcon({className:'rg',html:'R-'+l.id,iconSize:[38,18]}),interactive:!ED}).bindTooltip(`Registro da linha ${l.id} · ${f1(l.Q)} m³/h · Ponto ${l.ponto[1]}`).addTo(lReg));
+  D.P.forEach((p,i)=>L.marker(LL(p),{icon:L.divIcon({className:'sl',html:'Ponto '+(i+1),iconSize:[70,18],iconAnchor:[-10,9]}),interactive:false}).addTo(lNos));
+  if(curT!==null)showTurno(curT);
+}
 const monL={};
 G.segs.forEach(g=>{
   const p=L.polyline(ll(g.q),{weight:9,opacity:.75,color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'}).addTo(lMon);
@@ -248,13 +278,14 @@ G.segs.forEach(g=>{
 L.control.layers({'Satélite Google':goo,'Satélite Esri':esri},{'Setores 7,5 ha':lSet,'Nomes':lLbl,'Tubulação':lTubo,'Registros':lReg,'Fita linha 1':lF1,'Fita linha 2':lF2,'Tomadas':lTom,'Conexões':lNos,'Montagem (toque p/ marcar)':lMon},{collapsed:window.innerWidth<800}).addTo(map);
 const lg=L.control({position:'bottomleft'});
 lg.onAdd=()=>{const d=L.DomUtil.create('div','legend'+(window.innerWidth<700?' fechada':''));L.DomEvent.disableClickPropagation(d);d.innerHTML='<button type="button" aria-label="Mostrar ou esconder a legenda">Legenda ▾</button><div class="itens">'+
- Object.keys(DC).sort((a,b)=>b-a).map(k=>`<div><i style="height:${W[k]-1}px;background:${DC[k]}"></i>${DL(k)} mm</div>`).join('')+
+ Object.keys(DC).filter(k=>k!=50).sort((a,b)=>b-a).map(k=>`<div><i style="height:${W[k]-1}px;background:${DC[k]}"></i>${DL(k)} mm</div>`).join('')+
  `<div><i style="height:3px;background:#2ecc40"></i>Fita linha 1</div><div><i style="height:3px;background:#00e5ff"></i>Fita linha 2</div><div><i style="border-top:2px dashed #fff"></i>Tomada</div><div><i style="height:12px;background:#ff3b30;border:2px solid #111"></i>Registro de linha</div></div>`;d.querySelector('button').onclick=()=>d.classList.toggle('fechada');return d};
 lg.addTo(map);
+let curT=null,ED=false,DR=null;drawNet();
 const home=L.featureGroup([lSet,...lTubo.getLayers()]).getBounds().pad(0.05);map.fitBounds(home);
 // ---------- turnos no mapa
 const ownerLines=o=>G.linhas.map((l,i)=>l.ponto==o?i:-1).filter(i=>i>=0);
-function showTurno(ti){
+function showTurno(ti){curT=ti;
   document.querySelectorAll('.mapbar button[data-t],#bAll').forEach(b=>b.classList.remove('on'));
   if(ti===null){document.getElementById('bAll').classList.add('on');
     tuboL.forEach(p=>p.setStyle({opacity:1}));fitaL.forEach(p=>p.setStyle({opacity:1}));tomL.forEach(p=>p.setStyle({opacity:1}));return}
@@ -318,7 +349,7 @@ function renderBal(){
   let h='<tr><th>Tubo</th><th class="n">Solto</th><th class="n">Arrancado</th><th class="n">Temos</th><th class="n">Precisa</th><th class="n">Ainda enterrado</th><th>Situação</th></tr>';
   DNS.forEach(dn=>{const solto=G.solto[dn]||0;const ent=G.enterrado.filter(e=>String(e.dn)==dn);
     const arr=ent.reduce((a,e)=>a+Math.min(+ST.arr[e.b+'-'+e.dn]||0,e.barras),0);const rest=ent.reduce((a,e)=>a+e.barras,0)-arr;
-    const temos=solto+arr,prec=G.precisa[dn];const d=temos-prec;
+    const temos=solto+arr,prec=curPrec()[dn];const d=temos-prec;
     const sit=d>=0?`<span class="pill ok">Completo</span>`:(d+rest>=0?`<span class="pill warn">Faltam ${-d}: arrancar</span>`:`<span class="pill bad">Faltam ${-d}: comprar ${-(d+rest)}</span>`);
     h+=`<tr><td>DN ${dn=='150'?'150/160':dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
   document.getElementById('tBal').innerHTML=h;
@@ -326,15 +357,22 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;save();renderMont();renderArr();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;D=ST.ed||base();hist=[];save();renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  ST={inst:{},arr:{}};save();renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  ST={inst:{},arr:{},ed:ST.ed};save();renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
-const tot=G.tot,ttot=Object.values(tot).reduce((a,b)=>a+b,0);
+// metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
+function curTot(){const t={...G.tot};if(!ST.ed)return t;
+  G.tubos.forEach(x=>t[x.dm]-=x.L);D.tubos.forEach(x=>t[x.dm]=(t[x.dm]||0)+tLen(x));
+  Object.keys(t).forEach(k=>{t[k]=Math.round(t[k]);if(t[k]<=0)delete t[k]});return t}
+function curPrec(){if(!ST.ed)return G.precisa;const t=curTot(),b=k=>Math.ceil((t[k]||0)/6);return {75:b(75),100:b(100),125:b(125),150:b(160)}}
+function renderMat(){const tot=curTot(),ttot=Object.values(tot).reduce((a,b)=>a+b,0);
 document.getElementById('kTubo').textContent=fmt(ttot)+' m';document.getElementById('kFita').textContent=fmt(G.L1+G.L2)+' m';document.getElementById('kTom').textContent=G.tom.length;
-const tt=document.getElementById('tTubo');let nt=0;
+const tt=document.getElementById('tTubo');tt.innerHTML='<tr><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th></tr>';let nt=0;
 Object.keys(tot).sort((a,b)=>b-a).forEach(k=>{const n=Math.ceil(tot[k]/6);nt+=n;tt.insertAdjacentHTML('beforeend',`<tr><td><span class="sw" style="background:${DC[k]}"></span>${DL(k)} mm</td><td class="n">${fmt(tot[k])} m</td><td class="n">${n}</td></tr>`)});
 tt.insertAdjacentHTML('beforeend',`<tr class="tot"><td>Total</td><td class="n">${fmt(ttot)} m</td><td class="n">${nt}</td></tr>`);
+}
+renderMat();
 const maxF=Math.max(...G.fitas.map(f=>f.L)),minF=Math.min(...G.fitas.map(f=>f.L));
 document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="background:#2ecc40"></span>Linha 1</td><td class="n">${fmt(G.L1)} m</td></tr><tr><td><span class="sw" style="background:#00e5ff"></span>Linha 2 (a 2,5 m da linha 1)</td><td class="n">${fmt(G.L2)} m</td></tr>
 <tr><td>Trechos de quebra-vento</td><td class="n">${G.segs.length}</td></tr><tr><td>Fitas</td><td class="n">${G.fitas.length}</td></tr><tr><td>Comprimento de cada fita</td><td class="n">${minF}–${maxF} m</td></tr>
@@ -353,7 +391,7 @@ function plData(p){
       const sm=PL.solto.filter(r=>String(r[0])==dn).reduce((a,r)=>a+r[2],0);
       const em=dn=='150'?PL.cacau.reduce((a,r)=>a+r[2],0):PL.coco.filter(r=>String(r[2])==dn).reduce((a,r)=>a+r[3]+r[4],0);
       const sb=Math.floor(sm/6),eb=G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0);
-      const pm=G.tot[dn=='150'?'160':dn],pb=G.precisa[dn];
+      const pm=curTot()[dn=='150'?'160':dn]||0,pb=curPrec()[dn];
       const ar=G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+arrB(e.b,e.dn),0);
       return ['DN '+lab,sm,sb,em,eb,sm+em,sb+eb,pm,pb,ar,sb+eb-pb]});
     const T=['TOTAL'];for(let i=1;i<H.length;i++)T.push(rows.reduce((a,r)=>a+r[i],0));rows.push(T);
@@ -392,6 +430,102 @@ document.getElementById('bXls').onclick=()=>{
   document.getElementById('plNote').textContent='Planilha exportada.';
 };
 renderTurnos();renderMont();renderArr();renderPl();
+// ---------- edição do desenho
+let hist=[];
+const eMsg=document.getElementById('eMsg');
+const mid=(a,b)=>[+((a[0]+b[0])/2).toFixed(7),+((a[1]+b[1])/2).toFixed(7)];
+const KY=p=>p[0].toFixed(7)+','+p[1].toFixed(7);
+const rk=r=>r.k=='t'?r.i+':'+r.j:r.k+r.i;
+function groups(){const m=new Map();const add=(p,r)=>{const k=KY(p);if(!m.has(k))m.set(k,{p,refs:[]});m.get(k).refs.push(r)};
+  D.tubos.forEach((t,i)=>t.q.forEach((p,j)=>add(p,{k:'t',i,j})));
+  D.nos.forEach((p,i)=>add(p,{k:'n',i}));D.reg.forEach((p,i)=>add(p,{k:'r',i}));D.P.forEach((p,i)=>add(p,{k:'P',i}));
+  return [...m.values()]}
+function setRefs(refs,p){refs.forEach(r=>{if(r.k=='t'){D.tubos[r.i].q[r.j]=p.slice();D.tubos[r.i].mod=1}else (r.k=='n'?D.nos:r.k=='r'?D.reg:D.P)[r.i]=p.slice()})}
+// distância em metros de p ao segmento a-b
+function dSeg(p,a,b){const c=Math.cos(p[1]*Math.PI/180)*111320,y=110540;
+  const ax=(a[0]-p[0])*c,ay=(a[1]-p[1])*y,bx=(b[0]-p[0])*c,by=(b[1]-p[1])*y,dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;
+  const t=l?Math.max(0,Math.min(1,-(ax*dx+ay*dy)/l)):0;return Math.hypot(ax+t*dx,ay+t*dy)}
+// p caiu no meio de uma linha: vira ponto dessa linha (junção)
+function insertOn(p){const k=KY(p);D.tubos.forEach(t=>{if(t.q.some(x=>KY(x)==k))return;
+  for(let j=0;j<t.q.length-1;j++)if(dSeg(p,t.q[j],t.q[j+1])<0.5){t.q.splice(j+1,0,p.slice());t.mod=1;return}})}
+function cleanup(){D.tubos.forEach(t=>{t.q=t.q.filter((p,j)=>!j||KY(p)!=KY(t.q[j-1]))});D.tubos=D.tubos.filter(t=>t.q.length>1)}
+// encaixe: ponto existente (até 20 px) ou meio de uma linha (até 14 px)
+function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs||[]).map(rk));let best=null,bd=20;
+  groups().forEach(g=>{if(g.refs.some(r=>own.has(rk(r))))return;const d=pt.distanceTo(map.latLngToContainerPoint(LL(g.p)));if(d<bd){bd=d;best={p:g.p.slice()}}});
+  if(best)return best;bd=14;
+  D.tubos.forEach((t,i)=>{for(let j=0;j<t.q.length-1;j++){if(own.has(i+':'+j)||own.has(i+':'+(j+1)))continue;
+    const a=map.latLngToContainerPoint(LL(t.q[j])),b=map.latLngToContainerPoint(LL(t.q[j+1])),c=L.LineUtil.closestPointOnSegment(pt,a,b),d=pt.distanceTo(c);
+    if(d<bd){bd=d;best={p:fromLL(map.containerPointToLatLng(c)),seg:1}}}});
+  return best}
+const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
+function redraw(){drawNet();drawEd();renderMat();renderBal();renderPl();edMsg()}
+function commit(){cleanup();ST.ed=D;save();redraw()}
+function edMsg(){eMsg.innerHTML=DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
+  'Arraste os quadradinhos brancos para mudar os pontos; tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
+  (ST.ed?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; a vazão e a perda dos turnos continuam as do projeto original.':'');
+  document.getElementById('eUndo').disabled=!hist.length}
+function wireDrag(m,getRefs){let refs=[];
+  m.on('dragstart',()=>{map.closePopup();push();refs=getRefs()});
+  m.on('drag',()=>{setRefs(refs,fromLL(m.getLatLng()));new Set(refs.filter(r=>r.k=='t').map(r=>r.i)).forEach(i=>tubeP[i]&&tubeP[i].setLatLngs(ll(D.tubos[i].q)))});
+  m.on('dragend',()=>{const s=snap(m.getLatLng(),refs),p=s?s.p:fromLL(m.getLatLng());setRefs(refs,p);if(s&&s.seg)insertOn(p);commit()})}
+function drawEd(){lEd.clearLayers();if(!ED)return;
+  D.tubos.forEach((t,i)=>{for(let j=0;j<t.q.length-1;j++){const a=t.q[j],b=t.q[j+1];
+    const m=L.marker(LL(mid(a,b)),{draggable:true,icon:L.divIcon({className:'vh mid',iconSize:[13,13]}),title:'Arraste para criar uma curva'}).addTo(lEd);
+    wireDrag(m,()=>{t.q.splice(j+1,0,mid(a,b));t.mod=1;return [{k:'t',i,j:j+1}]});m.on('click',()=>{if(DR)drawAdd(m.getLatLng())})}});
+  groups().forEach(g=>{const isP=g.refs.some(r=>r.k=='P');
+    const m=L.marker(LL(g.p),{draggable:true,icon:L.divIcon({className:'vh'+(isP?' pt':''),iconSize:isP?[22,22]:[16,16]}),zIndexOffset:isP?1000:500}).addTo(lEd);
+    wireDrag(m,()=>g.refs);m.on('click',()=>{if(DR)drawAdd(m.getLatLng());else vertPop(g)})})}
+function vertPop(g){const d=document.createElement('div');d.className='pop';
+  const nm=g.refs.map(r=>r.k=='P'?'Ponto '+(r.i+1):r.k=='r'?'Registro R-'+G.linhas[r.i].id:r.k=='n'?G.nos[r.i].nm:null).filter(Boolean);
+  const tr=g.refs.filter(r=>r.k=='t'),meio=tr.filter(r=>r.j>0&&r.j<D.tubos[r.i].q.length-1);
+  d.innerHTML=`<b>${nm.length?[...new Set(nm)].join('<br>'):'Ponto da linha'}</b><br>${tr.length} linha(s) passam aqui<br>`;
+  const bt=(txt,fn)=>{const b=document.createElement('button');b.textContent=txt;b.onclick=()=>{map.closePopup();push();fn();commit()};d.appendChild(b)};
+  if(tr.length)bt('Apagar este ponto',()=>tr.slice().sort((a,b)=>b.j-a.j).forEach(r=>D.tubos[r.i].q.splice(r.j,1)));
+  if(meio.length)bt('Dividir a linha aqui',()=>meio.slice().sort((a,b)=>b.i-a.i).forEach(r=>{const t=D.tubos[r.i];
+    D.tubos.push({...t,q:t.q.slice(r.j),mod:1,L0:null});t.q=t.q.slice(0,r.j+1);t.mod=1}));
+  L.popup().setLatLng(LL(g.p)).setContent(d).openOn(map)}
+function tubePop(i,at){const t=D.tubos[i];const d=document.createElement('div');d.className='pop';
+  const dms=[160,125,100,75,50].map(k=>`<option value="${k}"${k==t.dm?' selected':''}>${DL(k)} mm</option>`).join('');
+  const os=[['','—'],['P1','Ponto 1'],['P2','Ponto 2']].map(([v,n])=>`<option value="${v}"${(t.o||'')==v?' selected':''}>${n}</option>`).join('');
+  d.innerHTML=`<b>Editar linha</b><table><tr><td>Nome</td><td><input type="text" data-f="d"></td></tr><tr><td>Diâmetro</td><td><select data-f="dm">${dms}</select></td></tr>
+   <tr><td>Sai do</td><td><select data-f="o">${os}</select></td></tr><tr><td>Comprimento</td><td>${tLen(t)} m · ${Math.ceil(tLen(t)/6)} barras</td></tr></table>`;
+  const nmI=d.querySelector('[data-f=d]');nmI.value=t.d;
+  nmI.onchange=()=>{push();t.d=nmI.value.trim()||t.d;commit()};
+  d.querySelector('[data-f=dm]').onchange=e=>{push();t.dm=+e.target.value;commit()};
+  d.querySelector('[data-f=o]').onchange=e=>{push();t.o=e.target.value||null;commit()};
+  const b=document.createElement('button');b.textContent='Apagar esta linha';b.onclick=()=>{map.closePopup();push();D.tubos.splice(i,1);commit()};d.appendChild(b);
+  L.popup().setLatLng(at).setContent(d).openOn(map)}
+// linha nova
+const lDr=L.layerGroup();
+function drawAdd(at){const s=snap(at);const p=s?s.p:fromLL(at);if(DR.q.length&&KY(DR.q[DR.q.length-1])==KY(p))return;DR.q.push(p);drPaint()}
+function drPaint(){lDr.clearLayers();L.polyline(ll(DR.q),{color:DC[+document.getElementById('eDm').value],weight:4,dashArray:'8 6'}).addTo(lDr);
+  DR.q.forEach(p=>L.circleMarker(LL(p),{radius:6,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(lDr));
+  document.getElementById('eFim').disabled=DR.q.length<2;document.getElementById('eVolta').disabled=!DR.q.length;edMsg()}
+function drMode(on){DR=on?{q:[]}:null;lDr.clearLayers();if(on)lDr.addTo(map);else lDr.remove();
+  ['eFim','eVolta','eCan'].forEach(id=>document.getElementById(id).hidden=!on);['eNova','eUndo','eKml','eOrig','eSair'].forEach(id=>document.getElementById(id).hidden=on);
+  map.closePopup();if(on)drPaint();else edMsg()}
+map.on('click',e=>{if(DR)drawAdd(e.latlng)});
+document.getElementById('eNova').onclick=()=>drMode(true);
+document.getElementById('eCan').onclick=()=>drMode(false);
+document.getElementById('eVolta').onclick=()=>{DR.q.pop();drPaint()};
+document.getElementById('eDm').onchange=()=>{if(DR)drPaint()};
+document.getElementById('eFim').onclick=()=>{if(DR.q.length<2)return;push();const q=DR.q;q.forEach(insertOn);
+  D.tubos.push({o:null,d:'Linha nova '+(D.tubos.filter(t=>t.L0==null).length+1),dm:+document.getElementById('eDm').value,q,ln:null,mod:1,L0:null});drMode(false);commit()};
+document.getElementById('eUndo').onclick=()=>{if(!hist.length)return;D=JSON.parse(hist.pop());map.closePopup();commit()};
+let orArm=false;document.getElementById('eOrig').onclick=()=>{const b=document.getElementById('eOrig');
+  if(!orArm){orArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{orArm=false;b.textContent='Voltar ao original'},4000);return}
+  orArm=false;b.textContent='Voltar ao original';push();D=base();delete ST.ed;save();map.closePopup();redraw()};
+document.getElementById('eKml').onclick=()=>{
+  const col=h=>{const c=h.slice(1);return 'ff'+c.slice(4,6)+c.slice(2,4)+c.slice(0,2)},esc=x=>String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const pm=D.tubos.map(t=>`<Placemark><name>${esc(`${t.d} · ${DL(t.dm)} mm · ${tLen(t)} m`)}</name><Style><LineStyle><color>${col(DC[t.dm])}</color><width>${W[t.dm]/1.5}</width></LineStyle></Style><LineString><tessellate>1</tessellate><coordinates>${t.q.map(p=>p[0]+','+p[1]+',0').join(' ')}</coordinates></LineString></Placemark>`).join('\n')+
+    D.P.map((p,i)=>`<Placemark><name>Ponto ${i+1}</name><Point><coordinates>${p[0]},${p[1]},0</coordinates></Point></Placemark>`).join('\n');
+  const x=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Quebra-vento Peirot - tubulação</name>\n${pm}\n</Document></kml>`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([x],{type:'application/vnd.google-earth.kml+xml'}));a.download=`Peirot_tubulacao_${new Date().toISOString().slice(0,10)}.kml`;document.body.appendChild(a);a.click();a.remove()};
+function edMode(on){ED=on;document.getElementById('edBar').hidden=!on;document.getElementById('bEd').classList.toggle('on',on);
+  document.getElementById('bEd').textContent=on?'Editando…':'Editar desenho';if(!on&&DR)drMode(false);map.closePopup();
+  if(on){showTurno(null);[lTubo,lNos,lReg].forEach(l=>l.addTo(map));lEd.addTo(map)}else lEd.remove();drawNet();drawEd();edMsg()}
+document.getElementById('bEd').onclick=()=>edMode(!ED);
+document.getElementById('eSair').onclick=()=>edMode(false);
 // ---------- PWA (funciona quando publicado em https, ex.: GitHub Pages)
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 </script>
