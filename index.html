@@ -77,6 +77,9 @@ tr.tot td{font-weight:700;border-bottom:none}
 .segs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:10px}
 .segs label{display:flex;gap:8px;align-items:center;font-size:.9rem;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;cursor:pointer}
 .segs label.done{background:var(--okbg);border-color:var(--ok)}
+.chk tr.done td{background:var(--okbg)}
+.chk input[type=checkbox]{width:20px;height:20px}
+.chk button{padding:4px 8px;font-size:.85rem}
 input[type=number]{width:74px;font:500 .95rem var(--f-num);padding:5px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink);text-align:right}
 input[type=number]:focus-visible{outline:3px solid var(--f1)}
 textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:8px}
@@ -109,7 +112,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot</b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot</b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -142,10 +145,21 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 
 <section class="card" id="montagem">
   <h2>Montagem do quebra-vento</h2>
+  <h3>Passo 1 · Eucalipto, fitas e tomadas</h3>
   <div class="big"><div><b id="mPct">0%</b><span>montado</span></div><div><b id="mSeg">0/49</b><span>trechos</span></div><div><b id="mFita">0 m</b><span>fita instalada</span></div></div>
   <div class="bar" style="margin-top:10px"><i id="mBar"></i></div>
   <p class="note">Marque cada trecho quando o eucalipto, as duas fitas e as tomadas estiverem instalados. Também dá para marcar tocando no trecho no mapa (camada Montagem).</p>
   <div class="segs" id="segList"></div>
+  <h3 id="passo2" style="margin-top:24px">Passo 2 · Tubulação</h3>
+  <div class="big"><div><b id="tPct">0%</b><span>montado</span></div><div><b id="tSeg">0/0</b><span>trechos de tubo</span></div><div><b id="tMet">0 m</b><span>tubo instalado</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="tBar"></i></div>
+  <p class="note">Marque cada trecho de tubo quando estiver no lugar, emendado e com os furos tampados. Se o desenho for editado, a lista acompanha o desenho novo.</p>
+  <div class="tbl chk"><table id="tubList"></table></div>
+  <h3 id="conexoes" style="margin-top:24px">Passo 3 · Conexões</h3>
+  <div class="big"><div><b id="cPct">0%</b><span>instalado</span></div><div><b id="cSeg">0/0</b><span>conexões</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="cBar"></i></div>
+  <p class="note">Lista de todas as conexões da tubulação, uma por linha, com o lugar de cada uma. Marque quando estiver instalada e sem vazamento. As tomadas e os conectores de início e final de fita entram no passo 1, junto com cada trecho.</p>
+  <div class="tbl chk"><table id="conList"></table></div>
 </section>
 
 <section class="card" id="arranque">
@@ -164,6 +178,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
     <button role="tab" data-p="cacau" aria-selected="false">Enterrado cacau</button>
     <button role="tab" data-p="solto" aria-selected="false">Estoque solto</button>
     <button role="tab" data-p="uso" aria-selected="false">Uso no projeto</button>
+    <button role="tab" data-p="conexoes" aria-selected="false">Conexões</button>
   </div>
   <div class="tbl"><table id="plBody"></table></div>
   <p class="note" id="plNote"></p>
@@ -243,6 +258,7 @@ const W={160:8,125:6,100:4.5,75:3,50:2.5};
 const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.inst)ST=s}catch(e){}
+ST.tub=ST.tub||{};ST.con=ST.con||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 // ---------- sincronização entre aparelhos (Firebase / Firestore do projeto registroocorrencia)
 // Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
@@ -264,9 +280,10 @@ function syncErr(e){const c=(e&&e.code)||String(e);SY.err=c;
    c==='permission-denied'?'O Firebase recusou: falta liberar a coleção <b>quebravento</b> nas regras do Firestore. Enquanto isso, o progresso fica salvo só neste aparelho.':'Não foi possível sincronizar ('+c+'). O progresso continua salvo neste aparelho.')}
 function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr'))}
 function aplicaRemoto(d){
-  const inst=d.inst||{},arr=d.arr||{};const ed=d.ed?JSON.parse(d.ed):null;
+  const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};const ed=d.ed?JSON.parse(d.ed):null;
   const mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null);
   ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};
+  ST.tub={};Object.keys(tub).forEach(k=>{if(tub[k])ST.tub[k]=true});ST.con={};Object.keys(con).forEach(k=>{if(con[k])ST.con[k]=true});
   if(ed)ST.ed=ed;else delete ST.ed;save();
   if(ocupado()){SY.adiado=true;return}
   SY.adiado=false;renderMont();renderArr();
@@ -286,11 +303,11 @@ function iniciarSync(){
       const d=snap.exists?snap.data():null;
       if(SY.first){SY.first=false;SY.ok=true;SY.err='';
         // primeira conexão: junta o que já existe aqui com o que está na nuvem (não perde nada)
-        const loc={};Object.keys(ST.inst||{}).forEach(k=>{if(!(d&&d.inst&&d.inst[k]))loc['inst.'+k]=true});
+        const loc={};['inst','tub','con'].forEach(c=>Object.keys(ST[c]||{}).forEach(k=>{if(!(d&&d[c]&&d[c][k]))loc[c+'.'+k]=true}));
         Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
         if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);
         Object.assign(SY.fila,loc);if(Object.keys(SY.fila).length)flush();
-        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
+        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
       }else if(d)aplicaRemoto(d);
       const pend=snap.metadata.hasPendingWrites,cache=snap.metadata.fromCache;
       if(SY.err)return;
@@ -411,20 +428,26 @@ function hidrDesenho(){if(!ST.ed)return null;
   const t=G.turnos.map((tu,ti)=>{const r=hidr(D,tu.idx);Object.keys(r.per).forEach(l=>{const b=HB.t[ti].per[l];if(b&&tu.perda[l])r.per[l]*=tu.perda[l]/b});return r});
   const j=hidr(D,[0,1,2,3,4]);j.perda=mx(j.per)*(G.junto.perda/mx(HB.j.per));
   HK=k;return HV={t,j}}
-// ---------- conexões contadas no desenho
-function conexoes(){if(!ST.ed)return G.cnt;
+// ---------- conexões do desenho, uma a uma (sem edição, a contagem bate com o projeto)
+const SK=x=>String(x).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9-]+/g,'_');
+function conLista(){
   const N=new Map(),nd=p=>{const k=KY(p);if(!N.has(k))N.set(k,{p,e:[]});return N.get(k)};
-  D.tubos.forEach(t=>t.q.forEach((p,j)=>{const n=nd(p);if(j>0)n.e.push({dm:t.dm,to:t.q[j-1]});if(j<t.q.length-1)n.e.push({dm:t.dm,to:t.q[j+1]})}));
-  const isP=new Set(D.P.filter((p,i)=>!(D.Poff&&D.Poff[i])).map(KY)),isR=new Set(D.reg.map(KY)),c={},add=k=>c[k]=(c[k]||0)+1;
+  D.tubos.forEach(t=>t.q.forEach((p,j)=>{const n=nd(p);if(j>0)n.e.push({dm:t.dm,d:t.d,to:t.q[j-1]});if(j<t.q.length-1)n.e.push({dm:t.dm,d:t.d,to:t.q[j+1]})}));
+  const isP=new Set(D.P.filter((p,i)=>!(D.Poff&&D.Poff[i])).map(KY)),isR=new Set(D.reg.map(KY)),out=[];
   const curva=(n,a,b)=>{const cs=Math.cos(n.p[1]*Math.PI/180),v=x=>[(x[0]-n.p[0])*cs,x[1]-n.p[1]],A=v(a),B=v(b);
     return 180-Math.acos(Math.max(-1,Math.min(1,(A[0]*B[0]+A[1]*B[1])/(Math.hypot(...A)*Math.hypot(...B)||1))))*180/Math.PI>20};
-  N.forEach((n,k)=>{const d=n.e.length,r=isR.has(k);
+  N.forEach((n,k)=>{const d=n.e.length,r=isR.has(k),mx=Math.max(...n.e.map(e=>e.dm)),onde=[...new Set(n.e.map(e=>e.d))].join(' / ');let sq=0;
+    const add=(nm,dm)=>out.push({k:SK(k)+'_'+(sq++),nm,dm:dm||DL(mx)+' mm',p:n.p,onde});
     if(isP.has(k)){add('Saída do sistema existente + registro');return}
     if(d==1){add('Final de linha (tampão p/ lavagem)');if(r)add('Registro de linha');return}
-    const mx=Math.max(...n.e.map(e=>e.dm));n.e.filter(e=>e.dm<mx).forEach(e=>add(`Redução ${mx}→${e.dm} mm`));
+    n.e.filter(e=>e.dm<mx).forEach(e=>add(`Redução ${mx}→${e.dm} mm`,`${DL(mx)} → ${DL(e.dm)} mm`));
     if(d==2){if(curva(n,n.e[0].to,n.e[1].to))add(r?'Curva + registro':'Curva');else if(r)add('Registro de linha')}
     else add((d==3?'Tê':'Cruzeta')+(r?' + registro':''))});
-  return c}
+  const ord=x=>x.startsWith('Saída')?0:x.includes('registro')||x.startsWith('Registro')?1:x.startsWith('Tê')||x.startsWith('Cruzeta')?2:x.startsWith('Curva')?3:x.startsWith('Redução')?4:5;
+  return out.sort((a,b)=>a.onde.localeCompare(b.onde,'pt-BR',{numeric:true})||ord(a.nm)-ord(b.nm)||a.nm.localeCompare(b.nm))}
+function conexoes(){if(!ST.ed)return G.cnt;const c={};conLista().forEach(x=>c[x.nm]=(c[x.nm]||0)+1);return c}
+// trechos de tubo do desenho, com chave fixa pelo nome, ponto e diâmetro
+function tubLista(){const vis={};return D.tubos.map((t,i)=>{const b=SK(`${t.o||'N'}_${t.d}_${t.dm}`);vis[b]=(vis[b]||0)+1;return {k:b+(vis[b]>1?'_'+vis[b]:''),t,i,L:tLen(t)}})}
 function renderTurnos(){const H=hidrDesenho();
   const min=Math.max(5,+document.getElementById('dur').value||60);const h=min/60;
   document.getElementById('durMsg').textContent=`${f1(10*h)} L por planta por turno · ${fmt(min*G.turnos.length)} min de rega por dia`;
@@ -446,6 +469,26 @@ function renderTurnos(){const H=hidrDesenho();
 }
 document.getElementById('dur').addEventListener('input',renderTurnos);
 // ---------- montagem
+function toggleChk(c,k){ST[c][k]=!ST[c][k];if(!ST[c][k])delete ST[c][k];save();sync({[c+'.'+k]:ST[c][k]?true:null});renderMont();if(plCur==='conexoes')renderPl()}
+function verNoMapa(ll,txt){const el=document.getElementById('map');el.scrollIntoView({behavior:'smooth',block:'start'});
+  if(Array.isArray(ll[0]))map.fitBounds(L.latLngBounds(ll),{maxZoom:19,padding:[30,30]});else map.setView(ll,19);
+  L.popup().setLatLng(Array.isArray(ll[0])?ll[Math.floor(ll.length/2)]:ll).setContent(`<div class="pop">${txt}</div>`).openOn(map)}
+function renderPassos(){
+  const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),td=tl.filter(x=>ST.tub[x.k]),Ld=td.reduce((a,x)=>a+x.L,0),pt=Lt?100*Ld/Lt:0;
+  document.getElementById('tPct').textContent=Math.round(pt)+'%';document.getElementById('tSeg').textContent=`${td.length}/${tl.length}`;
+  document.getElementById('tMet').textContent=fmt(Ld)+' m';document.getElementById('tBar').style.width=pt+'%';
+  const T=document.getElementById('tubList');T.innerHTML='<tr><th>Feito</th><th>Trecho</th><th>Ponto</th><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th><th></th></tr>'+
+    tl.map((x,j)=>`<tr class="${ST.tub[x.k]?'done':''}"><td><input type="checkbox" data-k="${x.k}" aria-label="Tubo instalado: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.tub[x.k]?'checked':''}></td><td>${x.t.d}</td><td>${x.t.o?'Ponto '+x.t.o.slice(1):'—'}</td><td><span class="sw" style="background:${DC[x.t.dm]}"></span>${DL(x.t.dm)} mm</td><td class="n">${fmt(x.L)}</td><td class="n">${Math.ceil(x.L/6)}</td><td><button data-i="${j}">Mapa</button></td></tr>`).join('');
+  T.querySelectorAll('input').forEach(i=>i.onchange=()=>toggleChk('tub',i.dataset.k));
+  T.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=tl[+b.dataset.i];verNoMapa(ll(x.t.q),`<b>${x.t.d}</b><br>${DL(x.t.dm)} mm · ${fmt(x.L)} m<br>${ST.tub[x.k]?'instalado':'pendente'}`)});
+  const cl=conLista(),cd=cl.filter(x=>ST.con[x.k]).length,pc=cl.length?100*cd/cl.length:0;
+  document.getElementById('cPct').textContent=Math.round(pc)+'%';document.getElementById('cSeg').textContent=`${cd}/${cl.length}`;document.getElementById('cBar').style.width=pc+'%';
+  const C=document.getElementById('conList');C.innerHTML='<tr><th>Feito</th><th class="n">Nº</th><th>Conexão</th><th>Onde</th><th></th></tr>'+
+    cl.map((x,j)=>`<tr class="${ST.con[x.k]?'done':''}"><td><input type="checkbox" data-k="${x.k}" aria-label="Conexão ${j+1} instalada" ${ST.con[x.k]?'checked':''}></td><td class="n">${j+1}</td><td>${x.nm.startsWith('Redução')?x.nm.replace('160','150/160'):x.nm+' · '+x.dm}</td><td>${x.onde}</td><td><button data-i="${j}">Mapa</button></td></tr>`).join('')+
+    `<tr class="tot"><td></td><td></td><td>Total</td><td>${cl.length} conexões</td><td></td></tr>`;
+  C.querySelectorAll('input').forEach(i=>i.onchange=()=>toggleChk('con',i.dataset.k));
+  C.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=cl[+b.dataset.i];verNoMapa([x.p[1],x.p[0]],`<b>Conexão ${+b.dataset.i+1}: ${x.nm}</b><br>${x.dm}<br>${x.onde}<br>${ST.con[x.k]?'instalada':'pendente'}`)});
+}
 function toggleSeg(id){ST.inst[id]=!ST.inst[id];if(!ST.inst[id])delete ST.inst[id];save();sync({['inst.'+id]:ST.inst[id]?true:null});renderMont()}
 function renderMont(){
   const done=G.segs.filter(g=>ST.inst[g.id]);const Lt=G.segs.reduce((a,g)=>a+g.L,0),Ld=done.reduce((a,g)=>a+g.L,0);
@@ -456,6 +499,7 @@ function renderMont(){
   G.segs.forEach(g=>{const lb=document.createElement('label');lb.className=ST.inst[g.id]?'done':'';const cb=document.createElement('input');cb.type='checkbox';cb.id='sg-'+g.id;cb.checked=!!ST.inst[g.id];cb.onchange=()=>toggleSeg(g.id);
     lb.appendChild(cb);lb.appendChild(document.createTextNode(`${g.id} · ${g.L} m`));lb.title=qvName(g);list.appendChild(lb);
     monL[g.id].setStyle({color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'})});
+  renderPassos();
 }
 // ---------- arranque
 const DNS=['150','125','100','75'];
@@ -479,9 +523,9 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;D=ST.ed||base();hist=[];save();sync({inst:{...ST.inst},arr:{...ST.arr},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};D=ST.ed||base();hist=[];save();sync({inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  ST={inst:{},arr:{},ed:ST.ed};save();sync({inst:{},arr:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  ST={inst:{},arr:{},tub:{},con:{},ed:ST.ed};save();sync({inst:{},arr:{},tub:{},con:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(){const t={...G.tot};if(!ST.ed)return t;
@@ -519,6 +563,10 @@ function plData(p){
       return ['DN '+lab,sm,sb,em,eb,sm+em,sb+eb,pm,pb,ar,sb+eb-pb]});
     const T=['TOTAL'];for(let i=1;i<H.length;i++)T.push(rows.reduce((a,r)=>a+r[i],0));rows.push(T);
     return {H,rows,note:'Barras de 6 m inteiras. Sobra/falta compara tudo o que existe (solto + enterrado) com o que o projeto precisa.'};}
+  if(p==='conexoes'){const H=['Nº','Conexão','Diâmetro','Onde','Latitude','Longitude','Instalada'];
+    const cl=conLista(),rows=cl.map((x,j)=>[j+1,x.nm,x.dm,x.onde,x.p[1].toFixed(7),x.p[0].toFixed(7),ST.con[x.k]?'sim':'não']);
+    rows.push(['TOTAL',cl.length+' conexões','','','','',cl.filter(x=>ST.con[x.k]).length+' instaladas']);
+    return {H,rows,note:'Todas as conexões da tubulação do desenho atual. Tomadas e conectores de fita estão no quadro Conexões, em Material.'};}
   if(p==='coco'){
     const H=['Bloco','Válvula','DN (mm)','Lado 1 (m)','Lado 2 (m)','Total (m)','Barras'];
     const rows=PL.coco.map(r=>[r[0],r[1],r[2],r[3],r[4],r[3]+r[4],Math.floor((r[3]+r[4])/6)]);
@@ -545,7 +593,7 @@ document.querySelectorAll('#plTabs button').forEach(b=>b.onclick=()=>{document.q
 document.getElementById('bXls').onclick=()=>{
   if(typeof XLSX==='undefined'){document.getElementById('plNote').textContent='Não foi possível carregar o exportador. Abra com internet uma vez e tente de novo.';return}
   const wb=XLSX.utils.book_new();
-  [['resumo','Resumo'],['coco','Enterrado coco'],['cacau','Enterrado cacau'],['solto','Estoque solto'],['uso','Uso no projeto']].forEach(([k,n])=>{
+  [['resumo','Resumo'],['coco','Enterrado coco'],['cacau','Enterrado cacau'],['solto','Estoque solto'],['uso','Uso no projeto'],['conexoes','Conexões']].forEach(([k,n])=>{
     const d=plData(k);const ws=XLSX.utils.aoa_to_sheet([d.H,...d.rows,[],[d.note]]);ws['!cols']=d.H.map(h=>({wch:Math.max(10,h.length+2)}));XLSX.utils.book_append_sheet(wb,ws,n)});
   const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(G.enterrado.map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,'DN '+(e.dn==150?160:e.dn),e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(arr),'Arranque (progresso)');
@@ -580,7 +628,7 @@ function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs
     if(d<bd){bd=d;best={p:fromLL(map.containerPointToLatLng(c)),seg:1}}}});
   return best}
 const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
-function redraw(){drawNet();drawEd();renderMat();renderTurnos();renderBal();renderPl();edMsg()}
+function redraw(){drawNet();drawEd();renderMat();renderMont();renderTurnos();renderBal();renderPl();edMsg()}
 function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));save();sync({ed:JSON.stringify(D)});redraw();setTimeout(depoisDeOcupado,50)}
 function edMsg(){eMsg.innerHTML=MV?'<b>Movendo ponto:</b> clique (ou toque) no lugar novo do mapa. Perto de outro ponto ou de uma linha, ele encaixa ali. Para desistir, aperte Esc ou clique de novo no ponto vermelho.':DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
   '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'||' tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
