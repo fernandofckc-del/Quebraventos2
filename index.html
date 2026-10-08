@@ -113,7 +113,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v10</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v11</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -130,7 +130,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 <div class="card edbar" id="edBar" hidden>
   <div class="mapbar">
     <button id="eNova">Nova linha</button>
-    <label for="eDm">Diâmetro</label><select id="eDm"><option value="160">150/160 mm</option><option value="125">125 mm</option><option value="100">100 mm</option><option value="75" selected>75 mm</option><option value="50">PE 50 mm</option></select>
+    <label for="eDm">Diâmetro</label><select id="eDm"><option value="160">150/160 mm</option><option value="125">125 mm</option><option value="100">100 mm</option><option value="75" selected>75 mm</option><option value="50">PE 50 mm</option><option value="32">32 mm</option></select>
     <button id="eFim" class="on" hidden>Concluir linha</button><button id="eGps" hidden>Ponto onde estou (GPS)</button><button id="eVolta" hidden>Tirar último ponto</button><button id="eCan" hidden>Cancelar</button>
     <button id="eUndo">Desfazer</button><button id="eKml">Baixar KML</button><button id="eOrig">Voltar ao original</button><button id="eSair">Sair da edição</button>
   </div>
@@ -173,7 +173,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
   <div class="tbl"><table id="tArr"></table></div>
   <h3 style="margin-top:16px">Balanço por diâmetro</h3>
   <div class="tbl"><table id="tBal"></table></div>
-  <p class="note">Digite quantas barras boas já saíram de cada bloco. O balanço soma o tubo solto com o arrancado e compara com o que o projeto precisa.</p>
+  <p class="note">Digite quantas barras boas já saíram de cada bloco e quantos metros de tubo 32 mm você tem no estoque. O balanço soma o tubo solto com o arrancado e compara com o que o projeto precisa.</p>
 </section>
 
 <section class="card" id="planilha">
@@ -258,13 +258,13 @@ const G={"setores":[{"n":1,"c":[-43.0428926,-10.9297258],"H":[[-43.0451473,-10.9
 const fmt=n=>Math.round(n).toLocaleString('pt-BR');
 const f1=(n)=>n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
 const pad=n=>String(n).padStart(2,'0');
-const DC={160:'#b3261e',125:'#f59f00',100:'#4dabf7',75:'#da77f2',50:'#ffffff'};const DL=k=>k==160?'150/160':k==50?'PE 50':k;
-const W={160:8,125:6,100:4.5,75:3,50:2.5};
+const DC={160:'#b3261e',125:'#f59f00',100:'#4dabf7',75:'#da77f2',50:'#ffffff',32:'#a3e635'};const DL=k=>k==160?'150/160':k==50?'PE 50':k;
+const W={160:8,125:6,100:4.5,75:3,50:2.5,32:2};
 // ---------- estado salvo
 const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.inst)ST=s}catch(e){}
-ST.tub=ST.tub||{};ST.con=ST.con||{};
+ST.tub=ST.tub||{};ST.con=ST.con||{};ST.est=ST.est||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 // ---------- sincronização entre aparelhos (Firebase / Firestore do projeto registroocorrencia)
 // Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
@@ -284,9 +284,9 @@ function flush(){if(!SY.ref)return;const F=firebase.firestore.FieldValue,up={};
 function syncErr(e){const c=(e&&e.code)||String(e);SY.err=c;
   syncSt('err',c==='permission-denied'?'Sem permissão no Firebase':'Erro de sincronização',
    c==='permission-denied'?'O Firebase recusou: falta liberar a coleção <b>quebravento</b> nas regras do Firestore. Enquanto isso, o progresso fica salvo só neste aparelho.':'Não foi possível sincronizar ('+c+'). O progresso continua salvo neste aparelho.')}
-function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr'))}
+function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr,#tBal'))}
 function aplicaRemoto(d){
-  const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};const ed=d.ed?JSON.parse(d.ed):null;
+  const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};ST.est={...(d.est||{})};const ed=d.ed?JSON.parse(d.ed):null;
   const mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null);
   ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};
   ST.tub={};Object.keys(tub).forEach(k=>{if(tub[k])ST.tub[k]=true});ST.con={};Object.keys(con).forEach(k=>{if(con[k])ST.con[k]=true});
@@ -314,8 +314,9 @@ function iniciarSync(){
         Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
         if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);
         if(ST.op>1&&!(d&&d.op))loc.op=ST.op;
+        Object.entries(ST.est||{}).forEach(([k,v])=>{if(!(d&&d.est&&k in d.est))loc['est.'+k]=v});
         Object.assign(SY.fila,loc);if(Object.keys(SY.fila).length)flush();
-        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},op:d.op||ST.op,ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
+        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},est:{...ST.est,...(d.est||{})},op:d.op||ST.op,ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
       }else if(d)aplicaRemoto(d);
       const pend=snap.metadata.hasPendingWrites,cache=snap.metadata.fromCache;
       if(SY.err)return;
@@ -429,7 +430,7 @@ document.getElementById('bGps').onclick=()=>{const msg=document.getElementById('
 // ---------- turnos painel
 // ---------- hidráulica pelo desenho (Hazen-Williams C=120, resolve rede com ou sem anel;
 // um fator por linha faz o desenho original dar exatamente os números do projeto)
-const HC=120,DI={160:.150,125:.120,100:.097,75:.072,50:.044};
+const HC=120,DI={160:.150,125:.120,100:.097,75:.072,50:.044,32:.028};
 const TDEM=G.tom.map(t=>({p:t.q[0],ln:t.ln,q:G.fitas.filter(f=>f.s==t.s&&f.ln==t.ln&&(t.f=='meio'?f.de=='meio':f.de==t.f)).reduce((a,f)=>a+f.L,0)}));
 G.linhas.forEach((l,i)=>{const s=TDEM.filter(d=>d.ln==i).reduce((a,d)=>a+d.q,0);TDEM.forEach(d=>{if(d.ln==i&&s)d.q*=l.fita/s})});
 function hidr(net,act){
@@ -554,14 +555,19 @@ function renderBal(){
     const temos=solto+arr,prec=curPrec()[dn];const d=temos-prec;
     const sit=d>=0?`<span class="pill ok">Completo</span>`:(d+rest>=0?`<span class="pill warn">Faltam ${-d}: arrancar</span>`:`<span class="pill bad">Faltam ${-d}: comprar ${-(d+rest)}</span>`);
     h+=`<tr><td>DN ${dn=='150'?'150/160':dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
+  // 32 mm: estoque digitado em metros (não tem tubo enterrado)
+  const e32=+ST.est['32']||0,p32=curTot()[32]||0,d32=e32-p32;
+  h+=`<tr><td>32 mm (metros)</td><td class="n"><input type="number" min="0" step="1" id="est32" value="${e32||''}" placeholder="0" aria-label="Estoque de tubo 32 mm em metros" style="width:90px"></td><td class="n">—</td><td class="n">${fmt(e32)} m</td><td class="n">${fmt(p32)} m</td><td class="n">—</td><td>${d32>=0?`<span class="pill ok">${p32?'Completo':'Sem uso no desenho'}</span>`:`<span class="pill bad">Faltam ${fmt(-d32)} m: comprar</span>`}</td></tr>`;
   document.getElementById('tBal').innerHTML=h;
+  const i32=document.getElementById('est32');i32.addEventListener('change',()=>{const v=Math.max(0,Math.round(+i32.value||0));if(v)ST.est['32']=v;else delete ST.est['32'];save();sync({'est.32':v||null});renderBal()});
+  i32.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50));
 }
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;D=ST.ed||base();hist=[];save();sync({op:ST.op,inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};D=ST.ed||base();hist=[];save();sync({op:ST.op,est:{...ST.est},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  ST={inst:{},arr:{},tub:{},con:{},op:ST.op,ed:ST.ed};save();sync({inst:{},arr:{},tub:{},con:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  ST={inst:{},arr:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed};save();sync({inst:{},arr:{},tub:{},con:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(net){const t={...G.tot};if(!net&&!alt())return t;
@@ -703,7 +709,7 @@ function vertPop(g){const d=document.createElement('div');d.className='pop';
     D.tubos.push({...t,q:t.q.slice(r.j),mod:1,L0:null});t.q=t.q.slice(0,r.j+1);t.mod=1}));
   L.popup().setLatLng(LL(g.p)).setContent(d).openOn(map)}
 function tubePop(i,at){const t=D.tubos[i];const d=document.createElement('div');d.className='pop';
-  const dms=[160,125,100,75,50].map(k=>`<option value="${k}"${k==t.dm?' selected':''}>${DL(k)} mm</option>`).join('');
+  const dms=[160,125,100,75,50,32].map(k=>`<option value="${k}"${k==t.dm?' selected':''}>${DL(k)} mm</option>`).join('');
   const os=[['','—'],['P1','Ponto 1'],['P2','Ponto 2']].map(([v,n])=>`<option value="${v}"${(t.o||'')==v?' selected':''}>${n}</option>`).join('');
   d.innerHTML=`<b>Editar linha</b><table><tr><td>Nome</td><td><input type="text" data-f="d"></td></tr><tr><td>Diâmetro</td><td><select data-f="dm">${dms}</select></td></tr>
    <tr><td>Sai do</td><td><select data-f="o">${os}</select></td></tr><tr><td>Comprimento</td><td>${tLen(t)} m · ${Math.ceil(tLen(t)/6)} barras</td></tr></table>`;
@@ -767,7 +773,7 @@ function renderOp(){document.querySelectorAll('#opBar button[data-op]').forEach(
     return {t,nc,per,falta,tot:Object.values(t).reduce((a,b)=>a+b,0)}});
   const row=(nm,f)=>`<tr><td>${nm}</td>${col.map((c,i)=>`<td class="n"${i+1===ST.op?' style="font-weight:700"':''}>${f(c)}</td>`).join('')}</tr>`;
   document.getElementById('opCmp').innerHTML='<tr><th></th>'+[1,2,3].map(n=>`<th class="n">Opção ${n}</th>`).join('')+'</tr>'+
-    [160,125,100,75].map(dm=>row(`Tubo ${DL(dm)} mm`,c=>fmt(c.t[dm]||0)+' m')).join('')+row('Tubo total',c=>fmt(c.tot)+' m')+row('Conexões da tubulação',c=>c.nc)+
+    [160,125,100,75,50,32].filter(dm=>dm>=75||col.some(c=>c.t[dm])).map(dm=>row(`Tubo ${DL(dm)} mm`,c=>fmt(c.t[dm]||0)+' m')).join('')+row('Tubo total',c=>fmt(c.tot)+' m')+row('Conexões da tubulação',c=>c.nc)+
     G.turnos.map((tu,ti)=>row(`Perda máx. ${tu.n}`,c=>f1(c.per[ti])+' mca')).join('')+row('Barras a comprar',c=>c.falta?`<span class="pill bad">${c.falta}</span>`:'<span class="pill ok">0</span>')}
 function hidrDesenho0(){const b=base0();HB={t:G.turnos.map(t=>hidr(b,t.idx)),j:hidr(b,[0,1,2,3,4])}}
 document.querySelectorAll('#opBar button[data-op]').forEach(b=>b.onclick=()=>{const n=+b.dataset.op;if(n===ST.op&&!ST.ed)return;
