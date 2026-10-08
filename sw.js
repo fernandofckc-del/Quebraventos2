@@ -1,5 +1,5 @@
-// versão do app: mudar junto com o "v9" do topo do index.html
-const V='peirot-qv-v9';
+// versão do app: mudar junto com o "vN" do topo do index.html
+const V='peirot-qv-v10';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png',
  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js','https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))));self.skipWaiting()});
