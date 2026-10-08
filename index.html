@@ -30,6 +30,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-head)
 nav{position:sticky;top:0;z-index:2000;background:var(--brand);color:#fff;padding:8px 16px;display:flex;gap:4px 6px;align-items:center;flex-wrap:wrap}
 @media (max-width:700px){nav{position:static}nav b{width:100%;font-size:1rem}nav a{padding:5px 8px;font-size:.88rem;background:rgba(255,255,255,.08)}}
 nav b{margin-right:8px;font-size:1.05rem}
+nav .ver{font-size:.75rem;font-weight:500;opacity:.75;margin-left:4px}
 nav a{color:#dfeee3;text-decoration:none;font-size:.92rem;padding:6px 10px;border-radius:6px}
 nav a:hover,nav a:focus-visible{background:rgba(255,255,255,.14);outline:none}
 .wrap{max-width:1240px;margin:0 auto;padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
@@ -112,7 +113,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot</b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v9</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
