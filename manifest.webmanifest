@@ -1,7 +1,9 @@
 {
+ "id": "/Quebraventos2/",
  "name": "Quebra-vento Peirot",
  "short_name": "Quebra-vento",
  "start_url": "./",
+ "scope": "./",
  "display": "standalone",
  "background_color": "#f4f6f2",
  "theme_color": "#1f3a2b",
