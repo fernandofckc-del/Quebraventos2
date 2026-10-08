@@ -104,6 +104,8 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 .edbar select,.pop select,.pop input[type=text]{font:500 .92rem var(--f-head);padding:6px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
 .pop input[type=text]{width:150px}
 .pop button+button{margin-left:6px}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--sheet);color:var(--ink)}
+.pop button{margin-top:6px}
 </style>
 </head>
 <body>
@@ -120,7 +122,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
   <div class="mapbar">
     <button id="eNova">Nova linha</button>
     <label for="eDm">Diâmetro</label><select id="eDm"><option value="160">150/160 mm</option><option value="125">125 mm</option><option value="100">100 mm</option><option value="75" selected>75 mm</option><option value="50">PE 50 mm</option></select>
-    <button id="eFim" class="on" hidden>Concluir linha</button><button id="eVolta" hidden>Tirar último ponto</button><button id="eCan" hidden>Cancelar</button>
+    <button id="eFim" class="on" hidden>Concluir linha</button><button id="eGps" hidden>Ponto onde estou (GPS)</button><button id="eVolta" hidden>Tirar último ponto</button><button id="eCan" hidden>Cancelar</button>
     <button id="eUndo">Desfazer</button><button id="eKml">Baixar KML</button><button id="eOrig">Voltar ao original</button><button id="eSair">Sair da edição</button>
   </div>
   <p class="note" id="eMsg" style="margin:0"></p>
@@ -318,6 +320,7 @@ G.tom.forEach(t=>{const p=L.polyline(ll(t.q),{color:'#ffffff',weight:1.5,dashArr
 const NC={tee:'#ff3b30',curva:'#ff3b30',red:'#ffe600',fim:'#ff4dff',saida:'#2f80ff'};
 // ---------- desenho editável (tubulação, conexões, registros e pontos)
 const LL=p=>[p[1],p[0]],fromLL=l=>[+l.lng.toFixed(7),+l.lat.toFixed(7)];
+const KY=p=>p[0].toFixed(7)+','+p[1].toFixed(7);
 const base=()=>({tubos:G.tubos.map(t=>({o:t.o,d:t.d,dm:t.dm,q:t.q.map(p=>p.slice()),ln:t.ln,L0:t.L})),nos:G.nos.map(n=>n.p.slice()),reg:G.linhas.map(l=>l.reg.slice()),P:G.P.map(p=>p.slice())});
 let D=ST.ed||base();
 const hav=q=>{let s=0;for(let k=1;k<q.length;k++){const a=q[k-1],b=q[k],r=Math.PI/180;s+=6371008.8*Math.hypot((b[0]-a[0])*r*Math.cos((a[1]+b[1])/2*r),(b[1]-a[1])*r)}return s};
@@ -330,7 +333,7 @@ function drawNet(){
     p._d=t;p.on('click',e=>{if(!ED)return;L.DomEvent.stop(e);if(DR)drawAdd(e.latlng);else tubePop(i,e.latlng)});tuboL.push(p);tubeP[i]=p});
   G.nos.forEach((n,i)=>{if(n.t==='tee'||(n.t==='curva'&&n.nm.includes('registro')))return;L.circleMarker(LL(D.nos[i]),{radius:n.t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[n.t],fillOpacity:1,interactive:!ED}).bindTooltip(n.nm).addTo(lNos)});
   G.linhas.forEach((l,i)=>L.marker(LL(D.reg[i]),{icon:L.divIcon({className:'rg',html:'R-'+l.id,iconSize:[38,18]}),interactive:!ED}).bindTooltip(`Registro da linha ${l.id} · ${f1(l.Q)} m³/h · Ponto ${l.ponto[1]}`).addTo(lReg));
-  D.P.forEach((p,i)=>L.marker(LL(p),{icon:L.divIcon({className:'sl',html:'Ponto '+(i+1),iconSize:[70,18],iconAnchor:[-10,9]}),interactive:false}).addTo(lNos));
+  D.P.forEach((p,i)=>L.marker(LL(p),{icon:L.divIcon({className:'sl',html:'Ponto '+(i+1)+(D.Poff&&D.Poff[i]?' (desligado)':''),iconSize:[D.Poff&&D.Poff[i]?150:70,18],iconAnchor:[-10,9]}),interactive:false}).addTo(lNos));
   if(curT!==null)showTurno(curT);
 }
 const monL={};
@@ -372,11 +375,63 @@ document.getElementById('bGps').onclick=()=>{const msg=document.getElementById('
     msg.textContent=`Precisão de ${Math.round(p.coords.accuracy)} m. Toque de novo para desligar.`},
    e=>{msg.textContent='Não foi possível pegar a posição. Libere a localização para este site.';document.getElementById('bGps').classList.remove('on');gpsW=null},{enableHighAccuracy:true,maximumAge:5000})};
 // ---------- turnos painel
-function renderTurnos(){
+// ---------- hidráulica pelo desenho (Hazen-Williams C=120, resolve rede com ou sem anel;
+// um fator por linha faz o desenho original dar exatamente os números do projeto)
+const HC=120,DI={160:.150,125:.120,100:.097,75:.072,50:.044};
+const TDEM=G.tom.map(t=>({p:t.q[0],ln:t.ln,q:G.fitas.filter(f=>f.s==t.s&&f.ln==t.ln&&(t.f=='meio'?f.de=='meio':f.de==t.f)).reduce((a,f)=>a+f.L,0)}));
+G.linhas.forEach((l,i)=>{const s=TDEM.filter(d=>d.ln==i).reduce((a,d)=>a+d.q,0);TDEM.forEach(d=>{if(d.ln==i&&s)d.q*=l.fita/s})});
+function hidr(net,act){
+  const ix=new Map(),pts=[],id=p=>{const k=KY(p);if(!ix.has(k)){ix.set(k,pts.length);pts.push(p)}return ix.get(k)};
+  const E=[];net.tubos.filter(t=>t.ln==null||act.includes(t.ln)).forEach(t=>{for(let j=1;j<t.q.length;j++){const a=id(t.q[j-1]),b=id(t.q[j]);if(a==b)continue;
+    const D=DI[t.dm]||.1,L=Math.max(hav([t.q[j-1],t.q[j]]),.1);E.push({a,b,D,ln:t.ln,Q:1e-3,r:10.67*L/(Math.pow(HC,1.852)*Math.pow(D,4.87))})}});
+  const n=pts.length,src=net.P.map((p,i)=>!(net.Poff&&net.Poff[i])&&ix.has(KY(p))?ix.get(KY(p)):-1),adj=pts.map(()=>[]);E.forEach(e=>{adj[e.a].push(e.b);adj[e.b].push(e.a)});
+  const ok=new Uint8Array(n),st=src.filter(s=>s>=0);st.forEach(s=>ok[s]=1);while(st.length){const x=st.pop();adj[x].forEach(y=>{if(!ok[y]){ok[y]=1;st.push(y)}})}
+  const q=new Float64Array(n),tom=[];let longe=0,seca=0;
+  TDEM.filter(d=>act.includes(d.ln)).forEach(d=>{const cand=new Set();E.forEach(e=>{if(e.ln===d.ln){cand.add(e.a);cand.add(e.b)}});
+    let best=-1,bd=1e9;(cand.size?[...cand]:pts.map((_,i)=>i)).forEach(i=>{const m=hav([d.p,pts[i]]);if(m<bd){bd=m;best=i}});
+    if(best<0||!ok[best]){seca++;return}if(bd>15)longe++;q[best]+=d.q*0.004/3600;tom.push({i:best,ln:d.ln})});
+  const h=new Float64Array(n),isS=new Uint8Array(n);src.forEach(s=>{if(s>=0)isS[s]=1});
+  const R=[...Array(n).keys()].filter(i=>ok[i]&&!isS[i]),pos=new Int32Array(n).fill(-1);R.forEach((i,k)=>pos[i]=k);const m=R.length;
+  for(let it=0;it<80&&m;it++){const A=Array.from({length:m},()=>new Float64Array(m)),b=new Float64Array(m);
+    E.forEach(e=>{if(!ok[e.a])return;const g=1/(e.r*Math.pow(Math.max(Math.abs(e.Q),1e-7),.852)),pa=pos[e.a],pb=pos[e.b];e.g=g;
+      if(pa>=0){A[pa][pa]+=g;if(pb>=0)A[pa][pb]-=g}if(pb>=0){A[pb][pb]+=g;if(pa>=0)A[pb][pa]-=g}});
+    R.forEach((i,k)=>b[k]=-q[i]);
+    for(let c=0;c<m;c++){let p=c;for(let r=c+1;r<m;r++)if(Math.abs(A[r][c])>Math.abs(A[p][c]))p=r;if(p!=c){[A[c],A[p]]=[A[p],A[c]];[b[c],b[p]]=[b[p],b[c]]}
+      const d=A[c][c];if(!d)continue;for(let r=c+1;r<m;r++){const f=A[r][c]/d;if(!f)continue;for(let k=c;k<m;k++)A[r][k]-=f*A[c][k];b[r]-=f*b[c]}}
+    for(let r=m-1;r>=0;r--){let s=b[r];for(let k=r+1;k<m;k++)s-=A[r][k]*h[R[k]];h[R[r]]=A[r][r]?s/A[r][r]:0}
+    let dq=0;E.forEach(e=>{if(!ok[e.a])return;const Qn=e.g*(h[e.a]-h[e.b]);dq=Math.max(dq,Math.abs(Qn-e.Q));e.Q=(e.Q+Qn)/2});if(dq<1e-7)break}
+  const per={};tom.forEach(t=>{const k=G.linhas[t.ln].id;per[k]=Math.max(per[k]||0,-h[t.i])});
+  const Q=src.map(s=>{if(s<0)return 0;let t=0;E.forEach(e=>{if(e.a==s)t+=e.Q;if(e.b==s)t-=e.Q});return t*3600});
+  return {per,Q,v:Math.max(0,...E.filter(e=>ok[e.a]).map(e=>Math.abs(e.Q)/(Math.PI*e.D*e.D/4))),longe,seca}}
+let HB=null,HK=null,HV=null;
+function hidrDesenho(){if(!ST.ed)return null;
+  const k=JSON.stringify([D.tubos.map(t=>[t.dm,t.ln,t.q]),D.P,D.Poff]);if(k===HK)return HV;
+  if(!HB){const b=base();HB={t:G.turnos.map(t=>hidr(b,t.idx)),j:hidr(b,[0,1,2,3,4])}}
+  const mx=o=>Math.max(0,...Object.values(o));
+  const t=G.turnos.map((tu,ti)=>{const r=hidr(D,tu.idx);Object.keys(r.per).forEach(l=>{const b=HB.t[ti].per[l];if(b&&tu.perda[l])r.per[l]*=tu.perda[l]/b});return r});
+  const j=hidr(D,[0,1,2,3,4]);j.perda=mx(j.per)*(G.junto.perda/mx(HB.j.per));
+  HK=k;return HV={t,j}}
+// ---------- conexões contadas no desenho
+function conexoes(){if(!ST.ed)return G.cnt;
+  const N=new Map(),nd=p=>{const k=KY(p);if(!N.has(k))N.set(k,{p,e:[]});return N.get(k)};
+  D.tubos.forEach(t=>t.q.forEach((p,j)=>{const n=nd(p);if(j>0)n.e.push({dm:t.dm,to:t.q[j-1]});if(j<t.q.length-1)n.e.push({dm:t.dm,to:t.q[j+1]})}));
+  const isP=new Set(D.P.filter((p,i)=>!(D.Poff&&D.Poff[i])).map(KY)),isR=new Set(D.reg.map(KY)),c={},add=k=>c[k]=(c[k]||0)+1;
+  const curva=(n,a,b)=>{const cs=Math.cos(n.p[1]*Math.PI/180),v=x=>[(x[0]-n.p[0])*cs,x[1]-n.p[1]],A=v(a),B=v(b);
+    return 180-Math.acos(Math.max(-1,Math.min(1,(A[0]*B[0]+A[1]*B[1])/(Math.hypot(...A)*Math.hypot(...B)||1))))*180/Math.PI>20};
+  N.forEach((n,k)=>{const d=n.e.length,r=isR.has(k);
+    if(isP.has(k)){add('Saída do sistema existente + registro');return}
+    if(d==1){add('Final de linha (tampão p/ lavagem)');if(r)add('Registro de linha');return}
+    const mx=Math.max(...n.e.map(e=>e.dm));n.e.filter(e=>e.dm<mx).forEach(e=>add(`Redução ${mx}→${e.dm} mm`));
+    if(d==2){if(curva(n,n.e[0].to,n.e[1].to))add(r?'Curva + registro':'Curva');else if(r)add('Registro de linha')}
+    else add((d==3?'Tê':'Cruzeta')+(r?' + registro':''))});
+  return c}
+function renderTurnos(){const H=hidrDesenho();
   const min=Math.max(5,+document.getElementById('dur').value||60);const h=min/60;
   document.getElementById('durMsg').textContent=`${f1(10*h)} L por planta por turno · ${fmt(min*G.turnos.length)} min de rega por dia`;
-  document.getElementById('tTurnos').innerHTML=G.turnos.map((t,ti)=>{
-    const pmax=Math.max(...Object.values(t.perda));const bar=(pmax+10)/10;
+  document.getElementById('tTurnos').innerHTML=G.turnos.map((t0,ti)=>{const r=H&&H.t[ti];
+    const t=r?{...t0,perda:r.per,Q1:r.Q[0]>.05?r.Q[0]:0,Q2:r.Q[1]>.05?r.Q[1]:0}:t0;
+    const pmax=Math.max(0,...Object.values(t.perda));const bar=(pmax+10)/10;
+    const av=r?[r.seca?`<span class="pill bad">${r.seca} tomada(s) sem água: linha desligada do ponto</span>`:'',r.longe?`<span class="pill warn">${r.longe} tomada(s) a mais de 15 m do tubo</span>`:'',r.v>2?`<span class="pill warn">Velocidade alta no tubo: ${f1(r.v)} m/s</span>`:'',bar>2.5?`<span class="pill warn">Pressão alta para a fita</span>`:''].filter(Boolean).join(' '):'';
     const regs=t.lin.map(x=>'R-'+x).join(' e ');const fech=G.linhas.filter(l=>!t.lin.includes(l.id)).map(l=>'R-'+l.id).join(', ');
     const fita=t.idx.reduce((a,i)=>a+G.linhas[i].fita,0);
     return `<div class="turno"><h3><span>${t.n}</span><span class="pill ok">${t.lin.join(' + ')}</span></h3>
@@ -384,9 +439,10 @@ function renderTurnos(){
      <span>Vazão no Ponto 1</span><span>${t.Q1?f1(t.Q1)+' m³/h':'desligado'}</span><span>Vazão no Ponto 2</span><span>${t.Q2?f1(t.Q2)+' m³/h':'desligado'}</span>
      <span>Fita regando</span><span>${fmt(fita)} m</span><span>Perda até a ponta</span><span>${f1(pmax)} mca</span>
      <span>Pressão no ponto</span><span>~${f1(bar)} bar</span><span>Água no turno</span><span>${f1(fita*0.004*h)} m³</span></div>
+     ${r?`<div class="kv">${Object.entries(t.perda).map(([k,v])=>`<span>Perda na linha ${k}</span><span>${f1(v)} mca</span>`).join('')}</div>`:''}${av?`<div>${av}</div>`:''}
      <button data-t="${ti}">Ver no mapa</button></div>`}).join('');
   document.querySelectorAll('#tTurnos button[data-t]').forEach(b=>b.onclick=()=>{showTurno(+b.dataset.t);document.getElementById('map').scrollIntoView({behavior:'smooth'})});
-  const j=G.junto;document.getElementById('juntoMsg').innerHTML=`Para comparar: abrindo tudo junto, o Ponto 1 precisaria de ${f1(j.Q1)} m³/h e o Ponto 2 de <b>${f1(j.Q2)} m³/h</b>, com perda de até ${f1(j.perda)} mca (~${f1((j.perda+10)/10)} bar no ponto).`;
+  const j=H?{Q1:Math.max(0,H.j.Q[0]),Q2:Math.max(0,H.j.Q[1]),perda:H.j.perda}:G.junto;document.getElementById('juntoMsg').innerHTML=(H?'<b>Calculado pelo desenho editado.</b> ':'')+`Para comparar: abrindo tudo junto, o Ponto 1 ${j.Q1>.05?'precisaria de '+f1(j.Q1)+' m³/h':'fica desligado'}, e o Ponto 2 ${j.Q2>.05?'precisaria de <b>'+f1(j.Q2)+' m³/h</b>':'fica desligado'}, com perda de até ${f1(j.perda)} mca (~${f1((j.perda+10)/10)} bar no ponto).`;
 }
 document.getElementById('dur').addEventListener('input',renderTurnos);
 // ---------- montagem
@@ -437,16 +493,17 @@ document.getElementById('kTubo').textContent=fmt(ttot)+' m';document.getElementB
 const tt=document.getElementById('tTubo');tt.innerHTML='<tr><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th></tr>';let nt=0;
 Object.keys(tot).sort((a,b)=>b-a).forEach(k=>{const n=Math.ceil(tot[k]/6);nt+=n;tt.insertAdjacentHTML('beforeend',`<tr><td><span class="sw" style="background:${DC[k]}"></span>${DL(k)} mm</td><td class="n">${fmt(tot[k])} m</td><td class="n">${n}</td></tr>`)});
 tt.insertAdjacentHTML('beforeend',`<tr class="tot"><td>Total</td><td class="n">${fmt(ttot)} m</td><td class="n">${nt}</td></tr>`);
+const c=conexoes(),reds=Object.entries(c).filter(([k])=>k.startsWith('Redução')).sort((a,b)=>parseInt(b[0].split(' ')[1])-parseInt(a[0].split(' ')[1]));
+document.getElementById('tCon').innerHTML=`<tr><td>Saída do sistema existente + registro</td><td class="n">${c['Saída do sistema existente + registro']||0}</td></tr><tr><td>Registro de linha (tê, curva ou reto)</td><td class="n">${(c['Tê + registro']||0)+(c['Curva + registro']||0)+(c['Cruzeta + registro']||0)+(c['Registro de linha']||0)}</td></tr>`+
+ [['Tê','Tê (sem registro)'],['Cruzeta','Cruzeta (sem registro)'],['Curva','Curva']].filter(([k])=>c[k]||k=='Curva').map(([k,n])=>`<tr><td>${n}</td><td class="n">${c[k]||0}</td></tr>`).join('')+
+ reds.map(([k,v])=>`<tr><td>${k.replace('160','150/160')}</td><td class="n">${v}</td></tr>`).join('')+
+ `<tr><td>Final de linha (tampão p/ lavagem)</td><td class="n">${c['Final de linha (tampão p/ lavagem)']||0}</td></tr><tr><td>Tomadas (conector + microtubo)</td><td class="n">${G.tom.length}</td></tr><tr><td>Início de fita (conector)</td><td class="n">${G.fitas.length}</td></tr><tr><td>Final de fita (fechamento)</td><td class="n">${G.fitas.length}</td></tr>`;
 }
 renderMat();
 const maxF=Math.max(...G.fitas.map(f=>f.L)),minF=Math.min(...G.fitas.map(f=>f.L));
 document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="background:#2ecc40"></span>Linha 1</td><td class="n">${fmt(G.L1)} m</td></tr><tr><td><span class="sw" style="background:#00e5ff"></span>Linha 2 (a 2,5 m da linha 1)</td><td class="n">${fmt(G.L2)} m</td></tr>
 <tr><td>Trechos de quebra-vento</td><td class="n">${G.segs.length}</td></tr><tr><td>Fitas</td><td class="n">${G.fitas.length}</td></tr><tr><td>Comprimento de cada fita</td><td class="n">${minF}–${maxF} m</td></tr>
 <tr><td>Microtubo das tomadas</td><td class="n">${fmt(G.tom.reduce((a,t)=>a+t.L,0))} m</td></tr><tr class="tot"><td>Total de fita</td><td class="n">${fmt(G.L1+G.L2)} m</td></tr>`;
-const c=G.cnt,reds=Object.entries(c).filter(([k])=>k.startsWith('Redução')).sort((a,b)=>parseInt(b[0].split(' ')[1])-parseInt(a[0].split(' ')[1]));
-document.getElementById('tCon').innerHTML=`<tr><td>Saída do sistema existente + registro</td><td class="n">2</td></tr><tr><td>Registro de linha (tê ou curva)</td><td class="n">${(c['Tê + registro']||0)+(c['Curva + registro']||0)}</td></tr><tr><td>Curva</td><td class="n">${c['Curva']||0}</td></tr>`+
- reds.map(([k,v])=>`<tr><td>${k.replace('160','150/160')}</td><td class="n">${v}</td></tr>`).join('')+
- `<tr><td>Final de linha (tampão p/ lavagem)</td><td class="n">${c['Final de linha (tampão p/ lavagem)']||0}</td></tr><tr><td>Tomadas (conector + microtubo)</td><td class="n">${G.tom.length}</td></tr><tr><td>Início de fita (conector)</td><td class="n">${G.fitas.length}</td></tr><tr><td>Final de fita (fechamento)</td><td class="n">${G.fitas.length}</td></tr>`;
 // ---------- planilha
 const PL=G.pl;const br=n=>Math.round(n).toLocaleString('pt-BR');
 const arrB=(b,dn)=>Math.min(+ST.arr[b+'-'+dn]||0,(G.enterrado.find(e=>e.b==b&&e.dn==dn)||{barras:0}).barras);
@@ -500,7 +557,6 @@ renderTurnos();renderMont();renderArr();renderPl();
 let hist=[];
 const eMsg=document.getElementById('eMsg');
 const mid=(a,b)=>[+((a[0]+b[0])/2).toFixed(7),+((a[1]+b[1])/2).toFixed(7)];
-const KY=p=>p[0].toFixed(7)+','+p[1].toFixed(7);
 const rk=r=>r.k=='t'?r.i+':'+r.j:r.k+r.i;
 function groups(){const m=new Map();const add=(p,r)=>{const k=KY(p);if(!m.has(k))m.set(k,{p,refs:[]});m.get(k).refs.push(r)};
   D.tubos.forEach((t,i)=>t.q.forEach((p,j)=>add(p,{k:'t',i,j})));
@@ -524,11 +580,11 @@ function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs
     if(d<bd){bd=d;best={p:fromLL(map.containerPointToLatLng(c)),seg:1}}}});
   return best}
 const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
-function redraw(){drawNet();drawEd();renderMat();renderBal();renderPl();edMsg()}
+function redraw(){drawNet();drawEd();renderMat();renderTurnos();renderBal();renderPl();edMsg()}
 function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));save();sync({ed:JSON.stringify(D)});redraw();setTimeout(depoisDeOcupado,50)}
 function edMsg(){eMsg.innerHTML=MV?'<b>Movendo ponto:</b> clique (ou toque) no lugar novo do mapa. Perto de outro ponto ou de uma linha, ele encaixa ali. Para desistir, aperte Esc ou clique de novo no ponto vermelho.':DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
   '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'||' tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
-  (ST.ed?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; a vazão e a perda dos turnos continuam as do projeto original.':'');
+  (ST.ed?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; as conexões e os turnos (vazão, perda e pressão) também são recalculados pelo desenho.':'');
   document.getElementById('eUndo').disabled=!hist.length}
 function wireDrag(m,getRefs){let refs=[];
   m.on('dragstart',()=>{map.closePopup();push();refs=getRefs()});
@@ -554,7 +610,10 @@ function vertPop(g){const d=document.createElement('div');d.className='pop';
   const tr=g.refs.filter(r=>r.k=='t'),meio=tr.filter(r=>r.j>0&&r.j<D.tubos[r.i].q.length-1);
   d.innerHTML=`<b>${nm.length?[...new Set(nm)].join('<br>'):'Ponto da linha'}</b><br>${tr.length} linha(s) passam aqui<br>`;
   const bt=(txt,fn)=>{const b=document.createElement('button');b.textContent=txt;b.onclick=()=>{map.closePopup();push();fn();commit()};d.appendChild(b)};
-  {const b=document.createElement('button');b.textContent='Mover este ponto';b.className='on';b.onclick=()=>moveStart(g);d.appendChild(b);d.appendChild(document.createElement('br'))}
+  {const b=document.createElement('button');b.textContent='Mover este ponto';b.className='on';b.onclick=()=>moveStart(g);d.appendChild(b);
+   const gb=document.createElement('button');gb.textContent='Pôr onde estou (GPS)';gb.onclick=()=>gpsPos(gb,p=>{push();setRefs(g.refs,p);commit()});d.appendChild(gb);d.appendChild(document.createElement('br'))}
+  g.refs.filter(r=>r.k=='P').forEach(r=>{const off=D.Poff&&D.Poff[r.i];
+    bt(off?`Ligar o Ponto ${r.i+1} (volta a fornecer água)`:`Desligar o Ponto ${r.i+1} (não fornece água)`,()=>{D.Poff=D.Poff||[];D.Poff[r.i]=!off})});
   if(tr.length)bt('Apagar este ponto',()=>tr.slice().sort((a,b)=>b.j-a.j).forEach(r=>D.tubos[r.i].q.splice(r.j,1)));
   if(meio.length)bt('Dividir a linha aqui',()=>meio.slice().sort((a,b)=>b.i-a.i).forEach(r=>{const t=D.tubos[r.i];
     D.tubos.push({...t,q:t.q.slice(r.j),mod:1,L0:null});t.q=t.q.slice(0,r.j+1);t.mod=1}));
@@ -577,11 +636,22 @@ function drPaint(){lDr.clearLayers();L.polyline(ll(DR.q),{color:DC[+document.get
   DR.q.forEach(p=>L.circleMarker(LL(p),{radius:6,color:'#111',weight:2,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(lDr));
   document.getElementById('eFim').disabled=DR.q.length<2;document.getElementById('eVolta').disabled=!DR.q.length;edMsg()}
 function drMode(on){DR=on?{q:[]}:null;lDr.clearLayers();if(on)lDr.addTo(map);else lDr.remove();
-  ['eFim','eVolta','eCan'].forEach(id=>document.getElementById(id).hidden=!on);['eNova','eUndo','eKml','eOrig','eSair'].forEach(id=>document.getElementById(id).hidden=on);
+  ['eFim','eGps','eVolta','eCan'].forEach(id=>document.getElementById(id).hidden=!on);['eNova','eUndo','eKml','eOrig','eSair'].forEach(id=>document.getElementById(id).hidden=on);
   map.closePopup();if(on)drPaint();else edMsg()}
 map.on('click',e=>{if(DR)drawAdd(e.latlng);else if(MV)moveTo(e.latlng)});
 document.getElementById('eNova').onclick=()=>drMode(true);
 document.getElementById('eCan').onclick=()=>{drMode(false);setTimeout(depoisDeOcupado,50)};
+// GPS: pega a posição atual (melhor leitura em até 12 s) para pôr um ponto onde a pessoa está
+function gpsPos(btn,cb){if(!navigator.geolocation){eMsg.textContent='Este aparelho não informa a posição.';return}
+  const tx=btn.textContent;btn.disabled=true;btn.textContent='Procurando GPS…';let best=null,w=null,ok=false;
+  const fim=()=>{if(ok)return;ok=true;navigator.geolocation.clearWatch(w);clearTimeout(tm);btn.disabled=false;btn.textContent=tx;
+    if(!best){eMsg.textContent='Não foi possível pegar a posição. Libere a localização para este site e tente de novo.';return}
+    map.closePopup();cb([+best.coords.longitude.toFixed(7),+best.coords.latitude.toFixed(7)]);
+    eMsg.insertAdjacentHTML('afterbegin',`<b>Ponto colocado pelo GPS</b> (precisão de ${Math.round(best.coords.accuracy)} m${best.coords.accuracy>10?': sinal fraco, confira no mapa':''}). `)};
+  const tm=setTimeout(fim,12000);
+  w=navigator.geolocation.watchPosition(p=>{if(!best||p.coords.accuracy<best.coords.accuracy)best=p;if(best.coords.accuracy<=4)fim()},
+    ()=>{if(!best)fim()},{enableHighAccuracy:true,maximumAge:0,timeout:12000})}
+document.getElementById('eGps').onclick=e=>gpsPos(e.currentTarget,p=>{DR.q.push(p);drPaint();map.panTo(LL(p))});
 document.getElementById('eVolta').onclick=()=>{DR.q.pop();drPaint()};
 document.getElementById('eDm').onchange=()=>{if(DR)drPaint()};
 document.getElementById('eFim').onclick=()=>{if(DR.q.length<2)return;push();const q=DR.q;q.forEach(insertOn);
