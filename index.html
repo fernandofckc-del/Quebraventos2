@@ -96,6 +96,8 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 .plhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 #plBody th{text-transform:none;letter-spacing:0;white-space:normal;font-size:.8rem;line-height:1.2;min-width:58px}
 #plBody td{white-space:nowrap}
+#tAV td{vertical-align:top}#tAV td.mut{color:var(--mut)}#tAV td.done{background:var(--okbg)}#tAV .avn{width:58px}#tAV small{font-size:.76rem;color:var(--mut)}
+#tAV tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tAV label{white-space:nowrap}
 .vh{background:#fff;border:2px solid #111;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.6);cursor:move}
 .vh.sel{background:#ff3b30;box-shadow:0 0 0 4px rgba(255,59,48,.45)}
 .movendo .leaflet-container,.movendo #map{cursor:crosshair!important}
@@ -113,7 +115,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v11</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v12</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -170,6 +172,12 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 
 <section class="card" id="arranque">
   <h2>Arranque de tubos enterrados (barras de 6 m)</h2>
+  <h3>Plano válvula por válvula · coco</h3>
+  <p class="note" id="avRes" style="margin-top:0"></p>
+  <p class="note">Os blocos vêm na ordem de onde sai mais tubo útil. Marque cada válvula e diâmetro quando o tubo sair; se alguma barra quebrar, corrija o número de barras boas. "Pode ficar" = não precisa arrancar para esta opção; "usar N" = basta tirar N barras.</p>
+  <label class="note" style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="avEsc"> Mostrar só o que ainda falta arrancar</label>
+  <div class="tbl"><table id="tAV"></table></div>
+  <h3 style="margin-top:16px">Total por bloco e cacau</h3>
   <div class="tbl"><table id="tArr"></table></div>
   <h3 style="margin-top:16px">Balanço por diâmetro</h3>
   <div class="tbl"><table id="tBal"></table></div>
@@ -264,7 +272,7 @@ const W={160:8,125:6,100:4.5,75:3,50:2.5,32:2};
 const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.inst)ST=s}catch(e){}
-ST.tub=ST.tub||{};ST.con=ST.con||{};ST.est=ST.est||{};
+ST.tub=ST.tub||{};ST.con=ST.con||{};ST.est=ST.est||{};ST.av=ST.av||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 // ---------- sincronização entre aparelhos (Firebase / Firestore do projeto registroocorrencia)
 // Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
@@ -284,11 +292,11 @@ function flush(){if(!SY.ref)return;const F=firebase.firestore.FieldValue,up={};
 function syncErr(e){const c=(e&&e.code)||String(e);SY.err=c;
   syncSt('err',c==='permission-denied'?'Sem permissão no Firebase':'Erro de sincronização',
    c==='permission-denied'?'O Firebase recusou: falta liberar a coleção <b>quebravento</b> nas regras do Firestore. Enquanto isso, o progresso fica salvo só neste aparelho.':'Não foi possível sincronizar ('+c+'). O progresso continua salvo neste aparelho.')}
-function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr,#tBal'))}
+function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#tArr,#tBal,#tAV'))}
 function aplicaRemoto(d){
   const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};ST.est={...(d.est||{})};const ed=d.ed?JSON.parse(d.ed):null;
   const mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null);
-  ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};
+  ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};ST.av={...(d.av||{})};
   ST.tub={};Object.keys(tub).forEach(k=>{if(tub[k])ST.tub[k]=true});ST.con={};Object.keys(con).forEach(k=>{if(con[k])ST.con[k]=true});
   const opN=+d.op||1,mudouOp=opN!==ST.op;ST.op=opN;
   if(ed)ST.ed=ed;else delete ST.ed;save();
@@ -312,11 +320,12 @@ function iniciarSync(){
         // primeira conexão: junta o que já existe aqui com o que está na nuvem (não perde nada)
         const loc={};['inst','tub','con'].forEach(c=>Object.keys(ST[c]||{}).forEach(k=>{if(!(d&&d[c]&&d[c][k]))loc[c+'.'+k]=true}));
         Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
+        Object.entries(ST.av||{}).forEach(([k,v])=>{if(v>((d&&d.av&&d.av[k])||0))loc['av.'+k]=v});
         if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);
         if(ST.op>1&&!(d&&d.op))loc.op=ST.op;
         Object.entries(ST.est||{}).forEach(([k,v])=>{if(!(d&&d.est&&k in d.est))loc['est.'+k]=v});
         Object.assign(SY.fila,loc);if(Object.keys(SY.fila).length)flush();
-        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},est:{...ST.est,...(d.est||{})},op:d.op||ST.op,ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
+        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},av:{...(d.av||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('av.')).map(([k,v])=>[k.slice(3),v]))},est:{...ST.est,...(d.est||{})},op:d.op||ST.op,ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
       }else if(d)aplicaRemoto(d);
       const pend=snap.metadata.hasPendingWrites,cache=snap.metadata.fromCache;
       if(SY.err)return;
@@ -347,6 +356,7 @@ const NC={tee:'#ff3b30',curva:'#ff3b30',red:'#ffe600',fim:'#ff4dff',saida:'#2f80
 // ---------- desenho editável (tubulação, conexões, registros e pontos)
 const LL=p=>[p[1],p[0]],fromLL=l=>[+l.lng.toFixed(7),+l.lat.toFixed(7)];
 const KY=p=>p[0].toFixed(7)+','+p[1].toFixed(7);
+const SK=x=>String(x).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9-]+/g,'_');
 const base0=()=>({tubos:G.tubos.map(t=>({o:t.o,d:t.d,dm:t.dm,q:t.q.map(p=>p.slice()),ln:t.ln,L0:t.L})),nos:G.nos.map(n=>n.p.slice()),reg:G.linhas.map(l=>l.reg.slice()),P:G.P.map(p=>p.slice())});
 // ---------- opções de tubulação (2 e 3 montadas a partir do traçado original)
 // pontos de cada linha a cada meio trecho, do carreador SE (i=0) ao NW (i=10)
@@ -465,7 +475,6 @@ function hidrDesenho(){if(!alt())return null;
   const j=hidr(D,[0,1,2,3,4]);j.perda=mx(j.per)*(G.junto.perda/mx(HB.j.per));
   HK=k;return HV={t,j}}
 // ---------- conexões do desenho, uma a uma (sem edição, a contagem bate com o projeto)
-const SK=x=>String(x).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9-]+/g,'_');
 function conLista(net){const D0=D;if(net)D=net;try{return conLista0()}finally{D=D0}}
 function conLista0(){
   const N=new Map(),nd=p=>{const k=KY(p);if(!N.has(k))N.set(k,{p,e:[]});return N.get(k)};
@@ -538,20 +547,56 @@ function renderMont(){
     monL[g.id].setStyle({color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'})});
   renderPassos();
 }
+// ---------- arranque por válvula (coco): barras de cada válvula; a soma por bloco fecha com o total enterrado
+const AV=(()=>{const by={},out=[];G.pl.coco.forEach(([b,v,dn,l1,l2])=>(by[b+'-'+dn]=by[b+'-'+dn]||[]).push({b,v,dn,l1,l2,x:(l1+l2)/6}));
+  Object.entries(by).forEach(([k,rs])=>{const tot=(G.enterrado.find(e=>e.b+'-'+e.dn==k)||{barras:0}).barras;rs.forEach(r=>r.n=Math.floor(r.x));
+    let d=tot-rs.reduce((a,r)=>a+r.n,0);rs.slice().sort((a,b)=>(b.x%1)-(a.x%1)).forEach(r=>{if(d>0){r.n++;d--}});
+    rs.forEach(r=>{r.k=r.b+'-'+r.v+'-'+r.dn;out.push(r)})});
+  return out})();
+const avQ=r=>Math.min(+ST.av[r.k]||0,r.n);
+const usaAV=(b,dn)=>AV.some(r=>r.b==b&&r.dn==dn&&ST.av[r.k]);
+// barras arrancadas de um bloco/DN: pelas válvulas marcadas; se nenhuma foi marcada, vale o total digitado por bloco
+function arrQ(b,dn){const e=G.enterrado.find(e=>e.b==b&&e.dn==dn);if(!e)return 0;
+  if(b.length==1&&usaAV(b,dn))return Math.min(e.barras,AV.filter(r=>r.b==b&&r.dn==dn).reduce((a,r)=>a+avQ(r),0));
+  return Math.min(+ST.arr[b+'-'+dn]||0,e.barras)}
+// plano: escolhe as válvulas que dão mais tubo útil para a opção atual, até cobrir o que falta além do tubo solto
+function planoAV(){const pr=curPrec(),need={},rest={},usa={};[125,100,75].forEach(dn=>rest[dn]=need[dn]=Math.max(0,pr[dn]-(G.solto[dn]||0)));
+  const vs=[...new Set(AV.map(r=>r.b+'|'+r.v))].map(s=>{const[b,v]=s.split('|');return {b,v:+v,c:AV.filter(r=>r.b==b&&r.v==+v)}}),pend=vs.slice();
+  while(pend.length){let bi=-1,bs=0;pend.forEach((x,i)=>{const s=x.c.reduce((a,r)=>a+Math.min(r.n,rest[r.dn]),0);if(s>bs){bs=s;bi=i}});if(bi<0)break;
+    pend.splice(bi,1)[0].c.forEach(r=>{const u=Math.min(r.n,rest[r.dn]);if(u>0){usa[r.k]=u;rest[r.dn]-=u}})}
+  return {need,rest,usa,vs}}
+function renderAV(){const P=planoAV(),esc=document.getElementById('avEsc').checked,T=document.getElementById('tAV');
+  const ja=dn=>['A','B','C','D'].reduce((a,b)=>a+arrQ(b,dn),0);
+  document.getElementById('avRes').innerHTML=`Para a <b>${OPS[ST.op].n}</b>${ST.ed?' (editada)':''}, além do tubo solto:<br>`+[125,100,75].map(dn=>{const q=P.need[dn]-P.rest[dn];
+    return `<b>${dn} mm:</b> arrancar ${q} barras · já saíram ${ja(dn)}${ja(dn)>=q&&q?' <span class="pill ok">pronto</span>':''}${P.rest[dn]?` · <span class="pill bad">comprar ${P.rest[dn]}</span>`:''}`}).join('<br>');
+  const bl=['A','B','C','D'].map(b=>({b,u:AV.filter(r=>r.b==b).reduce((a,r)=>a+(P.usa[r.k]||0),0)})).sort((a,b)=>b.u-a.u);
+  const cel=r=>{if(!r)return '<td class="n">—</td>';const ok=+ST.av[r.k]>0,u=P.usa[r.k]||0;
+    return `<td class="avc ${ok?'done':u?'':'mut'}"><label><input type="checkbox" data-k="${r.k}" ${ok?'checked':''} aria-label="Válvula ${r.v} bloco ${r.b} ${r.dn} mm arrancada"> ${r.n} b</label>`+
+     (ok?`<br><input type="number" class="avn" data-k="${r.k}" min="0" max="${r.n}" value="${ST.av[r.k]}" aria-label="Barras boas"> boas`:u<r.n?`<br><small>${u?'usar '+u:'pode ficar'}</small>`:'')+'</td>'};
+  let h='<tr><th>Válvula</th><th>125 mm</th><th>100 mm</th><th>75 mm</th></tr>';
+  bl.forEach(({b,u},bi)=>{const vs=P.vs.filter(x=>x.b==b).sort((a,c)=>a.v-c.v);
+    const rows=vs.filter(x=>!esc||x.c.some(r=>P.usa[r.k]&&!(+ST.av[r.k]>0))).map(x=>`<tr><td>Válvula ${x.v}<br><small>${x.c.map(r=>r.l1+r.l2).reduce((a,c)=>a+c,0)} m</small></td>${[125,100,75].map(dn=>cel(x.c.find(r=>r.dn==dn))).join('')}</tr>`).join('');
+    const leg=[125,100,75].filter(dn=>!usaAV(b,dn)&&+ST.arr[b+'-'+dn]>0).map(dn=>`${dn} mm: ${ST.arr[b+'-'+dn]} barras lançadas no total do bloco`);
+    h+=`<tr class="bh"><td colspan="4">${bi+1}º · Bloco ${b} (coco) · ${vs.length} válvula${vs.length>1?'s':''} · ${u} barras úteis${u?'':' · pode ficar enterrado'}${leg.length?`<br><small>${leg.join('; ')}. Ao marcar as válvulas, vale o que for marcado.</small>`:''}</td></tr>`+(rows||(esc?'<tr><td colspan="4"><small>Nada pendente neste bloco.</small></td></tr>':''))});
+  T.innerHTML=h;
+  const muda=(k,v)=>{if(v>0)ST.av[k]=v;else delete ST.av[k];save();sync({['av.'+k]:ST.av[k]||null});renderArr();renderPl()};
+  T.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>muda(c.dataset.k,c.checked?AV.find(r=>r.k==c.dataset.k).n:0));
+  T.querySelectorAll('input.avn').forEach(i=>{i.onchange=()=>muda(i.dataset.k,Math.min(+i.max,Math.max(0,Math.round(+i.value||0))));i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))})}
+document.getElementById('avEsc').onchange=renderAV;
 // ---------- arranque
 const DNS=['150','125','100','75'];
 function renderArr(){
-  const rows=G.enterrado.map((e,k)=>{const key=e.b+'-'+e.dn;const v=Math.min(+ST.arr[key]||0,e.barras);
-    return `<tr><td>${e.b.length>1?e.b+' (cacau)':'Bloco '+e.b+' (coco)'}</td><td>DN ${e.dn==150?'160':e.dn}</td><td class="n">${e.barras}</td><td class="n"><input type="number" min="0" max="${e.barras}" id="ar-${key}" data-k="${key}" value="${v||''}" placeholder="0" aria-label="Barras arrancadas ${key}"></td><td class="n" id="rs-${key}">${e.barras-v}</td></tr>`}).join('');
+  const rows=G.enterrado.map((e,k)=>{const key=e.b+'-'+e.dn;const v=arrQ(e.b,e.dn);const pv=e.b.length==1&&usaAV(e.b,e.dn);
+    return `<tr><td>${e.b.length>1?e.b+' (cacau)':'Bloco '+e.b+' (coco)'}</td><td>DN ${e.dn==150?'160':e.dn}</td><td class="n">${e.barras}</td><td class="n">${pv?v+'<br><small>pelas válvulas</small>':`<input type="number" min="0" max="${e.barras}" id="ar-${key}" data-k="${key}" value="${v||''}" placeholder="0" aria-label="Barras arrancadas ${key}">`}</td><td class="n" id="rs-${key}">${e.barras-v}</td></tr>`}).join('');
   document.getElementById('tArr').innerHTML=`<tr><th>Local</th><th>Tubo</th><th class="n">Enterradas</th><th class="n">Arrancadas</th><th class="n">Faltam</th></tr>${rows}`;
   document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('change',()=>{const mx=+i.max;const v=Math.min(mx,Math.max(0,+i.value||0));ST.arr[i.dataset.k]=v;sync({['arr.'+i.dataset.k]:v||null});if(+i.value!==v)i.value=v||'';document.getElementById('rs-'+i.dataset.k).textContent=mx-v;save();renderBal();renderPl()}));
   document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50)));
-  renderBal();
+  renderBal();renderAV();
 }
 function renderBal(){
   let h='<tr><th>Tubo</th><th class="n">Solto</th><th class="n">Arrancado</th><th class="n">Temos</th><th class="n">Precisa</th><th class="n">Ainda enterrado</th><th>Situação</th></tr>';
   DNS.forEach(dn=>{const solto=G.solto[dn]||0;const ent=G.enterrado.filter(e=>String(e.dn)==dn);
-    const arr=ent.reduce((a,e)=>a+Math.min(+ST.arr[e.b+'-'+e.dn]||0,e.barras),0);const rest=ent.reduce((a,e)=>a+e.barras,0)-arr;
+    const arr=ent.reduce((a,e)=>a+arrQ(e.b,e.dn),0);const rest=ent.reduce((a,e)=>a+e.barras,0)-arr;
     const temos=solto+arr,prec=curPrec()[dn];const d=temos-prec;
     const sit=d>=0?`<span class="pill ok">Completo</span>`:(d+rest>=0?`<span class="pill warn">Faltam ${-d}: arrancar</span>`:`<span class="pill bad">Faltam ${-d}: comprar ${-(d+rest)}</span>`);
     h+=`<tr><td>DN ${dn=='150'?'150/160':dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
@@ -565,9 +610,9 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};D=ST.ed||base();hist=[];save();sync({op:ST.op,est:{...ST.est},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};ST.av=ST.av||{};D=ST.ed||base();hist=[];save();sync({op:ST.op,est:{...ST.est},av:{...ST.av},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  ST={inst:{},arr:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed};save();sync({inst:{},arr:{},tub:{},con:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  ST={inst:{},arr:{},av:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed};save();sync({inst:{},arr:{},av:{},tub:{},con:{}});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(net){const t={...G.tot};if(!net&&!alt())return t;
@@ -592,7 +637,7 @@ document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="back
 <tr><td>Microtubo das tomadas</td><td class="n">${fmt(G.tom.reduce((a,t)=>a+t.L,0))} m</td></tr><tr class="tot"><td>Total de fita</td><td class="n">${fmt(G.L1+G.L2)} m</td></tr>`;
 // ---------- planilha
 const PL=G.pl;const br=n=>Math.round(n).toLocaleString('pt-BR');
-const arrB=(b,dn)=>Math.min(+ST.arr[b+'-'+dn]||0,(G.enterrado.find(e=>e.b==b&&e.dn==dn)||{barras:0}).barras);
+const arrB=(b,dn)=>arrQ(b,dn);
 function plData(p){
   if(p==='resumo'){
     const H=['Tubo','Solto (m)','Solto (barras)','Enterrado (m)','Enterrado (barras)','Total (m)','Total (barras)','Precisa (m)','Precisa (barras)','Já arrancado (barras)','Sobra/falta (barras)'];
@@ -639,6 +684,7 @@ document.getElementById('bXls').onclick=()=>{
     const d=plData(k);const ws=XLSX.utils.aoa_to_sheet([d.H,...d.rows,[],[d.note]]);ws['!cols']=d.H.map(h=>({wch:Math.max(10,h.length+2)}));XLSX.utils.book_append_sheet(wb,ws,n)});
   const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(G.enterrado.map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,'DN '+(e.dn==150?160:e.dn),e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(arr),'Arranque (progresso)');
+  {const P=planoAV();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Bloco','Válvula','DN (mm)','Lado 1 (m)','Lado 2 (m)','Barras','Arrancar (plano)','Arrancadas']].concat(AV.map(r=>[r.b,r.v,r.dn,r.l1,r.l2,r.n,P.usa[r.k]||0,avQ(r)]))),'Arranque por válvula')}
   const hoje=new Date().toISOString().slice(0,10);XLSX.writeFile(wb,`Peirot_tubos_${hoje}.xlsx`);
   document.getElementById('plNote').textContent='Planilha exportada.';
 };
@@ -670,7 +716,7 @@ function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs
     if(d<bd){bd=d;best={p:fromLL(map.containerPointToLatLng(c)),seg:1}}}});
   return best}
 const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
-function redraw(){drawNet();drawEd();renderMat();renderMont();renderOp();renderTurnos();renderBal();renderPl();edMsg()}
+function redraw(){drawNet();drawEd();renderMat();renderMont();renderOp();renderTurnos();renderBal();renderAV();renderPl();edMsg()}
 function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));save();sync({ed:JSON.stringify(D)});redraw();setTimeout(depoisDeOcupado,50)}
 function edMsg(){eMsg.innerHTML=MV?'<b>Movendo ponto:</b> clique (ou toque) no lugar novo do mapa. Perto de outro ponto ou de uma linha, ele encaixa ali. Para desistir, aperte Esc ou clique de novo no ponto vermelho.':DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
   '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'||' tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
