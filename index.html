@@ -97,7 +97,9 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 #plBody th{text-transform:none;letter-spacing:0;white-space:normal;font-size:.8rem;line-height:1.2;min-width:58px}
 #plBody td{white-space:nowrap}
 #tAV td{vertical-align:top}
-.hero{font:700 3rem/1.05 var(--f-head);margin:4px 0}.hero.sm{font-size:1.6rem}.etp{padding:10px 0;border-bottom:1px solid var(--rule)}.etp-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:6px}.etp-h a{color:var(--ink)}.etp .bar{background:var(--okbg)}
+.hero{font:700 clamp(2rem,9vw,3rem)/1.05 var(--f-head);margin:4px 0}.hero.sm{font-size:1.6rem}.etp{padding:10px 0;border-bottom:1px solid var(--rule)}.etp-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:6px}.etp-h a{color:var(--ink)}.etp .bar{background:var(--okbg)}
+#tstList td{vertical-align:top;padding:6px 6px 6px 0}#tstList tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tstList tr.done td{color:var(--mut)}#tstList input[type=number]{width:70px}#tstList small{color:var(--mut)}#tstList button{margin-top:4px;padding:4px 8px}
+#tubList small{color:var(--mut)}#tubList td{vertical-align:top}.ck2 label{display:flex;gap:6px;align-items:center;font-size:.85rem;white-space:nowrap;margin-bottom:4px}
 #tCompra{font-size:.9rem}#tCompra td,#tCompra th{padding:6px 4px 6px 0}#tCompra input{width:62px}#tCompra td{vertical-align:top}#tCompra tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tCompra tr.done td{color:var(--mut)}#tCompra small{font-size:.76rem;color:var(--mut)}
 select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
 #opCmp small{font-size:.76rem;color:var(--mut)}#opCmp{font-size:.84rem}#opCmp td,#opCmp th{padding:5px 3px 5px 0}#opCmp .pill{padding:1px 6px;font-size:.8rem}
@@ -120,7 +122,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v16</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#plano">Plano</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#compras">Compras</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v17</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#plano">Plano</a><a href="#arranque">1 Arrancar</a><a href="#compras">2 Compras</a><a href="#tubos">3·4 Tubos</a><a href="#mangueiras">5 Mangueiras</a><a href="#testes">6 Testes</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -167,49 +169,34 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </section>
 
 <section class="card" id="plano">
-  <h2>Plano de ação · retirada e montagem</h2>
+  <h2>Plano de execução · 6 etapas em sequência</h2>
   <div class="hero" id="plFim">—</div>
   <p class="note" id="plMsg" style="margin-top:4px"></p>
   <div id="tPlano"></div>
-  <details class="note" style="margin-top:10px"><summary>Ajustar dias de trabalho, prazo e ritmo da equipe</summary>
+  <details class="note" style="margin-top:10px"><summary>Ajustar dias de trabalho, prazo, entrega do material e ritmo da equipe</summary>
     <div class="mapbar" style="margin:8px 0">
       <label for="plDs">Dias de trabalho por semana</label><select id="plDs"><option value="5">5 (seg a sex)</option><option value="6">6 (seg a sáb)</option><option value="7">7 (todos os dias)</option></select>
       <label for="plPz">Prazo desejado</label><input type="date" id="plPz">
+      <label for="plEn">Entrega do material</label><input type="number" id="plEn" min="0" step="1" placeholder="7"><span>dias</span>
     </div>
-    <div class="mapbar" style="margin:8px 0">
-      <label for="plRa">Retirada (barras/dia)</label><input type="number" id="plRa" min="0" step="1">
-      <label for="plRe">Eucalipto (m/dia)</label><input type="number" id="plRe" min="0" step="10">
-      <label for="plRt">Tubulação (m/dia)</label><input type="number" id="plRt" min="0" step="10">
-      <label for="plRc">Conexões (un./dia)</label><input type="number" id="plRc" min="0" step="1">
+    <p class="note" style="margin:8px 0 4px"><b>Ritmo previsto por dia</b> (para as etapas que ainda não começaram):</p>
+    <div class="mapbar" style="margin:0 0 8px">
+      <label for="plRa">1. Arrancar (barras)</label><input type="number" id="plRa" min="0" step="1" placeholder="ex.: 40">
+      <label for="plRm">3. Marcação (m)</label><input type="number" id="plRm" min="0" step="50" placeholder="ex.: 1000">
+      <label for="plRt">4. Tubos (m)</label><input type="number" id="plRt" min="0" step="10" placeholder="ex.: 300">
+      <label for="plRc">4. Conexões (un.)</label><input type="number" id="plRc" min="0" step="1" placeholder="ex.: 10">
+      <label for="plRe">5. Mangueiras (m)</label><input type="number" id="plRe" min="0" step="50" placeholder="ex.: 1500">
+      <label for="plRx">6. Testes (testes)</label><input type="number" id="plRx" min="0" step="1" placeholder="ex.: 8">
     </div>
     <p class="note" style="margin:0">Deixe o ritmo em branco para o app medir sozinho: média dos últimos 21 dias, a partir do 2º dia com marcação. O ritmo digitado vale até ser apagado.</p>
   </details>
   <h3 style="margin-top:16px">Últimos dias</h3>
-  <div class="tbl"><table id="tHist"></table></div>
-  <p class="note">A previsão usa o que for marcado no app: barras no plano de arranque, trechos de eucalipto e fitas, trechos de tubo e conexões na montagem. Marque no mesmo dia em que o serviço foi feito.</p>
-</section>
-
-<section class="card" id="montagem">
-  <h2>Montagem do quebra-vento</h2>
-  <h3>Passo 1 · Eucalipto, fitas e tomadas</h3>
-  <div class="big"><div><b id="mPct">0%</b><span>montado</span></div><div><b id="mSeg">0/49</b><span>trechos</span></div><div><b id="mFita">0 m</b><span>fita instalada</span></div></div>
-  <div class="bar" style="margin-top:10px"><i id="mBar"></i></div>
-  <p class="note">Marque cada trecho quando o eucalipto, as duas fitas e as tomadas estiverem instalados. Também dá para marcar tocando no trecho no mapa (camada Montagem).</p>
-  <div class="segs" id="segList"></div>
-  <h3 id="passo2" style="margin-top:24px">Passo 2 · Tubulação</h3>
-  <div class="big"><div><b id="tPct">0%</b><span>montado</span></div><div><b id="tSeg">0/0</b><span>trechos de tubo</span></div><div><b id="tMet">0 m</b><span>tubo instalado</span></div></div>
-  <div class="bar" style="margin-top:10px"><i id="tBar"></i></div>
-  <p class="note">Marque cada trecho de tubo quando estiver no lugar, emendado e com os furos tampados. Se o desenho for editado, a lista acompanha o desenho novo.</p>
-  <div class="tbl chk"><table id="tubList"></table></div>
-  <h3 id="conexoes" style="margin-top:24px">Passo 3 · Conexões</h3>
-  <div class="big"><div><b id="cPct">0%</b><span>instalado</span></div><div><b id="cSeg">0/0</b><span>conexões</span></div></div>
-  <div class="bar" style="margin-top:10px"><i id="cBar"></i></div>
-  <p class="note">Lista de todas as conexões da tubulação, uma por linha, com o lugar de cada uma. Marque quando estiver instalada e sem vazamento. As tomadas e os conectores de início e final de fita entram no passo 1, junto com cada trecho.</p>
-  <div class="tbl chk"><table id="conList"></table></div>
+  <ul class="notes" id="tHist"></ul>
+  <p class="note">A previsão usa o que for marcado no app em cada etapa. Marque no mesmo dia em que o serviço foi feito.</p>
 </section>
 
 <section class="card" id="arranque">
-  <h2>Arranque de tubos enterrados (barras de 6 m)</h2>
+  <h2>1 · Arrancar tubos enterrados (barras de 6 m)</h2>
   <h3>Plano válvula por válvula · coco</h3>
   <p class="note" id="avRes" style="margin-top:0"></p>
   <p class="note">Os blocos vêm na ordem de onde sai mais tubo útil. Marque cada válvula e diâmetro quando o tubo sair; se alguma barra quebrar, corrija o número de barras boas. "Pode ficar" = não precisa arrancar para esta opção; "usar N" = basta tirar N barras.</p>
@@ -223,8 +210,15 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </section>
 
 <section class="card" id="compras">
-  <div class="plhead"><h2 style="margin:0">Lista de compras</h2><button id="bCmpCopy" class="on">Copiar lista</button></div>
+  <div class="plhead"><h2 style="margin:0">2 · Solicitação de compra de material</h2><button id="bCmpCopy" class="on">Copiar lista</button></div>
   <p class="note" id="cmpRes" style="margin-top:0"></p>
+  <div class="mapbar" style="margin:8px 0">
+    <button id="bSolic">Marcar solicitação enviada hoje</button>
+    <label for="cSolic">Enviada em</label><input type="date" id="cSolic">
+    <label for="cEntr">Entrega em</label><input type="number" id="cEntr" min="0" step="1" placeholder="7"><span>dias</span>
+    <button id="bReceb">Todo o material chegou</button>
+  </div>
+  <p class="note" id="solMsg" style="margin:0 0 8px"></p>
   <p class="note">Sai sozinha do desenho e da opção escolhida: mudou o desenho, a lista muda junto. Em "Já tenho", digite o que já está no estoque ou já foi comprado; a coluna Comprar mostra o que falta. Nos tubos, "já tenho" conta o tubo solto mais todo o enterrado (arrancando tudo).</p>
   <div class="mapbar" style="margin:8px 0">
     <label for="cFol">Folga para perda e quebra</label><input type="number" id="cFol" min="0" max="30" step="1"><span>%</span>
@@ -234,6 +228,35 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <textarea id="cmpTxt" hidden readonly></textarea>
   <div class="tbl"><table id="tCompra"></table></div>
   <p class="note">A folga vale para tubos, fita e microtubo (recomendo 3 a 5%). Com os pontos ligados, a lista inclui uma válvula de retenção na saída de cada ponto, para a água não voltar para o sistema do coco, e um registro na interligação. Os furos dos tubos usados que não virarem tomada também precisam ser tampados.</p>
+</section>
+
+<section class="card" id="tubos">
+  <h2>3 e 4 · Marcação e instalação dos tubos</h2>
+  <div class="big"><div><b id="tmPct">0%</b><span>marcado</span></div><div><b id="tPct">0%</b><span>instalado</span></div><div><b id="tSeg">0/0</b><span>trechos instalados</span></div><div><b id="tMet">0 m</b><span>tubo instalado</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="tBar"></i></div>
+  <p class="note">3. Marque <b>Marcado</b> quando o caminho do trecho estiver marcado no chão para escavar (o GPS do mapa e o arquivo KML do desenho ajudam). 4. Marque <b>Instalado</b> quando o tubo estiver no lugar, emendado e com os furos tampados. Se o desenho for editado, a lista acompanha o desenho novo.</p>
+  <div class="tbl chk"><table id="tubList"></table></div>
+  <h3 id="conexoes" style="margin-top:24px">Conexões da tubulação</h3>
+  <div class="big"><div><b id="cPct">0%</b><span>instalado</span></div><div><b id="cSeg">0/0</b><span>conexões</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="cBar"></i></div>
+  <p class="note">Todas as conexões da tubulação, uma por linha, com o lugar de cada uma. Marque quando estiver instalada e sem vazamento. As tomadas e os conectores de fita entram na etapa 5.</p>
+  <div class="tbl chk"><table id="conList"></table></div>
+</section>
+
+<section class="card" id="mangueiras">
+  <h2>5 · Instalação das mangueiras (fitas e tomadas)</h2>
+  <div class="big"><div><b id="mPct">0%</b><span>instalado</span></div><div><b id="mSeg">0/49</b><span>trechos</span></div><div><b id="mFita">0 m</b><span>fita instalada</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="mBar"></i></div>
+  <p class="note">Marque cada trecho quando as duas fitas e as tomadas estiverem instaladas, com o final das fitas fechado. Também dá para marcar tocando no trecho no mapa (camada Montagem).</p>
+  <div class="segs" id="segList"></div>
+</section>
+
+<section class="card" id="testes">
+  <h2>6 · Testes do sistema</h2>
+  <div class="big"><div><b id="xPct">0%</b><span>feito</span></div><div><b id="xN">0/0</b><span>testes</span></div></div>
+  <div class="bar" style="margin-top:10px"><i id="xBar"></i></div>
+  <p class="note">Faça na ordem: lavagem de cada linha, vazamento, e depois cada turno. Nas pressões, digite o que o manômetro marcou: o app compara com o previsto e avisa se algo está fora.</p>
+  <div class="tbl chk"><table id="tstList"></table></div>
 </section>
 
 <section class="card" id="planilha">
@@ -324,7 +347,7 @@ const W={160:8,125:6,100:4.5,75:3,50:2.5,32:2};
 const KEY='peirot_quebravento_v1';
 let ST={inst:{},arr:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.inst)ST=s}catch(e){}
-ST.tub=ST.tub||{};ST.con=ST.con||{};ST.est=ST.est||{};ST.av=ST.av||{};
+ST.tub=ST.tub||{};ST.con=ST.con||{};ST.est=ST.est||{};ST.av=ST.av||{};ST.mar=ST.mar||{};ST.tst=ST.tst||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 // ---------- sincronização entre aparelhos (Firebase / Firestore do projeto registroocorrencia)
 // Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
@@ -362,7 +385,7 @@ function mostraSync(){if(SY.err)return;const m=SY.meta||{},d=SY.doc,np=Object.ke
   else syncSt('ok','Sincronizado','Tudo o que for marcado aqui (montagem, arranque e desenho) aparece sozinho nos outros aparelhos com o app aberto, e vice-versa.'+(d&&d.atualizadoEm&&d.atualizadoEm.toDate?' Última mudança: '+d.atualizadoEm.toDate().toLocaleString('pt-BR')+(d.por===DEV?' (este aparelho).':'.'):''))}
 function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.matches&&document.activeElement.matches('input[type=number],input[type=date],select,textarea')&&document.activeElement.closest('#tArr,#tBal,#tAV,#turnos,#plano,#compras'))}
 // documento da nuvem com o que ainda está na fila por cima
-function comPend(d){const o={...d};['inst','arr','av','tub','con','est','eds'].forEach(m=>o[m]={...(d[m]||{})});
+function comPend(d){const o={...d};['inst','arr','av','tub','con','est','eds','mar','tst'].forEach(m=>o[m]={...(d[m]||{})});
   Object.entries(PEND).forEach(([k,v])=>{const i=k.indexOf('.');if(i<0){if(v===null)delete o[k];else o[k]=v}else{const a=k.slice(0,i),b=k.slice(i+1);o[a]={...(o[a]||{})};if(v===null)delete o[a][b];else o[a][b]=v}});
   return o}
 const GRUPO_ED=k=>k==='op'||k==='ed'||k==='edT'||k==='eds'||k.startsWith('eds.');
@@ -373,6 +396,7 @@ function aplicaRemoto(d0){
   const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};ST.est={...(d.est||{})};
   ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};ST.av={...(d.av||{})};
   ST.tub={};Object.keys(tub).forEach(k=>{if(tub[k])ST.tub[k]=true});ST.con={};Object.keys(con).forEach(k=>{if(con[k])ST.con[k]=true});
+  ST.mar={};Object.keys(d.mar||{}).forEach(k=>{if(d.mar[k])ST.mar[k]=true});ST.tst={...(d.tst||{})};
   // edição de cada opção; 'ed' é sempre a da opção atual (versões antigas do app só conhecem 'ed')
   const opN=+d.op||1,eds={};Object.entries(d.eds||{}).forEach(([n,j])=>{if(j){try{eds[n]=JSON.parse(j)}catch(e){}}});
   if(d.ed){try{eds[opN]=JSON.parse(d.ed)}catch(e){}}else delete eds[opN];
@@ -398,10 +422,11 @@ function iniciarSync(){
       const d=snap.exists?snap.data():null;SY.meta=snap.metadata;SY.doc=d;
       if(SY.first){SY.first=false;SY.ok=true;SY.err='';
         // primeira conexão: junta o que já existe aqui com o que está na nuvem (não perde nada)
-        const loc={};['inst','tub','con'].forEach(c=>Object.keys(ST[c]||{}).forEach(k=>{if(!(d&&d[c]&&d[c][k]))loc[c+'.'+k]=true}));
+        const loc={};['inst','tub','con','mar'].forEach(c=>Object.keys(ST[c]||{}).forEach(k=>{if(!(d&&d[c]&&d[c][k]))loc[c+'.'+k]=true}));
         Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
         Object.entries(ST.av||{}).forEach(([k,v])=>{if(v>((d&&d.av&&d.av[k])||0))loc['av.'+k]=v});
         Object.entries(ST.est||{}).forEach(([k,v])=>{if(!(d&&d.est&&k in d.est))loc['est.'+k]=v});
+        Object.entries(ST.tst||{}).forEach(([k,v])=>{if(!(d&&d.tst&&k in d.tst))loc['tst.'+k]=v});
         // desenho: vale o mais novo (data da última mudança); sem data dos dois lados, a nuvem só é completada
         const rT=+(d&&d.edT)||0,lT=+ST.edT||0;
         if(lT>rT)Object.assign(loc,campoEd());
@@ -637,6 +662,7 @@ function renderTurnos(){const T=TUR(),H=hidrNet(D),pb=H.pb;
      ${it?`<p class="note" style="margin:0">${it}</p>`:''}${av?`<div>${av}</div>`:''}
      <button data-t="${ti}">Ver no mapa</button></div>`}).join('');
   document.querySelectorAll('#tTurnos button[data-t]').forEach(b=>b.onclick=()=>{showTurno(+b.dataset.t);document.getElementById('map').scrollIntoView({behavior:'smooth'})});
+  if(typeof renderTestes==='function')try{renderTestes()}catch(e){}
   const ak=AUTO();document.querySelectorAll('#ctlSel button[data-ctl]').forEach(b=>b.classList.toggle('on',(b.dataset.ctl==='a')===ak));
   {const lr=document.getElementById('lgReg');if(lr)lr.textContent=ak?'Válvula automática de linha':'Registro de linha';
    const nv=conLista().filter(x=>x.lin!=null).length,tam=[...new Set(G.linhas.map(l=>VPOL(l.Q)))].join(' / ');
@@ -659,13 +685,14 @@ function verNoMapa(ll,txt){const el=document.getElementById('map');el.scrollInto
   if(Array.isArray(ll[0]))map.fitBounds(L.latLngBounds(ll),{maxZoom:19,padding:[30,30]});else map.setView(ll,19);
   L.popup().setLatLng(Array.isArray(ll[0])?ll[Math.floor(ll.length/2)]:ll).setContent(`<div class="pop">${txt}</div>`).openOn(map)}
 function renderPassos(){
-  const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),td=tl.filter(x=>ST.tub[x.k]),Ld=td.reduce((a,x)=>a+x.L,0),pt=Lt?100*Ld/Lt:0;
+  const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),td=tl.filter(x=>ST.tub[x.k]),Ld=td.reduce((a,x)=>a+x.L,0),pt=Lt?100*Ld/Lt:0,Lm=tl.filter(x=>ST.mar[x.k]).reduce((a,x)=>a+x.L,0);
+  document.getElementById('tmPct').textContent=Math.round(Lt?100*Lm/Lt:0)+'%';
   document.getElementById('tPct').textContent=Math.round(pt)+'%';document.getElementById('tSeg').textContent=`${td.length}/${tl.length}`;
   document.getElementById('tMet').textContent=fmt(Ld)+' m';document.getElementById('tBar').style.width=pt+'%';
-  const T=document.getElementById('tubList');T.innerHTML='<tr><th>Feito</th><th>Trecho</th><th>Ponto</th><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th><th></th></tr>'+
-    tl.map((x,j)=>`<tr class="${ST.tub[x.k]?'done':''}"><td><input type="checkbox" data-k="${x.k}" aria-label="Tubo instalado: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.tub[x.k]?'checked':''}></td><td>${x.t.d}</td><td>${x.t.o?'Ponto '+x.t.o.slice(1):'—'}</td><td><span class="sw" style="background:${DC[x.t.dm]}"></span>${DL(x.t.dm)} mm</td><td class="n">${fmt(x.L)}</td><td class="n">${Math.ceil(x.L/6)}</td><td><button data-i="${j}">Mapa</button></td></tr>`).join('');
-  T.querySelectorAll('input').forEach(i=>i.onchange=()=>toggleChk('tub',i.dataset.k));
-  T.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=tl[+b.dataset.i];verNoMapa(ll(x.t.q),`<b>${x.t.d}</b><br>${DL(x.t.dm)} mm · ${fmt(x.L)} m<br>${ST.tub[x.k]?'instalado':'pendente'}`)});
+  const T=document.getElementById('tubList');T.innerHTML='<tr><th>Feito</th><th>Trecho</th><th class="n">Metros</th><th></th></tr>'+
+    tl.map((x,j)=>`<tr class="${ST.tub[x.k]?'done':''}"><td class="ck2"><label><input type="checkbox" data-c="mar" data-k="${x.k}" aria-label="Trecho marcado para escavar: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.mar[x.k]?'checked':''}>marcado</label><label><input type="checkbox" data-c="tub" data-k="${x.k}" aria-label="Tubo instalado: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.tub[x.k]?'checked':''}>instalado</label></td><td><span class="sw" style="background:${DC[x.t.dm]}"></span>${x.t.d}<br><small>${DL(x.t.dm)} mm · ${x.t.o?'Ponto '+x.t.o.slice(1):'—'} · ${Math.ceil(x.L/6)} barras</small></td><td class="n">${fmt(x.L)}</td><td><button data-i="${j}">Mapa</button></td></tr>`).join('');
+  T.querySelectorAll('input').forEach(i=>i.onchange=()=>toggleChk(i.dataset.c,i.dataset.k));
+  T.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=tl[+b.dataset.i];verNoMapa(ll(x.t.q),`<b>${x.t.d}</b><br>${DL(x.t.dm)} mm · ${fmt(x.L)} m<br>${ST.mar[x.k]?'marcado':'falta marcar'} · ${ST.tub[x.k]?'instalado':'falta instalar'}`)});
   const cl=conLista(),cd=cl.filter(x=>ST.con[x.k]).length,pc=cl.length?100*cd/cl.length:0;
   document.getElementById('cPct').textContent=Math.round(pc)+'%';document.getElementById('cSeg').textContent=`${cd}/${cl.length}`;document.getElementById('cBar').style.width=pc+'%';
   const C=document.getElementById('conList');C.innerHTML='<tr><th>Feito</th><th class="n">Nº</th><th>Conexão</th><th>Onde</th><th></th></tr>'+
@@ -684,7 +711,7 @@ function renderMont(){
   G.segs.forEach(g=>{const lb=document.createElement('label');lb.className=ST.inst[g.id]?'done':'';const cb=document.createElement('input');cb.type='checkbox';cb.id='sg-'+g.id;cb.checked=!!ST.inst[g.id];cb.onchange=()=>toggleSeg(g.id);
     lb.appendChild(cb);lb.appendChild(document.createTextNode(`${g.id} · ${g.L} m`));lb.title=qvName(g);list.appendChild(lb);
     monL[g.id].setStyle({color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'})});
-  renderPassos();renderPlano();
+  renderPassos();renderTestes();renderPlano();
 }
 // ---------- arranque por válvula (coco): barras de cada válvula; a soma por bloco fecha com o total enterrado
 const AV=(()=>{const by={},out=[];G.pl.coco.forEach(([b,v,dn,l1,l2])=>(by[b+'-'+dn]=by[b+'-'+dn]||[]).push({b,v,dn,l1,l2,x:(l1+l2)/6}));
@@ -749,9 +776,9 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};ST.av=ST.av||{};ST.eds=ST.eds||{};if(ST.ed)ST.eds[ST.op]=ST.ed;else delete ST.eds[ST.op];ST.edT=Date.now();D=ST.ed||base();hist=[];save();sync({op:ST.op,edT:ST.edT,eds:Object.fromEntries(Object.entries(ST.eds).map(([n,e])=>[n,JSON.stringify(e)])),est:{...ST.est},av:{...ST.av},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.mar=ST.mar||{};ST.tst=ST.tst||{};ST.op=ST.op||1;ST.est=ST.est||{};ST.av=ST.av||{};ST.eds=ST.eds||{};if(ST.ed)ST.eds[ST.op]=ST.ed;else delete ST.eds[ST.op];ST.edT=Date.now();D=ST.ed||base();hist=[];save();sync({op:ST.op,edT:ST.edT,eds:Object.fromEntries(Object.entries(ST.eds).map(([n,e])=>[n,JSON.stringify(e)])),est:{...ST.est},av:{...ST.av},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},mar:{...ST.mar},tst:{...ST.tst},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  const hk=Object.keys(ST.est).filter(k=>k.startsWith('h_'));hk.forEach(k=>delete ST.est[k]);ST={inst:{},arr:{},av:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed,eds:ST.eds,edT:ST.edT};save();sync({inst:{},arr:{},av:{},tub:{},con:{},...Object.fromEntries(hk.map(k=>['est.'+k,null]))});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  const hk=Object.keys(ST.est).filter(k=>k.startsWith('h_'));hk.forEach(k=>delete ST.est[k]);ST={inst:{},arr:{},av:{},tub:{},con:{},mar:{},tst:{},op:ST.op,est:ST.est,ed:ST.ed,eds:ST.eds,edT:ST.edT};save();sync({inst:{},arr:{},av:{},tub:{},con:{},mar:{},tst:{},...Object.fromEntries(hk.map(k=>['est.'+k,null]))});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(net){const t={...G.tot};if(!net&&!alt())return t;
@@ -823,6 +850,8 @@ document.getElementById('bXls').onclick=()=>{
     const d=plData(k);const ws=XLSX.utils.aoa_to_sheet([d.H,...d.rows,[],[d.note]]);ws['!cols']=d.H.map(h=>({wch:Math.max(10,h.length+2)}));XLSX.utils.book_append_sheet(wb,ws,n)});
   const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(G.enterrado.map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,'DN '+(e.dn==150?160:e.dn),e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(arr),'Arranque (progresso)');
+  {const C=cronograma(),f=d=>d?d.toLocaleDateString('pt-BR'):'';XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Etapa','Feito','Total','Unidade','Início previsto','Término previsto','Situação']].concat(C.E.map((e,i)=>[(i+1)+'. '+e.n,Math.round(e.feito),Math.round(e.tot),e.un,f(e.ini),f(e.fim),{ok:'Concluído',and:'Em andamento',esp:'Aguardando',sem:'Sem ritmo',dep:'Aguardando previsão'}[e.st]||'']))),'Plano de execução')}
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Grupo','Teste','Previsto (bar)','Resultado']].concat(listaTestes().map(t=>[t.g,t.nm,t.prev!=null?Math.round(t.prev*10)/10:'',t.num?(ST.tst[t.k]??''):(ST.tst[t.k]?'feito':'')]))),'Testes');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Grupo','Item','Precisa','Unidade','Já tenho','Comprar']].concat(listaCompras().map(x=>[x.g,x.nm,x.prec,x.un,x.tem,Math.max(0,x.prec-x.tem)]))),'Lista de compras');
   {const P=planoAV();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Bloco','Válvula','DN (mm)','Lado 1 (m)','Lado 2 (m)','Barras','Arrancar (plano)','Arrancadas']].concat(AV.map(r=>[r.b,r.v,r.dn,r.l1,r.l2,r.n,P.usa[r.k]||0,avQ(r)]))),'Arranque por válvula')}
   const hoje=new Date().toISOString().slice(0,10);XLSX.writeFile(wb,`Peirot_tubos_${hoje}.xlsx`);
@@ -871,10 +900,20 @@ function renderCompras(){const L=listaCompras(),T=document.getElementById('tComp
     e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
   const n=L.filter(x=>x.prec>x.tem).length;
   document.getElementById('cmpRes').innerHTML=(n?`<b>${n} ${n>1?'itens':'item'} para comprar</b>`:'<span class="pill ok">Nada para comprar</span>')+` · ${OPS[ST.op].n}${ST.ed?' (editada no mapa)':''}.`;
-  [['cFol',ST.est.folga||0],['cRolo',ST.est.rolo||'']].forEach(([id,v])=>{const e=document.getElementById(id);if(document.activeElement!==e)e.value=v})}
+  [['cFol',ST.est.folga||0],['cRolo',ST.est.rolo||''],['cSolic',ST.est.solic||''],['cEntr',ST.est.entr??'']].forEach(([id,v])=>{const e=document.getElementById(id);if(document.activeElement!==e)e.value=v});
+  const so=ST.est.solic?s2d(ST.est.solic):null,ch=so?new Date(so):null;if(ch)ch.setDate(ch.getDate()+entrega());
+  document.getElementById('solMsg').innerHTML=!n?'<span class="pill ok">Todo o material está em estoque</span>':so?`Solicitação enviada em ${dCurto(so)}; material previsto para <b>${dTxt(ch)}</b>.${ch<s2d(diaS())?' <span class="pill bad">atrasado</span>':''} Quando chegar, digite em "Já tenho" ou toque em "Todo o material chegou".`:'Solicitação ainda não enviada. Toque em "Copiar lista", mande para quem compra e depois em "Marcar solicitação enviada hoje".'}
 [['cFol','folga',30],['cRolo','rolo',100000]].forEach(([id,k,mx])=>{const e=document.getElementById(id);
   e.addEventListener('change',()=>{const v=Math.min(mx,Math.max(0,Math.round(+String(e.value).replace(',','.')||0)));if(v)ST.est[k]=v;else delete ST.est[k];save();sync({['est.'+k]:v||null});renderCompras();renderPlano()});
   e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
+document.getElementById('bSolic').onclick=()=>{ST.est.solic=diaS();save();sync({'est.solic':ST.est.solic});renderCompras();renderPlano()};
+[['cSolic','solic'],['cEntr','entr']].forEach(([id,k])=>{const e=document.getElementById(id);
+  e.addEventListener('change',()=>{let v=String(e.value).trim();if(k==='solic'){if(!/^\d{4}-\d\d-\d\d$/.test(v))v=null}else v=v===''?null:Math.max(0,Math.round(+v.replace(',','.')||0));
+    if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderCompras();renderPlano()});
+  e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
+let rcArm=false;document.getElementById('bReceb').onclick=()=>{const b=document.getElementById('bReceb');
+  if(!rcArm){rcArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rcArm=false;b.textContent='Todo o material chegou'},4000);return}
+  rcArm=false;b.textContent='Todo o material chegou';const up={};listaCompras().forEach(x=>{if(x.tem<x.prec){ST.est[x.sk]=x.prec;up['est.'+x.sk]=x.prec}});save();if(Object.keys(up).length)sync(up);marcaDia();renderCompras();renderBal();renderPlano()};
 document.getElementById('bCmpCopy').onclick=()=>{const L=listaCompras().map(x=>({...x,c:Math.max(0,x.prec-x.tem)})).filter(x=>x.c>0);
   const t=`Lista de compras · Quebra-vento Peirot · ${OPS[ST.op].n}${ST.ed?' (editada)':''} · ${new Date().toLocaleDateString('pt-BR')}\n`+(L.length?L.map(x=>`- ${fmt(x.c)} ${x.un} · ${x.nm}`).join('\n'):'Nada para comprar.');
   const m=document.getElementById('cmpMsg'),ta=document.getElementById('cmpTxt');
@@ -887,16 +926,21 @@ function dUtil(d){const w=d.getDay(),n=+ST.est.dsem||6;return n>=7||(n==6?w!==0:
 function nUteis(a,b){let n=0;const d=new Date(a);d.setDate(d.getDate()+1);while(d<=b){if(dUtil(d))n++;d.setDate(d.getDate()+1)}return n}
 function maisUteis(a,n){const d=new Date(a);let g=0;while(n>0&&g++<5000){d.setDate(d.getDate()+1);if(dUtil(d))n--}return d}
 function dTxt(d){return `${DOW[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`}
+// as 6 etapas da execução, na ordem do serviço
 function etapas(){const P=planoAV(),pr=curPrec(),need={...P.need,150:Math.max(0,pr[150]-(G.solto[150]||0))};
   let tA=0,dA=0,rA=0;[150,125,100,75].forEach(dn=>{const es=G.enterrado.filter(e=>e.dn==dn),ent=es.reduce((a,e)=>a+e.barras,0),ar=es.reduce((a,e)=>a+arrQ(e.b,e.dn),0),alvo=Math.min(need[dn]||0,ent);tA+=alvo;dA+=Math.min(alvo,ar);rA+=ar});
+  const LC=listaCompras(),okLC=LC.filter(x=>x.tem>=x.prec).length;
+  const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),dm=tl.filter(x=>ST.mar[x.k]).reduce((a,x)=>a+x.L,0),dt=tl.filter(x=>ST.tub[x.k]).reduce((a,x)=>a+x.L,0),cl=conLista(),dc=cl.filter(x=>ST.con[x.k]).length;
   const Le=G.segs.reduce((a,g)=>a+g.L,0),de=G.segs.filter(g=>ST.inst[g.id]).reduce((a,g)=>a+g.L,0);
-  const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),dt=tl.filter(x=>ST.tub[x.k]).reduce((a,x)=>a+x.L,0),cl=conLista(),dc=cl.filter(x=>ST.con[x.k]).length;
-  return [{k:'a',n:'Retirada de tubos (arranque)',un:'barras',tot:tA,feito:dA,raw:rA,href:'#arranque'},
-    {k:'e',n:'Eucalipto, fitas e tomadas',un:'m',tot:Le,feito:de,raw:de,href:'#montagem'},
-    {k:'t',n:'Tubulação',un:'m',tot:Lt,feito:dt,raw:dt,href:'#passo2'},
-    {k:'c',n:'Conexões',un:'un.',tot:cl.length,feito:dc,raw:dc,href:'#conexoes'}]}
+  const TS=listaTestes(),dx=TS.filter(feitoT).length;
+  return [{k:'a',n:'Arrancar tubos',un:'barras',tot:tA,feito:dA,raw:rA,href:'#arranque'},
+    {k:'p',n:'Solicitação de compra de material',un:'itens',tot:LC.length,feito:okLC,raw:okLC,href:'#compras',compra:true},
+    {k:'m',n:'Marcação onde vai ser escavado',un:'m',tot:Lt,feito:dm,raw:dm,href:'#tubos'},
+    {k:'t',n:'Instalação dos tubos',un:'m',tot:Lt,feito:dt,raw:dt,href:'#tubos',sub:{k:'c',n:'conexões',un:'un.',tot:cl.length,feito:dc,raw:dc}},
+    {k:'e',n:'Instalação das mangueiras',un:'m',tot:Le,feito:de,raw:de,href:'#mangueiras'},
+    {k:'x',n:'Testes do sistema',un:'testes',tot:TS.length,feito:dx,raw:dx,href:'#testes'}]}
 // guarda o total de cada etapa no fim de cada dia em que algo foi marcado
-function marcaDia(){const v={};etapas().forEach(e=>v[e.k]=Math.round(e.raw));const k='h_'+diaS();
+function marcaDia(){const v={};etapas().forEach(e=>{if(e.k!=='p')v[e.k]=Math.round(e.raw);if(e.sub)v[e.sub.k]=Math.round(e.sub.raw)});const k='h_'+diaS();
   if(JSON.stringify(ST.est[k])===JSON.stringify(v))return;ST.est[k]=v;save();sync({['est.'+k]:v})}
 function histDias(){return Object.keys(ST.est).filter(x=>/^h_\d{4}-\d\d-\d\d$/.test(x)).sort().map(x=>({d:s2d(x.slice(2)),v:ST.est[x]||{}}))}
 // ritmo medido: avanço desde o último registro antes de 21 dias atrás (ou desde o 1º dia), por dia de trabalho
@@ -904,34 +948,78 @@ function ritmo(e,H){const man=+ST.est['r'+e.k]||0,hoje=s2d(diaS()),ini=new Date(
   let base=null;H.forEach(h=>{if(h.d<ini)base=h});if(!base&&H.length)base=H[0];
   let med=0;if(base){const n=nUteis(base.d,hoje);if(n>0)med=Math.max(0,(e.raw-(+base.v[e.k]||0))/n)}
   return {man,med,usa:man>0?man:med}}
-function renderPlano(){const E=etapas(),H=histDias(),hoje=s2d(diaS()),prazo=ST.est.prazo?s2d(ST.est.prazo):null;let fimG=null;const semR=[];
-  const rows=E.map(e=>{const r=ritmo(e,H),falta=Math.max(0,e.tot-e.feito),pct=e.tot?Math.min(100,100*e.feito/e.tot):100;let fim=null,txt;
-    if(!e.tot||falta<=0)txt='<span class="pill ok">Concluído</span>';
-    else if(r.usa>0){fim=maisUteis(hoje,Math.ceil(falta/r.usa));txt=`termina por volta de <b>${dTxt(fim)}</b>`;if(!fimG||fim>fimG)fimG=fim}
-    else{txt='<span class="pill warn">sem ritmo ainda</span>';semR.push(e.n)}
-    let pz='';if(prazo&&falta>0){const n=nUteis(hoje,prazo);pz=n>0?`Para o prazo: ${fmt(Math.ceil(falta/n))} ${e.un} por dia`+(fim?(fim>prazo?' <span class="pill bad">atrasado</span>':' <span class="pill ok">no prazo</span>'):''):'<span class="pill bad">prazo vencido</span>'}
-    return `<div class="etp"><div class="etp-h"><a href="${e.href}">${e.n}</a><b>${Math.floor(pct)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div>
-      <p class="note" style="margin:4px 0 0">${fmt(e.feito)} de ${fmt(e.tot)} ${e.un} · faltam ${fmt(falta)}</p>
-      <p class="note" style="margin:2px 0 0">Ritmo: ${r.usa>0?fmt(r.usa)+' '+e.un+' por dia'+(r.man>0?' (digitado)':' (medido)'):'—'} · ${txt}</p>${pz?`<p class="note" style="margin:2px 0 0">${pz}</p>`:''}</div>`});
-  const nc=listaCompras().filter(x=>x.prec>x.tem).length;
-  rows.push(`<div class="etp"><div class="etp-h"><a href="#compras">Compras</a><b>${nc?nc+(nc>1?' itens':' item'):'ok'}</b></div><p class="note" style="margin:2px 0 0">${nc?'Itens que ainda faltam na lista de compras.':'Tudo comprado ou em estoque.'}</p></div>`);
+const entrega=()=>{const v=ST.est.entr;return v==null||v===''?7:+v};
+// cronograma em sequência: cada etapa começa quando a anterior termina (se já começou, conta a partir de hoje)
+function cronograma(){const E=etapas(),H=histDias(),hoje=s2d(diaS());let ant=null,quebrou=false;
+  const out=E.map(e=>{const sub=e.sub,feito=(!e.tot||e.feito>=e.tot)&&(!sub||!sub.tot||sub.feito>=sub.tot),o={...e,r:ritmo(e,H)};
+    if(feito){o.st='ok';return o}
+    if(quebrou){o.st='dep';return o}
+    const comecou=e.compra?!!ST.est.solic:e.feito>0||(sub&&sub.feito>0),base=comecou||!ant?hoje:ant;
+    if(e.compra){const ent=entrega();
+      if(ST.est.solic){o.ini=s2d(ST.est.solic);o.fim=new Date(o.ini);o.fim.setDate(o.fim.getDate()+ent);if(o.fim<hoje){o.atraso=true;o.fim=new Date(hoje)}}
+      else{o.ini=base;o.fim=maisUteis(base,1);o.fim.setDate(o.fim.getDate()+ent)}}
+    else{let dur;
+      if(e.feito<e.tot){if(!(o.r.usa>0)){o.st='sem';quebrou=true;return o}dur=Math.ceil((e.tot-e.feito)/o.r.usa)}
+      else{const rc=ritmo(sub,H);o.rc=rc;dur=rc.usa>0?Math.ceil((sub.tot-sub.feito)/rc.usa):1;o.estim=!(rc.usa>0)}
+      o.ini=base;o.fim=maisUteis(base,Math.max(1,dur))}
+    if(ant&&o.fim<ant){o.proprio=o.fim;o.fim=new Date(ant)}
+    o.st=comecou?'and':'esp';ant=o.fim;return o});
+  return {E:out,fim:quebrou?null:ant}}
+const dCurto=d=>`${DOW[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(ST.est.prazo):null,ds=+ST.est.dsem||6;
+  const rows=C.E.map((e,i)=>{const pct=e.tot?Math.min(100,100*e.feito/e.tot):100,un=e.un;let lin1=`${fmt(e.feito)} de ${fmt(e.tot)} ${un}`+(e.feito<e.tot?` · faltam ${fmt(e.tot-e.feito)}`:''),lin2='';
+    if(e.compra)lin1=`${fmt(e.feito)} de ${fmt(e.tot)} itens já em estoque · ${ST.est.solic?'solicitação enviada em '+dCurto(s2d(ST.est.solic)):'solicitação ainda não enviada'} · entrega em ${entrega()} dias`;
+    if(e.sub)lin1+=` · conexões: ${e.sub.feito} de ${e.sub.tot}`;
+    const rt=e.compra?'':`Ritmo: ${e.r.usa>0?fmt(e.r.usa)+' '+un+' por dia'+(e.r.man>0?' (digitado)':' (medido)'):'—'} · `;
+    if(e.st==='ok')lin2='<span class="pill ok">Concluído</span>';
+    else if(e.st==='sem')lin2=rt+'<span class="pill warn">sem ritmo ainda</span> digite o ritmo previsto em "Ajustar"';
+    else if(e.st==='dep')lin2='Aguardando a previsão da etapa anterior';
+    else lin2=rt+(e.st==='esp'?`começa por volta de ${dCurto(e.ini)} · `:'em andamento · ')+`termina por volta de <b>${dTxt(e.fim)}</b>`+(e.proprio?(e.compra?` (o material chega ${dCurto(e.proprio)}, mas a etapa anterior termina depois)`:` (pelo ritmo terminaria ${dCurto(e.proprio)}, mas espera a etapa anterior)`):'')+(e.atraso?' <span class="pill bad">material atrasado</span>':'')+(e.estim?' (conexões estimadas em 1 dia)':'');
+    return `<div class="etp"><div class="etp-h"><a href="${e.href}">${i+1}. ${e.n}</a><b>${Math.floor(pct)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div>
+      <p class="note" style="margin:4px 0 0">${lin1}</p><p class="note" style="margin:2px 0 0">${lin2}</p></div>`});
   document.getElementById('tPlano').innerHTML=rows.join('');
-  const pend=E.filter(e=>e.tot&&e.feito<e.tot);
-  const hf=document.getElementById('plFim');hf.textContent=!pend.length?'Concluído':semR.length?'Sem previsão ainda':dTxt(fimG);hf.classList.toggle('sm',!!(pend.length&&semR.length));
-  const ds=+ST.est.dsem||6;
-  document.getElementById('plMsg').innerHTML=!pend.length?'Retirada e montagem concluídas.':semR.length?`Para prever o término de tudo falta o ritmo de: <b>${semR.join(', ')}</b>. Digite o ritmo previsto em "Ajustar", logo abaixo, ou espere o 2º dia com marcação para o app medir sozinho.`:
-    `Previsão de término de tudo, com ${ds} dias de trabalho por semana e cada etapa no seu ritmo, ao mesmo tempo.`+(prazo?(fimG>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`:` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):'');
+  const pend=C.E.some(e=>e.st!=='ok'),hf=document.getElementById('plFim');
+  hf.textContent=!pend?'Concluído':C.fim?dTxt(C.fim):'Sem previsão ainda';hf.classList.toggle('sm',pend&&!C.fim);
+  const semR=C.E.filter(e=>e.st==='sem').map(e=>e.n);
+  document.getElementById('plMsg').innerHTML=!pend?'Todas as etapas concluídas.':
+    (C.fim?`Término previsto da última etapa (testes). As etapas vão em sequência: cada uma começa quando a anterior termina; se uma já começou antes, ela segue junto. Com ${ds} dias de trabalho por semana.`+(prazo?(C.fim>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}) em ${nUteis(prazo,C.fim)} dias de trabalho</span>`:` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):''):
+    `Para fechar a previsão falta o ritmo de: <b>${semR.join(', ')}</b>. Digite o ritmo previsto em "Ajustar", logo abaixo, ou espere o 2º dia com marcação para o app medir sozinho.`);
   // últimos dias registrados
-  const Hs=H.slice(-11);let th='<tr><th>Dia</th><th class="n">Barras</th><th class="n">Eucalipto</th><th class="n">Tubo</th><th class="n">Conexões</th></tr>';
+  const Hs=H.slice(-11),nomes={a:['barras arrancadas',''],m:['m marcados',''],t:['m de tubo',''],c:['conexões',''],e:['m de mangueira',''],x:['testes','']};let hl='';
   for(let i=Hs.length-1;i>=Math.max(0,Hs.length-10);i--){const h=Hs[i],p=Hs[i-1];
-    const c=(k,u)=>{const v=+h.v[k]||0;if(!p)return fmt(v)+u;const d=v-(+p.v[k]||0);return d?(d>0?'+':'')+fmt(d)+u:'—'};
-    th+=`<tr><td>${pad(h.d.getDate())}/${pad(h.d.getMonth()+1)}${p?'':' <small>(1º dia)</small>'}</td><td class="n">${c('a','')}</td><td class="n">${c('e',' m')}</td><td class="n">${c('t',' m')}</td><td class="n">${c('c','')}</td></tr>`}
-  document.getElementById('tHist').innerHTML=Hs.length?th:'<tr><td>Ainda não há dias registrados. Cada dia em que algo for marcado na retirada ou na montagem fica guardado aqui.</td></tr>';
-  [['plDs',String(ds)],['plPz',ST.est.prazo||''],['plRa',ST.est.ra||''],['plRe',ST.est.re||''],['plRt',ST.est.rt||''],['plRc',ST.est.rc||'']].forEach(([id,v])=>{const e=document.getElementById(id);if(document.activeElement!==e)e.value=v})}
-[['plDs','dsem'],['plPz','prazo'],['plRa','ra'],['plRe','re'],['plRt','rt'],['plRc','rc']].forEach(([id,k])=>{const e=document.getElementById(id);
-  e.addEventListener('change',()=>{let v=String(e.value).trim();if(id!=='plPz'){v=v===''?null:Math.max(0,+v.replace(',','.')||0)||null}else if(!/^\d{4}-\d\d-\d\d$/.test(v))v=null;
-    if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano()});
+    const it=Object.keys(nomes).map(k=>{const v=+h.v[k]||0,d=p?v-(+p.v[k]||0):v;return d?`${d>0&&p?'+':''}${fmt(d)} ${nomes[k][0]}`:''}).filter(Boolean);
+    hl+=`<li><b>${pad(h.d.getDate())}/${pad(h.d.getMonth()+1)}</b>${p?'':' (1º dia)'}: ${it.length?it.join(', '):'sem avanço'}</li>`}
+  document.getElementById('tHist').innerHTML=Hs.length?hl:'<li>Ainda não há dias registrados. Cada dia em que algo for marcado em uma das etapas fica guardado aqui.</li>';
+  [['plDs',String(ds)],['plPz',ST.est.prazo||''],['plEn',ST.est.entr??''],['plRa',ST.est.ra||''],['plRm',ST.est.rm||''],['plRt',ST.est.rt||''],['plRc',ST.est.rc||''],['plRe',ST.est.re||''],['plRx',ST.est.rx||'']].forEach(([id,v])=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v})}
+[['plDs','dsem'],['plPz','prazo'],['plEn','entr'],['plRa','ra'],['plRm','rm'],['plRt','rt'],['plRc','rc'],['plRe','re'],['plRx','rx']].forEach(([id,k])=>{const e=document.getElementById(id);
+  e.addEventListener('change',()=>{let v=String(e.value).trim();if(id==='plPz'){if(!/^\d{4}-\d\d-\d\d$/.test(v))v=null}else if(id==='plEn'){v=v===''?null:Math.max(0,Math.round(+v.replace(',','.')||0))}else{v=v===''?null:Math.max(0,+v.replace(',','.')||0)||null}
+    if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano();if(id==='plEn')renderCompras()});
   e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
+// ---------- 6. testes do sistema
+function listaTestes(){const L=[],H=hidrNet(D),T=TUR();
+  G.linhas.forEach((l,i)=>{const ti=T.findIndex(t=>t.idx.includes(i)),r=ti>=0?H.t[ti]:null,prev=r&&r.pmin[l.id]!=null?r.pmin[l.id]/10:null,g='Linha '+l.id;
+    L.push({k:'lav_'+l.id,g,nm:`Lavagem: abrir o final da linha ${l.id}, deixar sair a sujeira e fechar`});
+    L.push({k:'vaz_'+l.id,g,nm:`Linha ${l.id} em pressão sem vazamento (tubo, conexões e tomadas)`});
+    L.push({k:'pp_'+l.id,g,nm:`Pressão na última tomada da linha ${l.id}, com o turno aberto`,num:1,prev});
+    if(AUTO())L.push({k:'val_'+l.id,g,nm:`Válvula V-${l.id} abre e fecha pelo comando`})});
+  T.forEach((t,ti)=>{const g=`${t.n} (${t.lin.join(' + ')})`;L.push({k:'tur_'+(ti+1),g,nm:'Todas as fitas do turno molhando até a ponta'});
+    [0,1].forEach(i=>{if(H.t[ti].Q[i]>.05)L.push({k:`pt_${ti+1}_${i+1}`,g,nm:`Pressão no Ponto ${i+1} com o turno aberto`,num:1,prev:H.pb[i],ponto:i})})});
+  return L}
+function feitoT(t){const v=ST.tst[t.k];return t.num?v!=null&&v!=='':!!v}
+function renderTestes(){const L=listaTestes(),T=document.getElementById('tstList');if(!T)return;let g0='',h='';
+  L.forEach((t,i)=>{if(t.g!==g0){g0=t.g;h+=`<tr class="bh"><td colspan="3">${t.g}</td></tr>`}const v=ST.tst[t.k],ok=feitoT(t);
+    let st='';if(t.num&&ok&&t.prev!=null){const m=+v;
+      if(t.ponto!=null)st=Math.abs(m-t.prev)>.2?`<span class="pill warn">diferente dos ${f1(t.prev)} bar usados no cálculo</span> <button data-usa="${i}">Usar ${f1(m)} bar</button>`:'<span class="pill ok">igual ao cálculo</span>';
+      else st=m<1?'<span class="pill bad">abaixo de 1 bar: a fita não rega direito</span>':m<t.prev-.3?'<span class="pill warn">abaixo do previsto: procure vazamento, entupimento ou registro meio fechado</span>':'<span class="pill ok">dentro do previsto</span>'}
+    h+=`<tr class="${ok?'done':''}"><td>${t.num?`<input type="number" min="0" max="10" step="0.1" data-i="${i}" value="${ok?v:''}" placeholder="bar" aria-label="${t.nm}">`:`<input type="checkbox" data-i="${i}" ${ok?'checked':''} aria-label="${t.nm}">`}</td>
+      <td>${t.nm}${t.num&&t.prev!=null?`<br><small>previsto: ${f1(t.prev)} bar</small>`:''}${st?`<br>${st}`:''}</td></tr>`});
+  T.innerHTML=h;
+  const ok=L.filter(feitoT).length,pc=L.length?100*ok/L.length:0;
+  document.getElementById('xPct').textContent=Math.round(pc)+'%';document.getElementById('xN').textContent=`${ok}/${L.length}`;document.getElementById('xBar').style.width=pc+'%';
+  const muda=(t,v)=>{if(v==null||v===false)delete ST.tst[t.k];else ST.tst[t.k]=v;save();sync({['tst.'+t.k]:t.k in ST.tst?ST.tst[t.k]:null});marcaDia();renderTestes();renderPlano()};
+  T.querySelectorAll('input[type=checkbox]').forEach(e=>e.onchange=()=>muda(L[+e.dataset.i],e.checked?true:null));
+  T.querySelectorAll('input[type=number]').forEach(e=>{e.onchange=()=>{const s=String(e.value).trim().replace(',','.');muda(L[+e.dataset.i],s===''?null:Math.min(10,Math.max(0,Math.round(+s*10)/10)))};e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
+  T.querySelectorAll('button[data-usa]').forEach(b=>b.onclick=()=>{const t=L[+b.dataset.usa],v=+ST.tst[t.k];ST.est['p'+(t.ponto+1)]=v;save();sync({['est.p'+(t.ponto+1)]:v});renderTurnos();renderOp();renderTestes();renderPlano()})}
 renderTurnos();renderMont();renderArr();renderPl();renderCompras();
 // ---------- edição do desenho
 let hist=[];
