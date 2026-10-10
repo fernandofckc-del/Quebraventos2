@@ -120,7 +120,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body>
-<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v14</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#plano">Plano</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#compras">Compras</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
+<nav aria-label="Atalhos"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v15</small></b><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span><a href="#mapa">Mapa</a><a href="#turnos">Turnos</a><a href="#plano">Plano</a><a href="#montagem">Montagem</a><a href="#conexoes">Conexões</a><a href="#arranque">Arranque</a><a href="#compras">Compras</a><a href="#planilha">Planilha</a><a href="#material">Material</a><a href="#detalhe">Detalhe</a><a href="#montar">Como montar</a></nav>
 <div class="wrap">
 <header id="mapa"><h1>Quebra-vento de eucalipto · Projeto Peirot 150 ha</h1><p class="sub">Linha dupla de 2,5 m no centro dos carreadores · fita de 4 L/h por metro · irrigação em 3 turnos</p></header>
 <div class="mapbar">
@@ -328,35 +328,63 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}};
 // Um documento só (quebravento/peirot) guarda: montagem (inst), arranque (arr) e o desenho editado (ed).
 // Cada caixinha e cada número vão como campo separado: duas pessoas mexendo ao mesmo tempo não apagam o trabalho uma da outra.
 const FB_CFG={apiKey:"AIzaSyAzsUSbMQsjMkADnOToZ3fMWEsPgbAOatg",authDomain:"registroocorrencia-94e27.firebaseapp.com",projectId:"registroocorrencia-94e27",storageBucket:"registroocorrencia-94e27.firebasestorage.app",messagingSenderId:"597413327398",appId:"1:597413327398:web:d6a87eaa7872203434ace7"};
-const SY={ref:null,ok:false,fila:{},first:true,adiado:false,err:''};
+const SY={ref:null,ok:false,first:true,adiado:false,err:'',meta:null,doc:null,tm:null};
 const DEV=(()=>{try{let d=localStorage.getItem('peirot_dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('peirot_dev',d)}return d}catch(e){return 'x'}})();
 function syncSt(cls,tx,info){const s=document.getElementById('sync');if(!s)return;s.className=cls;document.getElementById('syncTx').textContent=tx;const i=document.getElementById('syncInfo');if(i&&info!==undefined)i.innerHTML=info}
+// fila de envio: tudo o que ainda não foi confirmado pela nuvem fica guardado no aparelho
+// (sobrevive a fechar o app sem internet) e é reenviado; ao juntar com a nuvem, o que está na fila vale.
+const PKEY='peirot_pend';let PEND={};try{PEND=JSON.parse(localStorage.getItem(PKEY)||'{}')||{}}catch(e){PEND={}}
+function savePend(){try{localStorage.setItem(PKEY,JSON.stringify(PEND))}catch(e){}}
+// junta campos na fila sem misturar 'inst' inteiro com 'inst.x' (a nuvem recusa os dois juntos)
+function pendAdd(campos){Object.entries(campos).forEach(([k,v])=>{const i=k.indexOf('.');
+  if(i<0){Object.keys(PEND).forEach(x=>{if(x.startsWith(k+'.'))delete PEND[x]});PEND[k]=v}
+  else{const a=k.slice(0,i),b=k.slice(i+1);if(PEND[a]&&typeof PEND[a]==='object'){const m={...PEND[a]};if(v===null)delete m[b];else m[b]=v;PEND[a]=m}else PEND[k]=v}});savePend()}
 // envia campos: {'inst.H2-3':true,'arr.D-100':120,'ed':'...'}; null = apagar o campo
-function sync(campos){Object.assign(SY.fila,campos);if(SY.ok)flush();else if(!SY.err)syncSt('pend','Aguardando conexão…')}
-function flush(){if(!SY.ref)return;const F=firebase.firestore.FieldValue,up={};
-  Object.entries(SY.fila).forEach(([k,v])=>up[k]=v===null?F.delete():v);SY.fila={};
+function sync(campos){pendAdd(campos);if(SY.ok)flush();mostraSync()}
+function flush(){if(!SY.ref)return;const ks=Object.keys(PEND);if(!ks.length)return;
+  const F=firebase.firestore.FieldValue,env={...PEND},up={};ks.forEach(k=>up[k]=env[k]===null?F.delete():env[k]);
   up.atualizadoEm=F.serverTimestamp();up.por=DEV;
-  SY.ref.update(up).catch(e=>{
-    if(e&&e.code==='not-found'){const base={};Object.entries(up).forEach(([k,v])=>{if(k.includes('.')){const[a,b]=k.split(/\.(.+)/);(base[a]=base[a]||{})[b]=v}else base[k]=v});return SY.ref.set(base,{merge:true})}
-    throw e}).catch(syncErr)}
+  const ok=()=>{Object.keys(env).forEach(k=>{if(k in PEND&&JSON.stringify(PEND[k])===JSON.stringify(env[k]))delete PEND[k]});savePend();
+    if(SY.err&&SY.err!=='permission-denied')SY.err='';mostraSync();try{if(ED)edMsg()}catch(e){}};
+  const falha=e=>{const c=(e&&e.code)||'';if(c==='invalid-argument'){PEND={};savePend()}syncErr(e);clearTimeout(SY.tm);if(c!=='permission-denied')SY.tm=setTimeout(()=>{SY.tm=null;flush()},30000)};
+  let p;try{p=SY.ref.update(up)}catch(e){falha({code:'invalid-argument',message:String(e)});return}
+  p.catch(e=>{if(e&&e.code==='not-found'){const base={};Object.entries(up).forEach(([k,v])=>{const i=k.indexOf('.');if(i>0){const a=k.slice(0,i),b=k.slice(i+1);(base[a]=base[a]||{})[b]=v}else base[k]=v});return SY.ref.set(base,{merge:true})}throw e}).then(ok,falha)}
+window.addEventListener('online',()=>{if(SY.ok)flush()});
 function syncErr(e){const c=(e&&e.code)||String(e);SY.err=c;
   syncSt('err',c==='permission-denied'?'Sem permissão no Firebase':'Erro de sincronização',
    c==='permission-denied'?'O Firebase recusou: falta liberar a coleção <b>quebravento</b> nas regras do Firestore. Enquanto isso, o progresso fica salvo só neste aparelho.':'Não foi possível sincronizar ('+c+'). O progresso continua salvo neste aparelho.')}
+function mostraSync(){if(SY.err)return;const m=SY.meta||{},d=SY.doc,np=Object.keys(PEND).length;
+  if(!SY.ok)syncSt('pend','Aguardando conexão…','Suas mudanças ficam guardadas neste aparelho e sobem sozinhas para a nuvem quando conectar.');
+  else if(m.hasPendingWrites||np)syncSt('pend','Enviando…','Suas mudanças estão guardadas neste aparelho e sobem sozinhas para a nuvem assim que houver internet.');
+  else if(m.fromCache)syncSt('pend','Sem internet','Sem internet agora. O que você marcar fica guardado neste aparelho e sobe sozinho quando o sinal voltar.');
+  else syncSt('ok','Sincronizado','Tudo o que for marcado aqui (montagem, arranque e desenho) aparece sozinho nos outros aparelhos com o app aberto, e vice-versa.'+(d&&d.atualizadoEm&&d.atualizadoEm.toDate?' Última mudança: '+d.atualizadoEm.toDate().toLocaleString('pt-BR')+(d.por===DEV?' (este aparelho).':'.'):''))}
 function ocupado(){return (typeof DR!=='undefined'&&DR)||(typeof MV!=='undefined'&&MV)||document.querySelector('.leaflet-dragging')||(document.activeElement&&document.activeElement.matches&&document.activeElement.matches('input[type=number],input[type=date],select,textarea')&&document.activeElement.closest('#tArr,#tBal,#tAV,#turnos,#plano,#compras'))}
-function aplicaRemoto(d){
-  const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};ST.est={...(d.est||{})};const ed=d.ed?JSON.parse(d.ed):null;
-  const mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null);
+// documento da nuvem com o que ainda está na fila por cima
+function comPend(d){const o={...d};['inst','arr','av','tub','con','est','eds'].forEach(m=>o[m]={...(d[m]||{})});
+  Object.entries(PEND).forEach(([k,v])=>{const i=k.indexOf('.');if(i<0){if(v===null)delete o[k];else o[k]=v}else{const a=k.slice(0,i),b=k.slice(i+1);o[a]={...(o[a]||{})};if(v===null)delete o[a][b];else o[a][b]=v}});
+  return o}
+const GRUPO_ED=k=>k==='op'||k==='ed'||k==='edT'||k==='eds'||k.startsWith('eds.');
+function aplicaRemoto(d0){
+  // desenho: se a nuvem tem uma mudança mais nova que a da fila, vale a da nuvem
+  if(Object.keys(PEND).some(GRUPO_ED)&&(+d0.edT||0)>(+PEND.edT||0)){Object.keys(PEND).filter(GRUPO_ED).forEach(k=>delete PEND[k]);savePend()}
+  const d=comPend(d0);
+  const inst=d.inst||{},arr=d.arr||{},tub=d.tub||{},con=d.con||{};ST.est={...(d.est||{})};
   ST.inst={};Object.keys(inst).forEach(k=>{if(inst[k])ST.inst[k]=true});ST.arr={...arr};ST.av={...(d.av||{})};
   ST.tub={};Object.keys(tub).forEach(k=>{if(tub[k])ST.tub[k]=true});ST.con={};Object.keys(con).forEach(k=>{if(con[k])ST.con[k]=true});
-  const opN=+d.op||1,mudouOp=opN!==ST.op;ST.op=opN;
-  if(ed)ST.ed=ed;else delete ST.ed;save();
+  // edição de cada opção; 'ed' é sempre a da opção atual (versões antigas do app só conhecem 'ed')
+  const opN=+d.op||1,eds={};Object.entries(d.eds||{}).forEach(([n,j])=>{if(j){try{eds[n]=JSON.parse(j)}catch(e){}}});
+  if(d.ed){try{eds[opN]=JSON.parse(d.ed)}catch(e){}}else delete eds[opN];
+  const ed=eds[opN]||null,mudouEd=JSON.stringify(ed)!==JSON.stringify(ST.ed||null),mudouOp=opN!==ST.op;
+  ST.op=opN;ST.eds=eds;ST.edT=+d.edT||0;if(ed)ST.ed=ed;else delete ST.ed;save();
   if(ocupado()){SY.adiado=true;return}
   SY.adiado=false;renderMont();renderArr();
   if(mudouEd||mudouOp){D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();hist=[];redraw()}else{renderMat();renderPl();renderTurnos();renderOp();renderCompras();renderPlano()}
 }
 function depoisDeOcupado(){if(SY.adiado&&!ocupado()){SY.adiado=false;D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();renderMont();renderArr();redraw()}}
+// campos do desenho para mandar à nuvem
+function campoEd(){const o={op:ST.op,ed:ST.ed?JSON.stringify(ST.ed):null,edT:ST.edT||Date.now()};Object.entries(ST.eds||{}).forEach(([n,e])=>{o['eds.'+n]=e?JSON.stringify(e):null});return o}
 function iniciarSync(){
-  if(typeof firebase==='undefined'){syncSt('err','Sem sincronização','Abra o app com internet uma vez para ativar a sincronização entre aparelhos.');return}
+  if(typeof firebase==='undefined'){syncSt('err','Sem sincronização','Abra o app com internet uma vez para ativar a sincronização entre aparelhos. O que você fizer agora fica guardado neste aparelho e sobe depois.');return}
   try{firebase.initializeApp(FB_CFG,'quebravento')}catch(e){}
   const app=firebase.app('quebravento'),db=app.firestore();
   try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
@@ -365,23 +393,22 @@ function iniciarSync(){
   (auth.currentUser?Promise.resolve():new Promise(r=>{const u=auth.onAuthStateChanged(x=>{u();r(x)})}).then(u=>u||auth.signInAnonymously()))
   .then(()=>{SY.ref=db.collection('quebravento').doc('peirot');
     SY.ref.onSnapshot({includeMetadataChanges:true},snap=>{
-      const d=snap.exists?snap.data():null;
+      const d=snap.exists?snap.data():null;SY.meta=snap.metadata;SY.doc=d;
       if(SY.first){SY.first=false;SY.ok=true;SY.err='';
         // primeira conexão: junta o que já existe aqui com o que está na nuvem (não perde nada)
         const loc={};['inst','tub','con'].forEach(c=>Object.keys(ST[c]||{}).forEach(k=>{if(!(d&&d[c]&&d[c][k]))loc[c+'.'+k]=true}));
         Object.entries(ST.arr||{}).forEach(([k,v])=>{if(v>((d&&d.arr&&d.arr[k])||0))loc['arr.'+k]=v});
         Object.entries(ST.av||{}).forEach(([k,v])=>{if(v>((d&&d.av&&d.av[k])||0))loc['av.'+k]=v});
-        if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);
-        if(ST.op>1&&!(d&&d.op))loc.op=ST.op;
         Object.entries(ST.est||{}).forEach(([k,v])=>{if(!(d&&d.est&&k in d.est))loc['est.'+k]=v});
-        Object.assign(SY.fila,loc);if(Object.keys(SY.fila).length)flush();
-        if(d)aplicaRemoto({...d,inst:{...(d.inst||{}),...Object.fromEntries(Object.keys(ST.inst).map(k=>[k,true]))},tub:{...(d.tub||{}),...Object.fromEntries(Object.keys(ST.tub).map(k=>[k,true]))},con:{...(d.con||{}),...Object.fromEntries(Object.keys(ST.con).map(k=>[k,true]))},arr:{...(d.arr||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('arr.')).map(([k,v])=>[k.slice(4),v]))},av:{...(d.av||{}),...Object.fromEntries(Object.entries(loc).filter(([k])=>k.startsWith('av.')).map(([k,v])=>[k.slice(3),v]))},est:{...ST.est,...(d.est||{})},op:d.op||ST.op,ed:d.ed||(ST.ed?JSON.stringify(ST.ed):null)});
+        // desenho: vale o mais novo (data da última mudança); sem data dos dois lados, a nuvem só é completada
+        const rT=+(d&&d.edT)||0,lT=+ST.edT||0;
+        if(lT>rT)Object.assign(loc,campoEd());
+        else if(!rT&&!lT){if(ST.ed&&!(d&&d.ed))loc.ed=JSON.stringify(ST.ed);if(ST.op>1&&!(d&&d.op))loc.op=ST.op}
+        pendAdd(loc);
+        if(d)aplicaRemoto(d);
+        flush();
       }else if(d)aplicaRemoto(d);
-      const pend=snap.metadata.hasPendingWrites,cache=snap.metadata.fromCache;
-      if(SY.err)return;
-      if(pend)syncSt('pend','Enviando…','Enviando suas mudanças. Sem internet, elas ficam guardadas e sobem sozinhas quando o sinal voltar.');
-      else if(cache)syncSt('pend','Sem internet','Sem internet agora. O que você marcar fica guardado e sobe sozinho quando o sinal voltar.');
-      else syncSt('ok','Sincronizado','Tudo o que for marcado aqui (montagem, arranque e desenho) aparece sozinho nos outros aparelhos com o app aberto, e vice-versa.'+(d&&d.atualizadoEm?' Última mudança: '+d.atualizadoEm.toDate().toLocaleString('pt-BR')+(d.por===DEV?' (este aparelho).':'.'):''));
+      mostraSync();
     },syncErr);
   }).catch(syncErr);
 }
@@ -431,7 +458,7 @@ function opcao(n){const b=base0();if(n==3){b.tubos.push({o:null,d:'Interligaçã
     tb(o,l.nome+' · lado NW',100,P.slice(4,9),k);tb(o,l.nome+' · lado NW',75,P.slice(8),k);
     tb(o,l.nome+' · lado SE',100,P.slice(2,5).reverse(),k);tb(o,l.nome+' · lado SE',75,P.slice(0,3).reverse(),k)});
   return {tubos:T,nos:[],reg:LP.map(P=>P[4].slice()),P:G.P.map(p=>p.slice())}}
-ST.op=ST.op||1;
+ST.op=ST.op||1;ST.eds=ST.eds||{};if(ST.ed)ST.eds[ST.op]=ST.ed;else delete ST.eds[ST.op];
 const base=()=>ST.op>1?opcao(ST.op):base0();
 const alt=()=>!!ST.ed||ST.op>1;
 let D=ST.ed||base();
@@ -702,9 +729,9 @@ function renderBal(){
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
-document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};ST.av=ST.av||{};D=ST.ed||base();hist=[];save();sync({op:ST.op,est:{...ST.est},av:{...ST.av},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
+document.getElementById('bImp').onclick=()=>{try{const s=JSON.parse(document.getElementById('bk').value);if(!s.inst)throw 0;ST=s;ST.tub=ST.tub||{};ST.con=ST.con||{};ST.op=ST.op||1;ST.est=ST.est||{};ST.av=ST.av||{};ST.eds=ST.eds||{};if(ST.ed)ST.eds[ST.op]=ST.ed;else delete ST.eds[ST.op];ST.edT=Date.now();D=ST.ed||base();hist=[];save();sync({op:ST.op,edT:ST.edT,eds:Object.fromEntries(Object.entries(ST.eds).map(([n,e])=>[n,JSON.stringify(e)])),est:{...ST.est},av:{...ST.av},inst:{...ST.inst},arr:{...ST.arr},tub:{...ST.tub},con:{...ST.con},ed:ST.ed?JSON.stringify(ST.ed):null});renderMont();renderArr();redraw();bkMsg.textContent='Progresso carregado.'}catch(e){bkMsg.textContent='Código inválido. Cole o código completo.'}};
 let rsArm=false;document.getElementById('bReset').onclick=()=>{const b=document.getElementById('bReset');if(!rsArm){rsArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{rsArm=false;b.textContent='Zerar progresso'},4000);return}
-  const hk=Object.keys(ST.est).filter(k=>k.startsWith('h_'));hk.forEach(k=>delete ST.est[k]);ST={inst:{},arr:{},av:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed};save();sync({inst:{},arr:{},av:{},tub:{},con:{},...Object.fromEntries(hk.map(k=>['est.'+k,null]))});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
+  const hk=Object.keys(ST.est).filter(k=>k.startsWith('h_'));hk.forEach(k=>delete ST.est[k]);ST={inst:{},arr:{},av:{},tub:{},con:{},op:ST.op,est:ST.est,ed:ST.ed,eds:ST.eds,edT:ST.edT};save();sync({inst:{},arr:{},av:{},tub:{},con:{},...Object.fromEntries(hk.map(k=>['est.'+k,null]))});renderMont();renderArr();rsArm=false;b.textContent='Zerar progresso';bkMsg.textContent='Progresso zerado.'};
 // ---------- material
 // metros por diâmetro conforme o desenho atual (sem edição = números do projeto)
 function curTot(net){const t={...G.tot};if(!net&&!alt())return t;
@@ -913,10 +940,13 @@ function snap(at,refs){const pt=map.latLngToContainerPoint(at),own=new Set((refs
   return best}
 const push=()=>{hist.push(JSON.stringify(D));if(hist.length>60)hist.shift()};
 function redraw(){drawNet();drawEd();renderMat();renderMont();renderOp();renderTurnos();renderBal();renderAV();renderPl();renderCompras();renderPlano();edMsg()}
-function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));save();sync({ed:JSON.stringify(D)});redraw();setTimeout(depoisDeOcupado,50)}
+function commit(){cleanup();ST.ed=JSON.parse(JSON.stringify(D));ST.eds[ST.op]=ST.ed;ST.edT=Date.now();save();const j=JSON.stringify(D);sync({ed:j,['eds.'+ST.op]:j,op:ST.op,edT:ST.edT});redraw();setTimeout(depoisDeOcupado,50)}
+// situação do desenho: salvo no aparelho e, quando confirmado, na nuvem
+function edSalvo(){if(!ST.ed)return '';const pe=Object.keys(PEND).some(GRUPO_ED);
+  return '<br><small>'+(pe?(SY.ok&&!SY.err?'Desenho salvo neste aparelho · enviando para a nuvem…':'Desenho salvo neste aparelho · sobe para a nuvem quando conectar.'):SY.ok&&!SY.err?'Desenho salvo neste aparelho e na nuvem ✓':'Desenho salvo neste aparelho.')+'</small>'}
 function edMsg(){eMsg.innerHTML=MV?'<b>Movendo ponto:</b> clique (ou toque) no lugar novo do mapa. Perto de outro ponto ou de uma linha, ele encaixa ali. Para desistir, aperte Esc ou clique de novo no ponto vermelho.':DR?`Toque no mapa para marcar os pontos da linha nova (${DR.q.length} marcado${DR.q.length==1?'':'s'}). Tocando perto de um ponto ou de uma linha, ela encaixa ali. Depois toque em <b>Concluir linha</b>.`:
-  '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'||' tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar. Arraste uma bolinha amarela para criar uma curva no meio do trecho. Toque num ponto ou numa linha para mais opções.'+
-  (alt()?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; as conexões e os turnos (vazão, perda e pressão) também são recalculados pelo desenho.':'');
+  '<b>Para mover um ponto:</b> clique no quadradinho branco e depois em <b>Mover este ponto</b>, e clique no lugar novo. No celular também dá para arrastar com o dedo. Tudo o que está ligado naquele ponto vai junto. Solte em cima de outro ponto ou de outra linha para ligar.'+(map.getZoom()>=17?' Arraste uma bolinha amarela para criar uma curva no meio do trecho.':' Aproxime o mapa para aparecerem as bolinhas amarelas de criar curva.')+' Clique numa linha para mudar o diâmetro, o nome ou apagar.'+
+  (alt()?' <b>Desenho alterado:</b> os metros de tubo, o balanço e a planilha já usam o desenho novo; as conexões e os turnos (vazão, perda e pressão) também são recalculados pelo desenho.':'')+edSalvo();
   document.getElementById('eUndo').disabled=!hist.length}
 function wireDrag(m,getRefs){let refs=[];
   m.on('dragstart',()=>{map.closePopup();push();refs=getRefs()});
@@ -991,7 +1021,7 @@ document.getElementById('eFim').onclick=()=>{if(DR.q.length<2)return;push();cons
 document.getElementById('eUndo').onclick=()=>{if(!hist.length)return;D=JSON.parse(hist.pop());map.closePopup();commit()};
 let orArm=false;document.getElementById('eOrig').onclick=()=>{const b=document.getElementById('eOrig');
   if(!orArm){orArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{orArm=false;b.textContent='Voltar ao original'},4000);return}
-  orArm=false;b.textContent='Voltar ao original';push();D=base();delete ST.ed;save();sync({ed:null});map.closePopup();redraw()};
+  orArm=false;b.textContent='Voltar ao original';push();D=base();delete ST.ed;delete ST.eds[ST.op];ST.edT=Date.now();save();sync({ed:null,['eds.'+ST.op]:null,op:ST.op,edT:ST.edT});map.closePopup();redraw()};
 document.getElementById('eKml').onclick=()=>{
   const col=h=>{const c=h.slice(1);return 'ff'+c.slice(4,6)+c.slice(2,4)+c.slice(0,2)},esc=x=>String(x).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const pm=D.tubos.map(t=>`<Placemark><name>${esc(`${t.d} · ${DL(t.dm)} mm · ${tLen(t)} m`)}</name><Style><LineStyle><color>${col(DC[t.dm])}</color><width>${W[t.dm]/1.5}</width></LineStyle></Style><LineString><tessellate>1</tessellate><coordinates>${t.q.map(p=>p[0]+','+p[1]+',0').join(' ')}</coordinates></LineString></Placemark>`).join('\n')+
@@ -1004,28 +1034,28 @@ function edMode(on){ED=on;document.getElementById('edBar').hidden=!on;document.g
 document.getElementById('bEd').onclick=()=>edMode(!ED);
 document.getElementById('eSair').onclick=()=>edMode(false);
 // ---------- escolha e comparação das opções
-let opArm=0;
 function renderOp(){document.querySelectorAll('#opBar button[data-op]').forEach(b=>b.classList.toggle('on',+b.dataset.op===ST.op));
-  document.getElementById('opMsg').innerHTML=OPS[ST.op].tx+(ST.ed?' <b>Esta opção foi editada no mapa.</b>':'')+' Toque em outra opção para ver no mapa; turnos, material, conexões, compras e planilha mudam junto.';
+  const eo=[1,2,3].filter(n=>n!==ST.op&&ST.eds[n]);document.getElementById('opMsg').innerHTML=OPS[ST.op].tx+(ST.ed?' <b>Esta opção foi editada no mapa.</b>':'')+' Toque em outra opção para ver no mapa; turnos, material, conexões, compras e planilha mudam junto. A edição de cada opção fica guardada: trocar de opção não apaga nada.'+(eo.length?` Também editada: opção ${eo.join(' e ')}.`:'');
   const tem=dn=>(G.solto[dn]||0)+G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0),T=TUR(),pb=PB();
   const conta=h=>{const b=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=.5).length,l=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=0&&r.sobra<.5).length;return {b,l}};
-  const col=[1,2,3].map(n=>{const net=n===ST.op?D:opcao(n),orig=n==1&&!(n===ST.op&&ST.ed);
+  const col=[1,2,3].map(n=>{const edn=n===ST.op?!!ST.ed:!!ST.eds[n],net=n===ST.op?D:ST.eds[n]||opcao(n),orig=n==1&&!edn;
     const t=orig?G.tot:curTot(net),pr=orig?G.precisa:curPrec(net),c=orig?G.cnt:conexoes(net),nc=Object.values(c).reduce((a,b)=>a+b,0);
     const H=hidrNet(net,pb,true),c1=conta(hidrNet(net,[0,pb[1]],true)),c2=conta(hidrNet(net,[pb[0],0],true));
     const falta=['150','125','100','75'].reduce((a,dn)=>a+Math.max(0,pr[dn]-tem(dn)),0);
-    return {t,nc,H,c1,c2,falta,tot:Object.values(t).reduce((a,b)=>a+b,0)}});
+    return {t,nc,H,c1,c2,falta,edn,tot:Object.values(t).reduce((a,b)=>a+b,0)}});
   const row=(nm,f)=>`<tr><td>${nm}</td>${col.map((c,i)=>`<td class="n"${i+1===ST.op?' style="font-weight:700"':''}>${f(c)}</td>`).join('')}</tr>`;
   const sob=s=>s==null?'<span class="pill bad">sem água</span>':`<span class="pill ${s>=.5?'ok':s>=0?'warn':'bad'}">${s>0?'+':''}${f1(s)}</span>`;
   const rob=x=>{const n=x.b+x.l;return `<span class="pill ${n===T.length?(x.l?'warn':'ok'):n?'warn':'bad'}">${n} de ${T.length}</span>${x.l?`<br><small>${x.l} no limite</small>`:''}`};
-  document.getElementById('opCmp').innerHTML='<tr><th></th>'+[1,2,3].map(n=>`<th class="n">Opção ${n}</th>`).join('')+'</tr>'+
+  document.getElementById('opCmp').innerHTML='<tr><th></th>'+[1,2,3].map(n=>`<th class="n">Opção ${n}${col[n-1].edn?'<br><small>editada</small>':''}</th>`).join('')+'</tr>'+
     [160,125,100,75,50,32].filter(dm=>dm>=75||col.some(c=>c.t[dm])).map(dm=>row(`Tubo ${DL(dm)} (m)`,c=>fmt(c.t[dm]||0))).join('')+row('Tubo total (m)',c=>fmt(c.tot))+row('Conexões',c=>c.nc)+
     T.map((tu,ti)=>row(`Sobra ${tu.n} (${tu.lin.join('+')}), bar`,c=>sob(c.H.t[ti].sobra))).join('')+
     row('Turnos que funcionam se o Ponto 1 parar',c=>rob(c.c1))+row('Turnos que funcionam se o Ponto 2 parar',c=>rob(c.c2))+
     row('Barras a comprar',c=>c.falta?`<span class="pill bad">${c.falta}</span>`:'<span class="pill ok">0</span>')+
     `<tr><td colspan="4"><small>Sobra = pressão acima de 1 bar na tomada mais fraca, com ${f1(pb[0])} bar no Ponto 1 e ${f1(pb[1])} bar no Ponto 2 (troque em Turnos). "No limite" = sobra menor que 0,5 bar.</small></td></tr>`}
-document.querySelectorAll('#opBar button[data-op]').forEach(b=>b.onclick=()=>{const n=+b.dataset.op;if(n===ST.op&&!ST.ed)return;
-  if(ST.ed&&opArm!==n){opArm=n;b.textContent='Perde a edição: toque de novo';setTimeout(()=>{opArm=0;b.textContent=OPS[n].n},4000);return}
-  opArm=0;b.textContent=OPS[n].n;ST.op=n;delete ST.ed;D=base();hist=[];HK=null;save();sync({op:n,ed:null});map.closePopup();redraw()});
+document.querySelectorAll('#opBar button[data-op]').forEach(b=>b.onclick=()=>{const n=+b.dataset.op;if(n===ST.op)return;
+  if(DR)drMode(false);if(MV)moveEnd();
+  ST.op=n;if(ST.eds[n])ST.ed=JSON.parse(JSON.stringify(ST.eds[n]));else delete ST.ed;D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();hist=[];
+  ST.edT=Date.now();save();sync({op:n,ed:ST.ed?JSON.stringify(ST.ed):null,edT:ST.edT});map.closePopup();redraw()});
 renderOp();
 iniciarSync();
 // ---------- PWA (funciona quando publicado em https, ex.: GitHub Pages)
