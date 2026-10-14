@@ -159,7 +159,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v19</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v20</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -220,6 +220,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <details class="note" style="margin-top:10px"><summary>Ajustar equipe, início, dias de trabalho, prazo e entrega do material</summary>
     <div class="mapbar" style="margin:8px 0">
       <label for="plIn">Início da obra</label><input type="date" id="plIn">
+      <label for="plDi">Diária por pessoa (R$)</label><input type="number" id="plDi" min="0" step="10" placeholder="ex.: 120">
       <label for="plDs">Dias de trabalho por semana</label><select id="plDs"><option value="5">5 (seg a sex)</option><option value="6">6 (seg a sáb)</option><option value="7">7 (todos os dias)</option></select>
       <label for="plPz">Prazo desejado</label><input type="date" id="plPz">
       <label for="plEn">Entrega do material</label><input type="number" id="plEn" min="0" step="1" placeholder="7"><span>dias</span>
@@ -897,7 +898,7 @@ document.getElementById('bXls').onclick=()=>{
     const d=plData(k);const ws=XLSX.utils.aoa_to_sheet([d.H,...d.rows,[],[d.note]]);ws['!cols']=d.H.map(h=>({wch:Math.max(10,h.length+2)}));XLSX.utils.book_append_sheet(wb,ws,n)});
   const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(G.enterrado.map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,'DN '+(e.dn==150?160:e.dn),e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(arr),'Arranque (progresso)');
-  {const C=cronograma(),f=d=>d?d.toLocaleDateString('pt-BR'):'';XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Etapa','Feito','Total','Unidade','Pessoas','Rende por pessoa/dia','Ritmo da equipe/dia','Dias de trabalho','Início previsto','Término previsto','Situação']].concat(C.E.map((e,i)=>[(i+1)+'. '+e.n,Math.round(e.feito),Math.round(e.tot),e.un,e.compra?'':e.r.np||'',e.compra?'':e.r.rp||'',e.compra||!(e.r.usa>0)?'':Math.round(e.r.usa),e.dur||'',f(e.ini),f(e.fim),{ok:'Concluído',and:'Em andamento',esp:'Aguardando',sem:'Sem ritmo',dep:'Aguardando previsão'}[e.st]||'']))),'Plano de execução')}
+  {const C=cronograma(),f=d=>d?d.toLocaleDateString('pt-BR'):'';XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Etapa','Feito','Total','Unidade','Pessoas','Rende por pessoa/dia','Ritmo da equipe/dia','Dias de trabalho','Diárias','Custo (R$)','Início previsto','Término previsto','Situação']].concat(C.E.map((e,i)=>[(i+1)+'. '+e.n,Math.round(e.feito),Math.round(e.tot),e.un,e.compra?'':e.r.np||'',e.compra?'':e.r.rp||'',e.compra||!(e.r.usa>0)?'':Math.round(e.r.usa),e.dur||'',e.dia||'',e.dia&&+ST.est.diaria>0?Math.round(e.dia*ST.est.diaria):'',f(e.ini),f(e.fim),{ok:'Concluído',and:'Em andamento',esp:'Aguardando',sem:'Sem ritmo',dep:'Aguardando previsão'}[e.st]||'']))),'Plano de execução')}
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Grupo','Teste','Previsto (bar)','Resultado']].concat(listaTestes().map(t=>[t.g,t.nm,t.prev!=null?Math.round(t.prev*10)/10:'',t.num?(ST.tst[t.k]??''):(ST.tst[t.k]?'feito':'')]))),'Testes');
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Grupo','Item','Precisa','Unidade','Já tenho','Comprar']].concat(listaCompras().map(x=>[x.g,x.nm,x.prec,x.un,x.tem,Math.max(0,x.prec-x.tem)]))),'Lista de compras');
   {const P=planoAV();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Bloco','Válvula','DN (mm)','Lado 1 (m)','Lado 2 (m)','Barras','Arrancar (plano)','Arrancadas']].concat(AV.map(r=>[r.b,r.v,r.dn,r.l1,r.l2,r.n,P.usa[r.k]||0,avQ(r)]))),'Arranque por válvula')}
@@ -1000,22 +1001,43 @@ function ritmo(e,H){const rp=+ST.est['r'+e.k]||0,np=pessoas(e.k),man=rp*(np||1),
   return {man,med,usa:man>0?man:med,rp,np}}
 const entrega=()=>{const v=ST.est.entr;return v==null||v===''?7:+v};
 // cronograma em sequência: cada etapa começa quando a anterior termina (se já começou, conta a partir de hoje)
-function cronograma(){const E=etapas(),H=histDias(),hoje=s2d(diaS()),i0=ST.est.ini?s2d(ST.est.ini):null,fut=i0&&i0>hoje,st0=fut?new Date(i0.getFullYear(),i0.getMonth(),i0.getDate()-1):hoje;let ant=null,quebrou=false;
+// f multiplica o ritmo de todas as equipes (usado para achar quantas pessoas cumprem o prazo)
+function cronograma(f,E){f=f||1;E=E||etapas();const H=histDias(),hoje=s2d(diaS()),i0=ST.est.ini?s2d(ST.est.ini):null,fut=i0&&i0>hoje,st0=fut?new Date(i0.getFullYear(),i0.getMonth(),i0.getDate()-1):hoje;let ant=null,mat=null,quebrou=false;
   const out=E.map(e=>{const sub=e.sub,feito=(!e.tot||e.feito>=e.tot)&&(!sub||!sub.tot||sub.feito>=sub.tot),o={...e,r:ritmo(e,H)};
     if(feito){o.st='ok';return o}
-    if(quebrou){o.st='dep';return o}
-    const comecou=e.compra?!!ST.est.solic:e.feito>0||(sub&&sub.feito>0),base=comecou?hoje:ant||st0;
-    if(e.compra){const ent=entrega();
+    const comecou=e.compra?!!ST.est.solic:e.feito>0||(sub&&sub.feito>0);
+    // a compra corre junto desde o início da obra; só a instalação dos tubos espera o material
+    if(e.compra){const ent=entrega(),base=comecou?hoje:st0;
       if(ST.est.solic){o.ini=s2d(ST.est.solic);o.fim=new Date(o.ini);o.fim.setDate(o.fim.getDate()+ent);if(o.fim<hoje){o.atraso=true;o.fim=new Date(hoje)}}
-      else{o.ini=base;o.fim=maisUteis(base,1);o.fim.setDate(o.fim.getDate()+ent);if(base===st0&&fut)o.ini=i0}}
-    else{let dur;
-      if(e.feito<e.tot){if(!(o.r.usa>0)){o.st='sem';quebrou=true;return o}dur=Math.ceil((e.tot-e.feito)/o.r.usa)}
-      else{const rc=ritmo(sub,H);o.rc=rc;dur=rc.usa>0?Math.ceil((sub.tot-sub.feito)/rc.usa):1;o.estim=!(rc.usa>0)}
-      o.dur=Math.max(1,dur);o.ini=base===st0&&fut?i0:base;o.fim=maisUteis(base,o.dur)}
+      else{o.ini=base;o.fim=maisUteis(base,1);o.fim.setDate(o.fim.getDate()+ent);if(base===st0&&fut)o.ini=i0}
+      mat=o.fim;o.st=comecou?'and':'esp';return o}
+    if(quebrou){o.st='dep';return o}
+    let base=comecou?hoje:ant||st0;
+    if(e.k==='t'&&!comecou&&mat&&mat>base){o.espMat=mat;base=mat}
+    let dur;
+    if(e.feito<e.tot){if(!(o.r.usa>0)){o.st='sem';quebrou=true;return o}dur=Math.ceil((e.tot-e.feito)/(o.r.usa*f))}
+    else{const rc=ritmo(sub,H);o.rc=rc;dur=rc.usa>0?Math.ceil((sub.tot-sub.feito)/(rc.usa*f)):1;o.estim=!(rc.usa>0)}
+    o.dur=Math.max(1,dur);o.ini=base===st0&&fut?i0:base;o.fim=maisUteis(base,o.dur);
+    if(o.r.np)o.dia=o.r.np*o.dur;
     if(ant&&o.fim<ant){o.proprio=o.fim;o.fim=new Date(ant)}
     o.st=comecou?'and':'esp';ant=o.fim;return o});
-  return {E:out,fim:quebrou?null:ant}}
+  return {E:out,fim:quebrou?null:ant||mat,mat}}
+// menor aumento das equipes que faz a obra terminar até o prazo
+function equipePrazo(C,prazo){const E=etapas();if(!C.fim||C.fim<=prazo)return null;
+  if(cronograma(50,E).fim>prazo)return {imp:true};
+  let a=1,b=50;for(let i=0;i<30;i++){const m=(a+b)/2;if(cronograma(m,E).fim<=prazo)b=m;else a=m}
+  return {f:b,E:C.E.filter(e=>e.st==='and'||e.st==='esp').filter(e=>!e.compra)}}
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
 const dCurto=d=>`${DOW[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}`;
+// quantas pessoas cada etapa precisa para cumprir o prazo
+function txtPrazo(C,prazo){const q=equipePrazo(C,prazo),dd=`${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}`;if(!q)return '';
+  if(q.imp)return `<br>Mesmo com muito mais gente não dá para terminar até ${dd}`+(C.mat&&C.mat>prazo?`, porque o material só chega ${dCurto(C.mat)}.`:'. Ajuste o prazo ou a data de início.');
+  const it=q.E.map(e=>e.r.np?`${e.n}: ${e.r.np} → <b>${Math.ceil(e.r.np*q.f-1e-9)} pessoas</b>`:`${e.n}: ritmo de <b>${fmt(Math.ceil(e.r.usa*q.f))} ${e.un}/dia</b>`);
+  return `<br><b>Para terminar até ${dd}</b>, as equipes precisam render cerca de ${Math.round((q.f-1)*100)}% a mais: `+it.join(' · ')+'.'}
+// mão de obra prevista para o que falta: pessoas × dias de trabalho
+function txtCusto(C){const L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra);if(!L.length)return '';
+  const com=L.filter(e=>e.dia),sem=L.filter(e=>!e.dia).map(e=>e.n),n=com.reduce((a,e)=>a+e.dia,0),d=+ST.est.diaria||0;if(!com.length)return '';
+  return `<br>Mão de obra para o que falta: <b>${fmt(n)} diárias</b>`+(d>0?` · <b>${brl(n*d)}</b> a ${brl(d)} por diária`:' (informe o valor da diária em "Ajustar" para ver o custo)')+(sem.length?`. Sem contar ${sem.join(', ')}, que ainda estão sem número de pessoas.`:'.')}
 function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(ST.est.prazo):null,ds=+ST.est.dsem||6;
   const rows=C.E.map((e,i)=>{const pct=e.tot?Math.min(100,100*e.feito/e.tot):100,un=e.un;let lin1=`${fmt(e.feito)} de ${fmt(e.tot)} ${un}`+(e.feito<e.tot?` · faltam ${fmt(e.tot-e.feito)}`:''),lin2='';
     if(e.compra)lin1=`${fmt(e.feito)} de ${fmt(e.tot)} itens já em estoque · ${ST.est.solic?'solicitação enviada em '+dCurto(s2d(ST.est.solic)):'solicitação ainda não enviada'} · entrega em ${entrega()} dias`;
@@ -1024,7 +1046,7 @@ function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(
     if(e.st==='ok')lin2='<span class="pill ok">Concluído</span>';
     else if(e.st==='sem')lin2=rt+'<span class="pill warn">sem ritmo ainda</span> informe as pessoas e quanto cada uma rende em "Ajustar"';
     else if(e.st==='dep')lin2='Aguardando a previsão da etapa anterior';
-    else lin2=rt+(e.st==='esp'?`começa por volta de ${dCurto(e.ini)} · `:'em andamento · ')+`termina por volta de <b>${dTxt(e.fim)}</b>`+(e.dur?` · ${e.dur} ${e.dur>1?'dias':'dia'} de trabalho`:'')+(e.proprio?(e.compra?` (o material chega ${dCurto(e.proprio)}, mas a etapa anterior termina depois)`:` (pelo ritmo terminaria ${dCurto(e.proprio)}, mas espera a etapa anterior)`):'')+(e.atraso?' <span class="pill bad">material atrasado</span>':'')+(e.estim?' (conexões estimadas em 1 dia)':'');
+    else lin2=rt+(e.st==='esp'?`começa por volta de ${dCurto(e.ini)} · `:'em andamento · ')+`termina por volta de <b>${dTxt(e.fim)}</b>`+(e.dur?` · ${e.dur} ${e.dur>1?'dias':'dia'} de trabalho`:'')+(e.dia?` · ${fmt(e.dia)} diárias`+(+ST.est.diaria>0?` (${brl(e.dia*ST.est.diaria)})`:''):'')+(e.compra?' · corre junto com as outras etapas':'')+(e.espMat?` (espera o material, que chega ${dCurto(e.espMat)})`:'')+(e.proprio?` (pelo ritmo terminaria ${dCurto(e.proprio)}, mas espera a etapa anterior)`:'')+(e.atraso?' <span class="pill bad">material atrasado</span>':'')+(e.estim?' (conexões estimadas em 1 dia)':'');
     return `<div class="etp"><div class="etp-h"><a href="${e.href}">${i+1}. ${e.n}</a><b>${Math.floor(pct)}%</b></div><div class="bar"><i style="width:${pct}%"></i></div>
       <p class="note" style="margin:4px 0 0">${lin1}</p><p class="note" style="margin:2px 0 0">${lin2}</p></div>`});
   document.getElementById('tPlano').innerHTML=rows.join('');
@@ -1032,7 +1054,7 @@ function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(
   hf.textContent=!pend?'Concluído':C.fim?dTxt(C.fim):'Sem previsão ainda';hf.classList.toggle('sm',pend&&!C.fim);
   const semR=C.E.filter(e=>e.st==='sem').map(e=>e.n);
   document.getElementById('plMsg').innerHTML=!pend?'Todas as etapas concluídas.':
-    (C.fim?(ST.est.ini&&s2d(ST.est.ini)>s2d(diaS())?`Começando em ${dCurto(s2d(ST.est.ini))}. `:'')+`Término previsto da última etapa (testes). As etapas vão em sequência: cada uma começa quando a anterior termina; se uma já começou antes, ela segue junto. Com ${ds} dias de trabalho por semana.`+(prazo?(C.fim>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}) em ${nUteis(prazo,C.fim)} dias de trabalho</span>`:` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):''):
+    (C.fim?(ST.est.ini&&s2d(ST.est.ini)>s2d(diaS())?`Começando em ${dCurto(s2d(ST.est.ini))}. `:'')+`Término previsto da última etapa (testes). As etapas vão em sequência: cada uma começa quando a anterior termina; se uma já começou antes, ela segue junto. A compra do material corre junto desde o início, e a instalação dos tubos espera o material chegar. Com ${ds} dias de trabalho por semana.`+(prazo?(C.fim>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}) em ${nUteis(prazo,C.fim)} dias de trabalho</span>`+txtPrazo(C,prazo):` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):'')+txtCusto(C):
     `Para fechar a previsão falta o ritmo de: <b>${semR.join(', ')}</b>. Informe as pessoas e quanto cada uma rende em "Ajustar", logo abaixo, ou espere o 2º dia com marcação para o app medir sozinho.`);
   // últimos dias registrados
   const Hs=H.slice(-11),nomes={a:['barras arrancadas',''],m:['m marcados',''],t:['m de tubo',''],c:['conexões',''],e:['m de mangueira',''],x:['testes','']};let hl='';
@@ -1041,7 +1063,7 @@ function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(
     hl+=`<li><b>${pad(h.d.getDate())}/${pad(h.d.getMonth()+1)}</b>${p?'':' (1º dia)'}: ${it.length?it.join(', '):'sem avanço'}</li>`}
   document.getElementById('tHist').innerHTML=Hs.length?hl:'<li>Ainda não há dias registrados. Cada dia em que algo for marcado em uma das etapas fica guardado aqui.</li>';
   renderEquipe(C);
-  [['plIn',ST.est.ini||''],['plDs',String(ds)],['plPz',ST.est.prazo||''],['plEn',ST.est.entr??'']].forEach(([id,v])=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v})}
+  [['plIn',ST.est.ini||''],['plDi',ST.est.diaria||''],['plDs',String(ds)],['plPz',ST.est.prazo||''],['plEn',ST.est.entr??'']].forEach(([id,v])=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v})}
 // tabela da equipe: pessoas e rendimento por pessoa em cada etapa
 function renderEquipe(C){const tb=document.querySelector('#plEq tbody'),H=histDias(),T=C.E.find(x=>x.k==='t'),ok=k=>{const e=k==='c'?T:C.E.find(x=>x.k===k);return e&&e.st==='ok'};
   if(!tb.children.length)tb.innerHTML=EQ.map(([k,n,un])=>`<tr data-k="${k}"><td>${n}</td><td>${k==='c'?'<small>a mesma dos tubos</small>':`<input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}">`}</td><td><input type="number" min="0" step="any" data-f="r${k}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join('');
@@ -1052,7 +1074,7 @@ document.querySelector('#plEq tbody').addEventListener('change',ev=>{const i=ev.
   let v=s===''?null:Math.max(0,+s||0)||null;if(v!=null&&k[0]==='q')v=Math.round(v)||null;
   if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano()});
 document.querySelector('#plEq tbody').addEventListener('focusout',()=>setTimeout(depoisDeOcupado,50));
-[['plIn','ini'],['plDs','dsem'],['plPz','prazo'],['plEn','entr']].forEach(([id,k])=>{const e=document.getElementById(id);
+[['plIn','ini'],['plDi','diaria'],['plDs','dsem'],['plPz','prazo'],['plEn','entr']].forEach(([id,k])=>{const e=document.getElementById(id);
   e.addEventListener('change',()=>{let v=String(e.value).trim();if(id==='plPz'||id==='plIn'){if(!/^\d{4}-\d\d-\d\d$/.test(v))v=null}else if(id==='plEn'){v=v===''?null:Math.max(0,Math.round(+v.replace(',','.')||0))}else{v=v===''?null:Math.max(0,+v.replace(',','.')||0)||null}
     if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano();if(id==='plEn')renderCompras()});
   e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
