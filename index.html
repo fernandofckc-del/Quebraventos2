@@ -34,6 +34,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-head)
 .appbar .ver{font-size:.72rem;font-weight:500;opacity:.75;margin-left:3px}
 #tabTit{font-size:.9rem;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:600px){#tabTit{display:none}}
+.novaver{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom,0px));z-index:5000;width:max-content;max-width:calc(100% - 32px);background:var(--brand);color:#fff;padding:10px 12px 10px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.3);font:600 .92rem var(--f-head)}.novaver button{font:700 .9rem var(--f-head);color:var(--brand);background:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
 .appnav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);z-index:3000;background:var(--sheet);border-top:1px solid var(--rule);display:grid;grid-template-columns:repeat(5,1fr)}
 .appnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);text-decoration:none;font:600 .72rem var(--f-head);-webkit-tap-highlight-color:transparent}
 .appnav .ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;transition:background .15s,color .15s}
@@ -167,7 +168,8 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v30</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<div class="novaver" id="novaVer" role="status" hidden><span id="novaVerTx"></span><button type="button" id="novaVerBt">Atualizar</button></div>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v31</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -1583,7 +1585,19 @@ window.addEventListener('resize',()=>{if(document.body.dataset.tab==='mapa')map.
 abrir(location.hash||(()=>{try{return localStorage.getItem('peirot_tab')||''}catch(e){return ''}})()||'mapa',true);
 iniciarSync();
 // ---------- PWA (funciona quando publicado em https, ex.: GitHub Pages)
-if('serviceWorker' in navigator && location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){const SW=navigator.serviceWorker,VER=+document.querySelector('.ver').textContent.replace(/\D/g,'');
+  SW.register('sw.js').then(reg=>{
+    // o app aberto por trás não recarrega sozinho: ao voltar para a tela, e a cada 10 min, confere se saiu versão nova
+    const confere=()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})};
+    document.addEventListener('visibilitychange',confere);setInterval(confere,10*60e3)}).catch(()=>{});
+  // a versão nova assumiu: se for mais nova que esta página, recarrega (na hora, se ninguém estiver digitando nem editando o desenho)
+  SW.addEventListener('controllerchange',()=>caches.keys().then(ks=>{if(ks.some(k=>+(k.match(/^peirot-qv-v(\d+)$/)||[])[1]>VER))novaVersao()}).catch(()=>{}))}
+function novaVersao(){const b=document.getElementById('novaVer'),tx=document.getElementById('novaVerTx'),bt=document.getElementById('novaVerBt'),a=document.activeElement;
+  if(document.visibilityState==='hidden')return location.reload();
+  const ocup=ocupado()||(a&&a.matches&&a.matches('input,select,textarea'))||!document.getElementById('edBar').hidden;b.hidden=false;
+  if(!ocup){tx.textContent='Versão nova do app. Atualizando…';bt.hidden=true;setTimeout(()=>location.reload(),1200);return}
+  tx.textContent='Versão nova do app pronta.';bt.hidden=false;bt.onclick=()=>location.reload();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')location.reload()})}
 </script>
 </body>
 </html>
