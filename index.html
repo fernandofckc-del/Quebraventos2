@@ -144,6 +144,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
 #opCmp small{font-size:.76rem;color:var(--mut);white-space:normal}#opCmp{font-size:.84rem}#opCmp td,#opCmp th{padding:5px 3px 5px 0}#opCmp .pill{padding:1px 6px;font-size:.8rem}
 #opCmp tr.rl{display:none}
+#tEst td{vertical-align:middle}#tEst tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tEst .pill{margin-left:6px}
 @media(max-width:600px){#opCmp tr.rl{display:table-row}#opCmp tr.rl td{border-bottom:none;padding:8px 0 0;font-weight:600}#opCmp .lb{display:none}#opCmp td.n,#opCmp th.n{padding:2px 1px 6px}#opCmp th.n{white-space:normal}#opCmp{font-size:.76rem}#opCmp th{letter-spacing:0;font-size:.66rem}#opCmp .pill{font-size:.72rem;padding:1px 3px}#opCmp small{font-size:.68rem}}
 @media(max-width:520px){.mapui #mapOp{gap:4px}.mapui #mapOp button{min-width:34px;padding:7px 4px}}
 @media(max-width:380px){.mapui .oplb{display:none!important}#opCmp{font-size:.68rem}#opCmp th{letter-spacing:0;font-size:.6rem}#opCmp .pill{font-size:.66rem;padding:1px 2px}.mapui #mapOp{gap:4px}.mapui #mapOp button{min-width:34px;padding:7px 4px}}
@@ -166,7 +167,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v23</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v24</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -253,7 +254,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <div class="tbl"><table id="tArr"></table></div>
   <h3 style="margin-top:16px">Balanço por diâmetro</h3>
   <div class="tbl"><table id="tBal"></table></div>
-  <p class="note">Digite quantas barras boas já saíram de cada bloco e quantos metros de tubo 32 mm você tem no estoque. O balanço soma o tubo solto com o arrancado e compara com o que o projeto precisa.</p>
+  <p class="note">Digite quantas barras boas já saíram de cada bloco e quantos metros de tubo 32 mm você tem no estoque. O balanço soma o tubo solto com o arrancado e compara com o que o projeto precisa. Para corrigir o que você tem de cada tubo (solto e enterrado), use o <a href="#estoque">estoque de tubos</a>, na tela Material.</p>
 </section>
 
 <section class="card" data-sub="compras" id="compras">
@@ -266,7 +267,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
     <button id="bReceb">Todo o material chegou</button>
   </div>
   <p class="note" id="solMsg" style="margin:0 0 8px"></p>
-  <p class="note">Sai sozinha do desenho e da opção escolhida: mudou o desenho, a lista muda junto. Em "Já tenho", digite o que já está no estoque ou já foi comprado; a coluna Comprar mostra o que falta. Nos tubos, "já tenho" conta o tubo solto mais todo o enterrado (arrancando tudo).</p>
+  <p class="note">Sai sozinha do desenho e da opção escolhida: mudou o desenho, a lista muda junto. Em "Já tenho", digite o que já está no estoque ou já foi comprado; a coluna Comprar mostra o que falta. Nos tubos, "já tenho" conta o tubo solto mais todo o enterrado (arrancando tudo), pelo <a href="#estoque">estoque de tubos</a> da tela Material.</p>
   <div class="mapbar" style="margin:8px 0">
     <label for="cFol">Folga para perda e quebra</label><input type="number" id="cFol" min="0" max="30" step="1"><span>%</span>
     <label for="cRolo">Metros por rolo de fita</label><input type="number" id="cRolo" min="0" step="100" placeholder="—">
@@ -314,6 +315,13 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <section class="card"><h2>Fita gotejadora</h2><table id="tFita"></table></section>
   <section class="card"><h2>Conexões</h2><table id="tCon"></table></section>
 </div>
+
+<section class="card" id="estoque">
+  <div class="plhead"><h2 style="margin:0">Estoque de tubos</h2><button id="bEstReset">Voltar ao levantamento</button></div>
+  <p class="note" style="margin-top:0">Digite quantas barras de 6 m você tem de cada tubo, solto ou enterrado. O app recalcula sozinho o balanço, o plano de arrancar, a lista de compras, a comparação das opções e a planilha. Some no solto também o tubo comprado que já chegou. O 150 soldável e o 160 DeFoFo servem para o mesmo diâmetro do projeto (150/160); não junte os dois no mesmo trecho sem adaptador. Deixe em branco para voltar ao número do levantamento.</p>
+  <div class="tbl"><table id="tEst"></table></div>
+  <p class="note" id="estMsg" style="margin:0"></p>
+</section>
 
 <section class="card" id="planilha">
   <div class="plhead"><h2 style="margin:0">Planilha de tubos</h2><button id="bXls" class="on">Exportar para Excel</button></div>
@@ -863,19 +871,31 @@ function renderMont(){
   renderPassos();renderTestes();renderPlano();
 }
 // ---------- arranque por válvula (coco): barras de cada válvula; a soma por bloco fecha com o total enterrado
-const AV=(()=>{const by={},out=[];G.pl.coco.forEach(([b,v,dn,l1,l2])=>(by[b+'-'+dn]=by[b+'-'+dn]||[]).push({b,v,dn,l1,l2,x:(l1+l2)/6}));
-  Object.entries(by).forEach(([k,rs])=>{const tot=(G.enterrado.find(e=>e.b+'-'+e.dn==k)||{barras:0}).barras;rs.forEach(r=>r.n=Math.floor(r.x));
+// ---------- estoque de tubos (barras de 6 m): vem do levantamento e cada número pode ser corrigido no app
+// o 150/160 do projeto pode ser 150 soldável ou 160 DeFoFo; o enterrado no cacau é 160 DeFoFo
+const PRODS=[{k:'s150',dn:'150',nm:'150 mm soldável'},{k:'d160',dn:'150',nm:'160 mm DeFoFo'},{k:'125',dn:'125',nm:'125 mm'},{k:'100',dn:'100',nm:'100 mm'},{k:'75',dn:'75',nm:'75 mm'}];
+const SOL0={s150:G.solto[150]||0,d160:0,125:G.solto[125]||0,100:G.solto[100]||0,75:G.solto[75]||0};
+const ovr=k=>{const v=ST.est[k];return v==null||v===''?null:+v};
+function soltoP(k){const v=ovr('sol_'+k);return v==null?SOL0[k]:v}
+function entQ(b,dn){const v=ovr('ent_'+b+'-'+dn),e=G.enterrado.find(e=>e.b==b&&e.dn==dn);return v==null?(e?e.barras:0):v}
+function ENT(){return G.enterrado.map(e=>({...e,barras:entQ(e.b,e.dn)}))}
+// tubo solto por diâmetro do projeto (o 150/160 soma o soldável e o DeFoFo)
+function soltoDN(dn){return String(dn)==='150'?soltoP('s150')+soltoP('d160'):soltoP(String(dn))}
+// barras de cada válvula do coco pelo comprimento levantado, fechando com o total do bloco
+function calcAV(){const by={},out=[];G.pl.coco.forEach(([b,v,dn,l1,l2])=>(by[b+'-'+dn]=by[b+'-'+dn]||[]).push({b,v,dn,l1,l2,x:(l1+l2)/6}));
+  Object.entries(by).forEach(([k,rs])=>{const [b,dn]=k.split('-'),tot=entQ(b,+dn),s0=rs.reduce((a,r)=>a+Math.floor(r.x),0),f=ovr('ent_'+k)!=null&&tot<s0?tot/s0:1;rs.forEach(r=>r.n=Math.floor(r.x*f));
     let d=tot-rs.reduce((a,r)=>a+r.n,0);rs.slice().sort((a,b)=>(b.x%1)-(a.x%1)).forEach(r=>{if(d>0){r.n++;d--}});
     rs.forEach(r=>{r.k=r.b+'-'+r.v+'-'+r.dn;out.push(r)})});
-  return out})();
+  return out}
+let AV=calcAV();
 const avQ=r=>Math.min(+ST.av[r.k]||0,r.n);
 const usaAV=(b,dn)=>AV.some(r=>r.b==b&&r.dn==dn&&ST.av[r.k]);
 // barras arrancadas de um bloco/DN: pelas válvulas marcadas; se nenhuma foi marcada, vale o total digitado por bloco
-function arrQ(b,dn){const e=G.enterrado.find(e=>e.b==b&&e.dn==dn);if(!e)return 0;
-  if(b.length==1&&usaAV(b,dn))return Math.min(e.barras,AV.filter(r=>r.b==b&&r.dn==dn).reduce((a,r)=>a+avQ(r),0));
-  return Math.min(+ST.arr[b+'-'+dn]||0,e.barras)}
+function arrQ(b,dn){if(!G.enterrado.some(e=>e.b==b&&e.dn==dn))return 0;const mx=entQ(b,dn);
+  if(b.length==1&&usaAV(b,dn))return Math.min(mx,AV.filter(r=>r.b==b&&r.dn==dn).reduce((a,r)=>a+avQ(r),0));
+  return Math.min(+ST.arr[b+'-'+dn]||0,mx)}
 // plano: escolhe as válvulas que dão mais tubo útil para a opção atual, até cobrir o que falta além do tubo solto
-function planoAV(){const pr=curPrec(),need={},rest={},usa={};[125,100,75].forEach(dn=>rest[dn]=need[dn]=Math.max(0,pr[dn]-(G.solto[dn]||0)));
+function planoAV(){const pr=curPrec(),need={},rest={},usa={};[125,100,75].forEach(dn=>rest[dn]=need[dn]=Math.max(0,pr[dn]-soltoDN(dn)));
   const vs=[...new Set(AV.map(r=>r.b+'|'+r.v))].map(s=>{const[b,v]=s.split('|');return {b,v:+v,c:AV.filter(r=>r.b==b&&r.v==+v)}}),pend=vs.slice();
   while(pend.length){let bi=-1,bs=0;pend.forEach((x,i)=>{const s=x.c.reduce((a,r)=>a+Math.min(r.n,rest[r.dn]),0);if(s>bs){bs=s;bi=i}});if(bi<0)break;
     pend.splice(bi,1)[0].c.forEach(r=>{const u=Math.min(r.n,rest[r.dn]);if(u>0){usa[r.k]=u;rest[r.dn]-=u}})}
@@ -900,9 +920,9 @@ function renderAV(){const P=planoAV(),esc=document.getElementById('avEsc').check
 document.getElementById('avEsc').onchange=renderAV;
 // ---------- arranque
 const DNS=['150','125','100','75'];
-function renderArr(){
-  const rows=G.enterrado.map((e,k)=>{const key=e.b+'-'+e.dn;const v=arrQ(e.b,e.dn);const pv=e.b.length==1&&usaAV(e.b,e.dn);
-    return `<tr><td>${e.b.length>1?e.b+' (cacau)':'Bloco '+e.b+' (coco)'}</td><td>DN ${e.dn==150?'160':e.dn}</td><td class="n">${e.barras}</td><td class="n">${pv?v+'<br><small>pelas válvulas</small>':`<input type="number" min="0" max="${e.barras}" id="ar-${key}" data-k="${key}" value="${v||''}" placeholder="0" aria-label="Barras arrancadas ${key}">`}</td><td class="n" id="rs-${key}">${e.barras-v}</td></tr>`}).join('');
+function renderArr(){AV=calcAV();renderEst();
+  const rows=ENT().map((e,k)=>{const key=e.b+'-'+e.dn;const v=arrQ(e.b,e.dn);const pv=e.b.length==1&&usaAV(e.b,e.dn);
+    return `<tr><td>${e.b.length>1?e.b+' (cacau)':'Bloco '+e.b+' (coco)'}</td><td>${e.dn==150?'160 DeFoFo':'DN '+e.dn}</td><td class="n">${e.barras}</td><td class="n">${pv?v+'<br><small>pelas válvulas</small>':`<input type="number" min="0" max="${e.barras}" id="ar-${key}" data-k="${key}" value="${v||''}" placeholder="0" aria-label="Barras arrancadas ${key}">`}</td><td class="n" id="rs-${key}">${e.barras-v}</td></tr>`}).join('');
   document.getElementById('tArr').innerHTML=`<tr><th>Local</th><th>Tubo</th><th class="n">Enterradas</th><th class="n">Arrancadas</th><th class="n">Faltam</th></tr>${rows}`;
   document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('change',()=>{const mx=+i.max;const v=Math.min(mx,Math.max(0,+i.value||0));ST.arr[i.dataset.k]=v;sync({['arr.'+i.dataset.k]:v||null});if(+i.value!==v)i.value=v||'';document.getElementById('rs-'+i.dataset.k).textContent=mx-v;save();marcaDia();renderBal();renderPl();renderPlano()}));
   document.querySelectorAll('#tArr input').forEach(i=>i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50)));
@@ -910,11 +930,14 @@ function renderArr(){
 }
 function renderBal(){
   let h='<tr><th>Tubo</th><th class="n">Solto</th><th class="n">Arrancado</th><th class="n">Temos</th><th class="n">Precisa</th><th class="n">Ainda enterrado</th><th>Situação</th></tr>';
-  DNS.forEach(dn=>{const solto=G.solto[dn]||0;const ent=G.enterrado.filter(e=>String(e.dn)==dn);
+  const E=ENT();
+  DNS.forEach(dn=>{const solto=soltoDN(dn);const ent=E.filter(e=>String(e.dn)==dn);
     const arr=ent.reduce((a,e)=>a+arrQ(e.b,e.dn),0);const rest=ent.reduce((a,e)=>a+e.barras,0)-arr;
     const temos=solto+arr,prec=curPrec()[dn];const d=temos-prec;
     const sit=d>=0?`<span class="pill ok">Completo</span>`:(d+rest>=0?`<span class="pill warn">Faltam ${-d}: arrancar</span>`:`<span class="pill bad">Faltam ${-d}: comprar ${-(d+rest)}</span>`);
-    h+=`<tr><td>DN ${dn=='150'?'150/160':dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
+    if(dn=='150')h+=`<tr><td><small>150 soldável</small></td><td class="n"><small>${soltoP('s150')}</small></td><td class="n"><small>—</small></td><td class="n"><small>${soltoP('s150')}</small></td><td></td><td class="n"><small>—</small></td><td></td></tr>`+
+      `<tr><td><small>160 DeFoFo</small></td><td class="n"><small>${soltoP('d160')}</small></td><td class="n"><small>${arr}</small></td><td class="n"><small>${soltoP('d160')+arr}</small></td><td></td><td class="n"><small>${rest}</small></td><td></td></tr>`;
+    h+=`<tr><td>${dn=='150'?'150/160 (total)':'DN '+dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
   // 32 mm: estoque digitado em metros (não tem tubo enterrado)
   const e32=+ST.est['32']||0,p32=curTot()[32]||0,d32=e32-p32;
   h+=`<tr><td>32 mm (metros)</td><td class="n"><input type="number" min="0" step="1" id="est32" value="${e32||''}" placeholder="0" aria-label="Estoque de tubo 32 mm em metros" style="width:90px"></td><td class="n">—</td><td class="n">${fmt(e32)} m</td><td class="n">${fmt(p32)} m</td><td class="n">—</td><td>${d32>=0?`<span class="pill ok">${p32?'Completo':'Sem uso no desenho'}</span>`:`<span class="pill bad">Faltam ${fmt(-d32)} m: comprar</span>`}</td></tr>`;
@@ -922,6 +945,27 @@ function renderBal(){
   const i32=document.getElementById('est32');i32.addEventListener('change',()=>{const v=Math.max(0,Math.round(+i32.value||0));if(v)ST.est['32']=v;else delete ST.est['32'];save();sync({'est.32':v||null});renderBal()});
   i32.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50));
 }
+// ---------- estoque de tubos: o usuário corrige o que tem e o app recalcula tudo
+function renderEst(){const T=document.getElementById('tEst');if(!T)return;let h='<tr><th>Tubo e onde está</th><th class="n">Barras</th><th class="n">Levantamento</th></tr>',nm=0;
+  const lin=(nmL,key,val,def)=>{const mud=val!==def;if(mud)nm++;return `<tr><td>${nmL}${mud?'<span class="pill warn">corrigido</span>':''}</td><td class="n"><input type="number" min="0" step="1" data-k="${key}" data-d="${def}" value="${val}" placeholder="${def}" aria-label="${nmL}"></td><td class="n">${def}</td></tr>`};
+  PRODS.forEach(p=>{const ents=G.enterrado.filter(e=>p.k=='d160'?e.dn==150:p.k!='s150'&&String(e.dn)===p.k),tot=soltoP(p.k)+ents.reduce((a,e)=>a+entQ(e.b,e.dn),0);
+    h+=`<tr class="bh"><td colspan="3">${p.nm} · ${tot} barras</td></tr>`+lin('Solto','sol_'+p.k,soltoP(p.k),SOL0[p.k])+
+      ents.map(e=>lin(e.b.length>1?`Enterrado no cacau (${e.b})`:`Enterrado no coco, bloco ${e.b}`,'ent_'+e.b+'-'+e.dn,entQ(e.b,e.dn),e.barras)).join('')});
+  const e32=+ST.est['32']||0;
+  h+=`<tr class="bh"><td colspan="3">32 mm · ${fmt(e32)} m</td></tr><tr><td>Solto (metros)</td><td class="n"><input type="number" min="0" step="1" data-k="32" data-d="0" value="${e32||''}" placeholder="0" aria-label="Tubo 32 mm solto em metros"></td><td class="n">—</td></tr>`;
+  T.innerHTML=h;document.getElementById('estMsg').innerHTML=nm?`<b>${nm} número${nm>1?'s':''} corrigido${nm>1?'s':''}</b> em relação ao levantamento.`:'Todos os números são os do levantamento.';
+  T.querySelectorAll('input').forEach(i=>{i.onchange=()=>{const k=i.dataset.k,def=+i.dataset.d,t=String(i.value).trim(),v=t===''?null:Math.max(0,Math.round(+t.replace(',','.')||0)),up={};
+      if(k==='32'){if(v)ST.est['32']=v;else delete ST.est['32'];up['est.32']=v||null}
+      else{if(v===null||v===def)delete ST.est[k];else ST.est[k]=v;up['est.'+k]=k in ST.est?ST.est[k]:null;
+        // a lista de compras passa a usar o estoque: tira o "já tenho" digitado à mão no tubo desse diâmetro
+        const p=PRODS.find(x=>k==='sol_'+x.k)||PRODS.find(x=>x.k=='d160'&&/-150$/.test(k))||PRODS.find(x=>k.endsWith('-'+x.k)),sk=p?'c_'+SK(`Tubo PVC ${DL(p.dn=='150'?160:+p.dn)} mm`):null;
+        if(sk&&sk in ST.est){delete ST.est[sk];up['est.'+sk]=null}}
+      save();sync(up);estoqueMudou()};
+    i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))})}
+function estoqueMudou(){renderArr();renderPl();renderCompras();renderOp();renderPlano()}
+let erArm=false;document.getElementById('bEstReset').onclick=()=>{const b=document.getElementById('bEstReset');
+  if(!erArm){erArm=true;b.textContent='Toque de novo para confirmar';setTimeout(()=>{erArm=false;b.textContent='Voltar ao levantamento'},4000);return}
+  erArm=false;b.textContent='Voltar ao levantamento';const up={};Object.keys(ST.est).filter(k=>/^(sol|ent)_/.test(k)).forEach(k=>{delete ST.est[k];up['est.'+k]=null});save();if(Object.keys(up).length)sync(up);estoqueMudou()};
 // ---------- backup
 document.getElementById('bExp').onclick=()=>{const t=JSON.stringify(ST);const ta=document.getElementById('bk');ta.value=t;
   (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>bkMsg.textContent='Código copiado.').catch(()=>{ta.select();bkMsg.textContent='Código selecionado: copie.'})};
@@ -954,17 +998,15 @@ renderMat();
 const PL=G.pl;const br=n=>Math.round(n).toLocaleString('pt-BR');
 const arrB=(b,dn)=>arrQ(b,dn);
 function plData(p){
-  if(p==='resumo'){
-    const H=['Tubo','Solto (m)','Solto (barras)','Enterrado (m)','Enterrado (barras)','Total (m)','Total (barras)','Precisa (m)','Precisa (barras)','Já arrancado (barras)','Sobra/falta (barras)'];
-    const rows=[['150','150/160'],['125','125'],['100','100'],['75','75']].map(([dn,lab])=>{
-      const sm=PL.solto.filter(r=>String(r[0])==dn).reduce((a,r)=>a+r[2],0);
-      const em=dn=='150'?PL.cacau.reduce((a,r)=>a+r[2],0):PL.coco.filter(r=>String(r[2])==dn).reduce((a,r)=>a+r[3]+r[4],0);
-      const sb=Math.floor(sm/6),eb=G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0);
-      const pm=curTot()[dn=='150'?'160':dn]||0,pb=curPrec()[dn];
-      const ar=G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+arrB(e.b,e.dn),0);
-      return ['DN '+lab,sm,sb,em,eb,sm+em,sb+eb,pm,pb,ar,sb+eb-pb]});
-    const T=['TOTAL'];for(let i=1;i<H.length;i++)T.push(rows.reduce((a,r)=>a+r[i],0));rows.push(T);
-    return {H,rows,note:'Barras de 6 m inteiras. Sobra/falta compara tudo o que existe (solto + enterrado) com o que o projeto precisa.'};}
+  if(p==='resumo'){const E=ENT(),pr=curPrec(),tot=curTot();
+    const H=['Tubo','Solto (barras)','Enterrado (barras)','Total (barras)','Precisa (m)','Precisa (barras)','Já arrancado (barras)','Sobra/falta (barras)'];
+    const en=dn=>E.filter(e=>String(e.dn)==dn),sm=(es,f)=>es.reduce((a,e)=>a+f(e),0);
+    const e15=en('150'),ent15=sm(e15,e=>e.barras),ar15=sm(e15,e=>arrB(e.b,e.dn));
+    const rows=[['150 soldável',soltoP('s150'),0,soltoP('s150'),'','',0,''],['160 DeFoFo',soltoP('d160'),ent15,soltoP('d160')+ent15,'','',ar15,''],
+      ['150/160 (total)',soltoDN(150),ent15,soltoDN(150)+ent15,tot[160]||0,pr[150],ar15,soltoDN(150)+ent15-pr[150]],
+      ...['125','100','75'].map(dn=>{const es=en(dn),e=sm(es,x=>x.barras);return ['DN '+dn,soltoDN(dn),e,soltoDN(dn)+e,tot[dn]||0,pr[dn],sm(es,x=>arrB(x.b,x.dn)),soltoDN(dn)+e-pr[dn]]})];
+    const T=['TOTAL'];for(let i=1;i<H.length;i++)T.push(rows.slice(2).reduce((a,r)=>a+(+r[i]||0),0));rows.push(T);
+    return {H,rows,note:'Barras de 6 m inteiras, pelo estoque de tubos (Material). Sobra/falta compara tudo o que existe (solto + enterrado) com o que o projeto precisa. O 150/160 do projeto pode ser 150 soldável ou 160 DeFoFo.'};}
   if(p==='conexoes'){const H=['Nº','Conexão','Diâmetro','Onde','Latitude','Longitude','Instalada'];
     const cl=conLista(),rows=cl.map((x,j)=>[j+1,nmV(x),x.dm,x.onde,x.p[1].toFixed(7),x.p[0].toFixed(7),ST.con[x.k]?'sim':'não']);
     rows.push(['TOTAL',cl.length+' conexões','','','','',cl.filter(x=>ST.con[x.k]).length+' instaladas']);
@@ -974,21 +1016,22 @@ function plData(p){
     const rows=PL.coco.map(r=>[r[0],r[1],r[2],r[3],r[4],r[3]+r[4],Math.floor((r[3]+r[4])/6)]);
     const T=['TOTAL','','',rows.reduce((a,r)=>a+r[3],0),rows.reduce((a,r)=>a+r[4],0),rows.reduce((a,r)=>a+r[5],0),rows.reduce((a,r)=>a+r[6],0)];rows.push(T);
     return {H,rows,note:'Ramais que ainda estão enterrados no coco, por válvula.'};}
-  if(p==='cacau'){const H=['Local','DN (mm)','Metros','Barras','Já arrancado (barras)'];
-    const rows=PL.cacau.map(r=>[r[0],r[1],r[2],Math.floor(r[2]/6),arrB(r[0],150)]);rows.push(['TOTAL','',rows.reduce((a,r)=>a+r[2],0),rows.reduce((a,r)=>a+r[3],0),rows.reduce((a,r)=>a+r[4],0)]);
-    return {H,rows,note:'Tubos DN160 enterrados no cacau. No projeto entram junto com o DN150.'};}
-  if(p==='solto'){const H=['DN (mm)','Condição','Metros','Barras'];
-    const rows=PL.solto.map(r=>[r[0],r[1],r[2],Math.floor(r[2]/6)]);rows.push(['TOTAL','',rows.reduce((a,r)=>a+r[2],0),rows.reduce((a,r)=>a+r[3],0)]);
-    return {H,rows,note:'"Usado furado": tampar os furos antes de ligar a água.'};}
+  if(p==='cacau'){const H=['Local','Tubo','Metros (levantamento)','Barras (estoque)','Já arrancado (barras)'];
+    const rows=PL.cacau.map(r=>[r[0],'160 DeFoFo',r[2],entQ(r[0],150),arrB(r[0],150)]);rows.push(['TOTAL','',rows.reduce((a,r)=>a+r[2],0),rows.reduce((a,r)=>a+r[3],0),rows.reduce((a,r)=>a+r[4],0)]);
+    return {H,rows,note:'Tubos 160 DeFoFo enterrados no cacau. No projeto entram no 150/160, junto com o 150 soldável.'};}
+  if(p==='solto'){const H=['Tubo','Barras (estoque)','Barras (levantamento)','Levantamento'];
+    const lev=dn=>PL.solto.filter(r=>String(r[0])==dn).map(r=>`${r[2]} m ${r[1].toLowerCase()}`).join(' + ')||'—';
+    const rows=PRODS.map(p=>[p.nm,soltoP(p.k),SOL0[p.k],p.k=='d160'?'—':lev(p.dn)]);rows.push(['TOTAL',rows.reduce((a,r)=>a+r[1],0),rows.reduce((a,r)=>a+r[2],0),'']);
+    return {H,rows,note:'Tubo solto pelo estoque de tubos (Material). "Usado furado": tampar os furos antes de ligar a água.'};}
   const H=['Ponto','Trecho','DN (mm)','Metros','Barras 6 m'];
   const rows=alt()?D.tubos.map(t=>[t.o?'Ponto '+t.o.slice(1):'—',t.d,DL(t.dm),tLen(t),Math.ceil(tLen(t)/6)]):PL.uso.map(r=>[r[0],r[1],r[2],r[3],Math.ceil(r[3]/6)]);rows.push(['TOTAL','','',rows.reduce((a,r)=>a+r[3],0),rows.reduce((a,r)=>a+r[4],0)]);
   return {H,rows,note:'Onde cada diâmetro entra no traçado do quebra-vento.'};
 }
 let plCur='resumo';
 function renderPl(){const d=plData(plCur);const num=v=>typeof v==='number';
-  document.getElementById('plBody').innerHTML='<tr>'+d.H.map((h,i)=>`<th class="${i&&num(d.rows[0][i])?'n':''}">${h}</th>`).join('')+'</tr>'+
+  document.getElementById('plBody').innerHTML='<tr>'+d.H.map((h,i)=>`<th class="${i&&d.rows.some(r=>num(r[i]))?'n':''}">${h}</th>`).join('')+'</tr>'+
    d.rows.map((r,k)=>`<tr class="${k==d.rows.length-1?'tot':''}">`+r.map((v,i)=>{
-     if(plCur==='resumo'&&i==10&&k<d.rows.length){const cl=v>=0?(v==0?'warn':'ok'):'bad';return `<td class="n"><span class="pill ${cl}">${v>0?'Sobra '+v:v==0?'Justo':'Falta '+(-v)}</span></td>`}
+     if(plCur==='resumo'&&i==d.H.length-1&&typeof v==='number'){const cl=v>=0?(v==0?'warn':'ok'):'bad';return `<td class="n"><span class="pill ${cl}">${v>0?'Sobra '+v:v==0?'Justo':'Falta '+(-v)}</span></td>`}
      return `<td class="${num(v)?'n':''}">${num(v)?br(v):v}</td>`}).join('')+'</tr>').join('');
   document.getElementById('plNote').textContent=d.note;}
 document.querySelectorAll('#plTabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#plTabs button').forEach(x=>x.setAttribute('aria-selected','false'));b.setAttribute('aria-selected','true');plCur=b.dataset.p;renderPl()});
@@ -997,7 +1040,7 @@ document.getElementById('bXls').onclick=()=>{
   const wb=XLSX.utils.book_new();
   [['resumo','Resumo'],['coco','Enterrado coco'],['cacau','Enterrado cacau'],['solto','Estoque solto'],['uso','Uso no projeto'],['conexoes','Conexões']].forEach(([k,n])=>{
     const d=plData(k);const ws=XLSX.utils.aoa_to_sheet([d.H,...d.rows,[],[d.note]]);ws['!cols']=d.H.map(h=>({wch:Math.max(10,h.length+2)}));XLSX.utils.book_append_sheet(wb,ws,n)});
-  const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(G.enterrado.map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,'DN '+(e.dn==150?160:e.dn),e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
+  const arr=[['Local','Tubo','Enterradas','Arrancadas','Faltam']].concat(ENT().map(e=>[e.b.length>1?e.b+' (cacau)':'Bloco '+e.b,e.dn==150?'160 DeFoFo':'DN '+e.dn,e.barras,arrB(e.b,e.dn),e.barras-arrB(e.b,e.dn)]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(arr),'Arranque (progresso)');
   {const C=cronograma(),f=d=>d?d.toLocaleDateString('pt-BR'):'';XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Etapa','Feito','Total','Unidade','Pessoas','Rende por pessoa/dia','Ritmo da equipe/dia','Dias de trabalho','Diárias','Custo (R$)','Início previsto','Término previsto','Situação']].concat(C.E.map((e,i)=>[(i+1)+'. '+e.n,Math.round(e.feito),Math.round(e.tot),e.un,e.compra?'':e.r.np||'',e.compra?'':e.r.rp||'',e.compra||!(e.r.usa>0)?'':Math.round(e.r.usa),e.dur||'',e.dia||'',e.dia&&+ST.est.diaria>0?Math.round(e.dia*ST.est.diaria):'',f(e.ini),f(e.fim),{ok:'Concluído',and:'Em andamento',esp:'Aguardando',sem:'Sem ritmo',dep:'Aguardando previsão'}[e.st]||'']))),'Plano de execução')}
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['Grupo','Teste','Previsto (bar)','Resultado']].concat(listaTestes().map(t=>[t.g,t.nm,t.prev!=null?Math.round(t.prev*10)/10:'',t.num?(ST.tst[t.k]??''):(ST.tst[t.k]?'feito':'')]))),'Testes');
@@ -1011,8 +1054,8 @@ function listaCompras(){const fol=1+Math.max(0,+ST.est.folga||0)/100,L=[];
   const it=(g,nm,un,prec,def,sk)=>{prec=Math.ceil(prec-1e-9);sk=sk||'c_'+SK(nm);const v=ST.est[sk];L.push({g,nm,un,prec,def,sk,tem:sk==='32'||v==null||v===''?def:+v})};
   // tubos: o que já existe = solto + todo o enterrado (contando que tudo seja arrancado)
   const t=curTot(),dk={160:'150',125:'125',100:'100',75:'75'},gt='Tubos (barras de 6 m)';
-  [160,125,100,75].forEach(dm=>{const k=dk[dm],ent=G.enterrado.filter(e=>String(e.dn)==k).reduce((a,e)=>a+e.barras,0),prec=Math.ceil((t[dm]||0)*fol/6);
-    if(prec)it(gt,`Tubo PVC ${DL(dm)} mm`,'barras',prec,(G.solto[k]||0)+ent)});
+  const E=ENT();[160,125,100,75].forEach(dm=>{const k=dk[dm],ent=E.filter(e=>String(e.dn)==k).reduce((a,e)=>a+e.barras,0),prec=Math.ceil((t[dm]||0)*fol/6);
+    if(prec)it(gt,`Tubo PVC ${DL(dm)} mm${dm==160?' (150 soldável ou 160 DeFoFo)':''}`,'barras',prec,soltoDN(k)+ent,'c_'+SK(`Tubo PVC ${DL(dm)} mm`))});
   if(t[50])it('Mangueira e tubo fino','Mangueira PE 50 mm','m',t[50]*fol,0);
   if(t[32])it('Mangueira e tubo fino','Tubo 32 mm','m',t[32]*fol,+ST.est['32']||0,'32');
   // conexões da tubulação, com o diâmetro de cada uma
@@ -1076,8 +1119,8 @@ function nUteis(a,b){let n=0;const d=new Date(a);d.setDate(d.getDate()+1);while(
 function maisUteis(a,n){const d=new Date(a);let g=0;while(n>0&&g++<5000){d.setDate(d.getDate()+1);if(dUtil(d))n--}return d}
 function dTxt(d){return `${DOW[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`}
 // as 6 etapas da execução, na ordem do serviço
-function etapas(){const P=planoAV(),pr=curPrec(),need={...P.need,150:Math.max(0,pr[150]-(G.solto[150]||0))};
-  let tA=0,dA=0,rA=0;[150,125,100,75].forEach(dn=>{const es=G.enterrado.filter(e=>e.dn==dn),ent=es.reduce((a,e)=>a+e.barras,0),ar=es.reduce((a,e)=>a+arrQ(e.b,e.dn),0),alvo=Math.min(need[dn]||0,ent);tA+=alvo;dA+=Math.min(alvo,ar);rA+=ar});
+function etapas(){const P=planoAV(),pr=curPrec(),need={...P.need,150:Math.max(0,pr[150]-soltoDN(150))};
+  let tA=0,dA=0,rA=0;const E=ENT();[150,125,100,75].forEach(dn=>{const es=E.filter(e=>e.dn==dn),ent=es.reduce((a,e)=>a+e.barras,0),ar=es.reduce((a,e)=>a+arrQ(e.b,e.dn),0),alvo=Math.min(need[dn]||0,ent);tA+=alvo;dA+=Math.min(alvo,ar);rA+=ar});
   const LC=listaCompras(),okLC=LC.filter(x=>x.tem>=x.prec).length;
   const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),dm=tl.filter(x=>ST.mar[x.k]).reduce((a,x)=>a+x.L,0),dt=tl.filter(x=>ST.tub[x.k]).reduce((a,x)=>a+x.L,0),cl=conLista(),dc=cl.filter(x=>ST.con[x.k]).length;
   const SG=layOf(D).segs,Le=SG.reduce((a,g)=>a+g.L,0),de=SG.filter(g=>ST.inst[g.id]).reduce((a,g)=>a+g.L,0);
@@ -1331,7 +1374,7 @@ document.getElementById('eAj').onclick=()=>{const pn=document.getElementById('ed
 // ---------- escolha e comparação das opções
 function renderOp(){document.querySelectorAll('button[data-op]').forEach(b=>b.classList.toggle('on',+b.dataset.op===ST.op));
   const OPN=Object.keys(OPS).map(Number),eo=OPN.filter(n=>n!==ST.op&&ST.eds[n]);document.getElementById('opMsg').innerHTML=OPS[ST.op].tx+(ST.ed?' <b>Esta opção foi editada no mapa.</b>':'')+' Toque em outra opção para ver no mapa; turnos, material, conexões, compras e planilha mudam junto. A edição de cada opção fica guardada: trocar de opção não apaga nada.'+(eo.length?` Também editada: opção ${eo.join(' e ')}.`:'');
-  const tem=dn=>(G.solto[dn]||0)+G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0),pb=PB();
+  const E=ENT(),tem=dn=>soltoDN(dn)+E.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0),pb=PB();
   const conta=h=>{const b=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=.5).length,l=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=0&&r.sobra<.5).length;return {b,l,n:h.t.length}};
   const col=OPN.map(n=>{const edn=n===ST.op?!!ST.ed:!!ST.eds[n],net=n===ST.op?D:ST.eds[n]||opcao(n),orig=n==1&&!edn;
     const t=orig?G.tot:curTot(net),pr=orig?G.precisa:curPrec(net),c=orig?G.cnt:conexoes(net),nc=Object.values(c).reduce((a,b)=>a+b,0);
@@ -1362,7 +1405,7 @@ document.querySelectorAll('button[data-op]').forEach(b=>b.onclick=()=>{const n=+
   ST.edT=Date.now();save();sync({op:n,ed:ST.ed?JSON.stringify(ST.ed):null,edT:ST.edT});map.closePopup();redraw()});
 renderOp();
 // ---------- telas (barra de ícones) e rotas: #mapa, #rega, #plano, #arranque, ...
-const ROTA={mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],mais:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
+const ROTA={mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],estoque:['material'],mais:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
 const TIT={mapa:'Mapa',rega:'Rega · turnos e opções',plano:'Plano de execução',material:'Material e planilha',mais:'Mais'};
 const SCR={};let rotaAt=null;
 function abrir(h,inicio){h=String(h||'').replace('#','');if(!ROTA[h])h='mapa';const [t,sb]=ROTA[h],chave=t+(sb||'');
