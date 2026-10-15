@@ -137,7 +137,7 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 #plBody th{text-transform:none;letter-spacing:0;white-space:normal;font-size:.8rem;line-height:1.2;min-width:58px}
 #plBody td{white-space:nowrap}
 #tAV td{vertical-align:top}
-.hero{font:700 clamp(2rem,9vw,3rem)/1.05 var(--f-head);margin:4px 0}.hero.sm{font-size:1.6rem}.etp{padding:10px 0;border-bottom:1px solid var(--rule)}.etp-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:6px}.etp-h a{color:var(--ink)}.etp .bar{background:var(--okbg)}.eqp td,.eqp th{padding:4px 6px 4px 0;text-align:left;vertical-align:middle}.eqp th{font-weight:600;font-size:.85rem;color:var(--mut)}.eqp input[type=number]{width:64px}.eqp small{display:block;color:var(--mut)}
+.hero{font:700 clamp(2rem,9vw,3rem)/1.05 var(--f-head);margin:4px 0}.hero.sm{font-size:1.6rem}.etp{padding:10px 0;border-bottom:1px solid var(--rule)}.etp-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:6px}.etp-h a{color:var(--ink)}.etp .bar{background:var(--okbg)}.cxt td,.cxt th,.cxf td,.mot td,.mot th{padding:5px 6px 5px 0;vertical-align:top}.cxt td.n,.cxt th.n,.mot td.n,.mot th.n{text-align:right;white-space:nowrap}.cxt tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}.cxt tr.tot td{font-weight:700;border-top:1.5px solid var(--rule)}.cxt small,.cxf small,.mot small{display:block;color:var(--mut)}.cxf td:first-child{width:60%}.cxf tr.bh td{font-weight:700;padding-top:12px}.cxf input[type=number]{width:80px}.mot{margin-top:10px;font-size:.92rem}.mot tr.tot td{font-weight:700;border-top:1.5px solid var(--rule)}.eqp td,.eqp th{padding:4px 6px 4px 0;text-align:left;vertical-align:middle}.eqp th{font-weight:600;font-size:.85rem;color:var(--mut)}.eqp input[type=number]{width:64px}.eqp small{display:block;color:var(--mut)}
 #tstList td{vertical-align:top;padding:6px 6px 6px 0}#tstList tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tstList tr.done td{color:var(--mut)}#tstList input[type=number]{width:70px}#tstList small{color:var(--mut)}#tstList button{margin-top:4px;padding:4px 8px}
 #tubList small{color:var(--mut)}#tubList td{vertical-align:top}.ck2 label{display:flex;gap:6px;align-items:center;font-size:.85rem;white-space:nowrap;margin-bottom:4px}
 #tCompra{font-size:.9rem}#tCompra td,#tCompra th{padding:6px 4px 6px 0}#tCompra input{width:62px}#tCompra td{vertical-align:top}#tCompra tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tCompra tr.done td{color:var(--mut)}#tCompra small{font-size:.76rem;color:var(--mut)}
@@ -167,7 +167,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v24</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v25</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -220,11 +220,12 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </div>
 
 <div class="tab wrap" id="tab-plano">
-<div class="subtabs" aria-label="Etapas"><a href="#plano" data-sub="plano">Resumo</a><a href="#arranque" data-sub="arranque">1 Arrancar</a><a href="#compras" data-sub="compras">2 Compras</a><a href="#tubos" data-sub="tubos">3·4 Tubos</a><a href="#mangueiras" data-sub="mangueiras">5 Mangueiras</a><a href="#testes" data-sub="testes">6 Testes</a></div>
+<div class="subtabs" aria-label="Etapas"><a href="#plano" data-sub="plano">Resumo</a><a href="#arranque" data-sub="arranque">1 Arrancar</a><a href="#compras" data-sub="compras">2 Compras</a><a href="#tubos" data-sub="tubos">3·4 Tubos</a><a href="#mangueiras" data-sub="mangueiras">5 Mangueiras</a><a href="#testes" data-sub="testes">6 Testes</a><a href="#custo" data-sub="custo">Custo</a></div>
 <section class="card" data-sub="plano" id="plano">
   <h2>Plano de execução · 6 etapas em sequência</h2>
   <div class="hero" id="plFim">—</div>
   <p class="note" id="plMsg" style="margin-top:4px"></p>
+  <div id="plMo"></div>
   <div id="tPlano"></div>
   <details class="note" style="margin-top:10px"><summary>Ajustar equipe, início, dias de trabalho, prazo e entrega do material</summary>
     <div class="mapbar" style="margin:8px 0">
@@ -305,6 +306,18 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <div class="bar" style="margin-top:10px"><i id="xBar"></i></div>
   <p class="note">Faça na ordem: lavagem de cada linha, vazamento, e depois cada turno. Nas pressões, digite o que o manômetro marcou: o app compara com o previsto e avisa se algo está fora.</p>
   <div class="tbl chk"><table id="tstList"></table></div>
+</section>
+
+<section class="card" data-sub="custo" id="custo">
+  <h2>Custo · reaproveitar os tubos × material novo</h2>
+  <p class="note" style="margin-top:0">Compara só o que muda entre as duas formas de fazer. Conexões, fita, mangueiras e testes são iguais nas duas e ficam de fora. <b>Diária</b> = 1 pessoa trabalhando 1 dia.</p>
+  <div class="big" id="cxBig"></div>
+  <p class="note" id="cxMsg"></p>
+  <div class="tbl"><table class="cxt" id="cxTab"></table></div>
+  <h3 style="margin-top:16px">Valores usados na conta</h3>
+  <p class="note" style="margin-top:0">Os campos em branco usam o valor cinza. Tudo fica guardado e vale também nos outros aparelhos.</p>
+  <div class="tbl"><table class="cxf" id="cxForm"></table></div>
+  <p style="margin-top:10px"><button type="button" id="cxPlano">Usar esses rendimentos no plano</button> <span class="note" id="cxPlMsg"></span></p>
 </section>
 </div>
 
@@ -1178,10 +1191,14 @@ function txtPrazo(C,prazo){const q=equipePrazo(C,prazo),dd=`${pad(prazo.getDate(
   if(q.imp)return `<br>Mesmo com muito mais gente não dá para terminar até ${dd}`+(C.mat&&C.mat>prazo?`, porque o material só chega ${dCurto(C.mat)}.`:'. Ajuste o prazo ou a data de início.');
   const it=q.E.map(e=>e.r.np?`${e.n}: ${e.r.np} → <b>${Math.ceil(e.r.np*q.f-1e-9)} pessoas</b>`:`${e.n}: ritmo de <b>${fmt(Math.ceil(e.r.usa*q.f))} ${e.un}/dia</b>`);
   return `<br><b>Para terminar até ${dd}</b>, as equipes precisam render cerca de ${Math.round((q.f-1)*100)}% a mais: `+it.join(' · ')+'.'}
-// mão de obra prevista para o que falta: pessoas × dias de trabalho
-function txtCusto(C){const L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra);if(!L.length)return '';
-  const com=L.filter(e=>e.dia),sem=L.filter(e=>!e.dia).map(e=>e.n),n=com.reduce((a,e)=>a+e.dia,0),d=+ST.est.diaria||0;if(!com.length)return '';
-  return `<br>Mão de obra para o que falta: <b>${fmt(n)} diárias</b>`+(d>0?` · <b>${brl(n*d)}</b> a ${brl(d)} por diária`:' (informe o valor da diária em "Ajustar" para ver o custo)')+(sem.length?`. Sem contar ${sem.join(', ')}, que ainda estão sem número de pessoas.`:'.')}
+// mão de obra prevista para o que falta: pessoas × dias de trabalho, etapa por etapa
+function renderMo(C){const el=document.getElementById('plMo'),L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra&&e.dur),d=+ST.est.diaria||0;
+  if(!L.length){el.innerHTML='';return}
+  const n=L.reduce((a,e)=>a+(e.dia||0),0),sem=L.filter(e=>!e.dia).map(e=>e.n);
+  el.innerHTML=`<h3 style="margin-top:14px">Mão de obra do que falta</h3><div class="tbl"><table class="mot"><tr><th>Etapa</th><th class="n">Pessoas</th><th class="n">Dias</th><th class="n">Diárias</th>${d?'<th class="n">Custo</th>':''}</tr>`+
+    L.map(e=>`<tr><td>${e.n}</td><td class="n">${e.r.np||'—'}</td><td class="n">${e.dur}</td><td class="n">${e.dia?fmt(e.dia):'—'}</td>${d?`<td class="n">${e.dia?brl(e.dia*d):'—'}</td>`:''}</tr>`).join('')+
+    `<tr class="tot"><td>Total</td><td></td><td></td><td class="n">${fmt(n)}</td>${d?`<td class="n">${brl(n*d)}</td>`:''}</tr></table></div>`+
+    `<p class="note" style="margin:4px 0 0">Diárias = pessoas × dias de trabalho da etapa (1 diária = 1 pessoa trabalhando 1 dia).`+(d?` Custo = diárias × ${brl(d)}.`:' Informe o valor da diária em "Ajustar" para ver o custo.')+(sem.length?` Sem número de pessoas ainda: ${sem.join(', ')} (não entram no total).`:'')+` A comparação com material novo fica na aba <a href="#custo">Custo</a>.</p>`}
 function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(ST.est.prazo):null,ds=+ST.est.dsem||6;
   const rows=C.E.map((e,i)=>{const pct=e.tot?Math.min(100,100*e.feito/e.tot):100,un=e.un;let lin1=`${fmt(e.feito)} de ${fmt(e.tot)} ${un}`+(e.feito<e.tot?` · faltam ${fmt(e.tot-e.feito)}`:''),lin2='';
     if(e.compra)lin1=`${fmt(e.feito)} de ${fmt(e.tot)} itens já em estoque · ${ST.est.solic?'solicitação enviada em '+dCurto(s2d(ST.est.solic)):'solicitação ainda não enviada'} · entrega em ${entrega()} dias`;
@@ -1198,7 +1215,7 @@ function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(
   hf.textContent=!pend?'Concluído':C.fim?dTxt(C.fim):'Sem previsão ainda';hf.classList.toggle('sm',pend&&!C.fim);
   const semR=C.E.filter(e=>e.st==='sem').map(e=>e.n);
   document.getElementById('plMsg').innerHTML=!pend?'Todas as etapas concluídas.':
-    (C.fim?(ST.est.ini&&s2d(ST.est.ini)>s2d(diaS())?`Começando em ${dCurto(s2d(ST.est.ini))}. `:'')+`Término previsto da última etapa (testes). As etapas vão em sequência: cada uma começa quando a anterior termina; se uma já começou antes, ela segue junto. A compra do material corre junto desde o início, e a instalação dos tubos espera o material chegar. Com ${ds} dias de trabalho por semana.`+(prazo?(C.fim>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}) em ${nUteis(prazo,C.fim)} dias de trabalho</span>`+txtPrazo(C,prazo):` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):'')+txtCusto(C):
+    (C.fim?(ST.est.ini&&s2d(ST.est.ini)>s2d(diaS())?`Começando em ${dCurto(s2d(ST.est.ini))}. `:'')+`Término previsto da última etapa (testes). As etapas vão em sequência: cada uma começa quando a anterior termina; se uma já começou antes, ela segue junto. A compra do material corre junto desde o início, e a instalação dos tubos espera o material chegar. Com ${ds} dias de trabalho por semana.`+(prazo?(C.fim>prazo?` <span class="pill bad">Passa do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)}) em ${nUteis(prazo,C.fim)} dias de trabalho</span>`+txtPrazo(C,prazo):` <span class="pill ok">Dentro do prazo (${pad(prazo.getDate())}/${pad(prazo.getMonth()+1)})</span>`):''):
     `Para fechar a previsão falta o ritmo de: <b>${semR.join(', ')}</b>. Informe as pessoas e quanto cada uma rende em "Ajustar", logo abaixo, ou espere o 2º dia com marcação para o app medir sozinho.`);
   // últimos dias registrados
   const Hs=H.slice(-11),nomes={a:['barras arrancadas',''],m:['m marcados',''],t:['m de tubo',''],c:['conexões',''],e:['m de mangueira',''],x:['testes','']};let hl='';
@@ -1206,8 +1223,54 @@ function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(
     const it=Object.keys(nomes).map(k=>{const v=+h.v[k]||0,d=p?v-(+p.v[k]||0):v;return d?`${d>0&&p?'+':''}${fmt(d)} ${nomes[k][0]}`:''}).filter(Boolean);
     hl+=`<li><b>${pad(h.d.getDate())}/${pad(h.d.getMonth()+1)}</b>${p?'':' (1º dia)'}: ${it.length?it.join(', '):'sem avanço'}</li>`}
   document.getElementById('tHist').innerHTML=Hs.length?hl:'<li>Ainda não há dias registrados. Cada dia em que algo for marcado em uma das etapas fica guardado aqui.</li>';
-  renderEquipe(C);
+  renderEquipe(C);renderMo(C);renderCusto();
   [['plIn',ST.est.ini||''],['plDi',ST.est.diaria||''],['plDs',String(ds)],['plPz',ST.est.prazo||''],['plEn',ST.est.entr??'']].forEach(([id,v])=>{const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v})}
+// ---------- custo: reaproveitar os tubos enterrados × comprar tudo novo e instalar na profundidade certa
+const CXD=[['g','Geral'],['diaria','Diária por pessoa','R$',null],
+  ['g','Reaproveitar os tubos velhos'],['cx_ra','Arrancar: metros de valeta por pessoa por dia','m',40],['cx_rm','Montar na valeta rasa (abrir, montar e fechar): metros por pessoa por dia','m',40],
+  ['cx_fu','Barras velhas que vão precisar de conserto','%',10],['cx_cd','Conserto: diárias por barra consertada','diárias',0.25],['cx_cm','Conserto: material por barra consertada','R$',null],
+  ['cx_qa','Quebras pelo trator por ano','quebras',null],['cx_qc','Custo de cada quebra (material e mão de obra)','R$',null],['cx_an','Tempo de uso do quebra-vento provisório','anos',1],
+  ['g','Material novo na profundidade certa'],['cx_p150','Barra nova 150/160 mm','R$',null],['cx_p125','Barra nova 125 mm','R$',null],['cx_p100','Barra nova 100 mm','R$',null],['cx_p75','Barra nova 75 mm','R$',null],
+  ['cx_vm','Valeta funda com máquina: custo por metro (se preencher, vale este)','R$/m',null],['cx_vf','Valeta funda à mão: metros por pessoa por dia','m',null],['cx_mf','Montar e fechar na valeta funda: metros por pessoa por dia','m',40]];
+const cxv=k=>{const v=ST.est[k];if(v!=null&&v!=='')return +v;const d=CXD.find(x=>x[0]===k);return d&&d[3]!=null?d[3]:null};
+function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cxv('diaria'),DN=['150','125','100','75'];
+  const tub={};listaCompras().forEach(x=>{const m=x.nm.match(/^Tubo PVC (\d+)/);if(m)tub[m[1]]={prec:x.prec,comp:Math.max(0,x.prec-x.tem)}});
+  const pr=dn=>cxv('cx_p'+dn),R=(nm,q,di,rs,falta)=>({nm,q,di:di||0,rs:(rs||0)+(di&&dia?di*dia:0),falta:[].concat(falta||[],di&&dia==null?['diária']:[])});
+  const reuso=[],novo=[];
+  // reaproveitar
+  reuso.push(R('Arrancar os tubos enterrados',`${fmt(bA)} barras · ${fmt(bA*6)} m de valeta`,bA*6/cxv('cx_ra')));
+  reuso.push(R('Montar na valeta rasa',`${fmt(mT)} m`,mT/cxv('cx_rm')));
+  const bc=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].comp:0),0),fc=DN.filter(dn=>tub[dn]&&tub[dn].comp&&pr(dn)==null);
+  if(bc)reuso.push(R('Comprar as barras que faltam',`${fmt(bc)} barras`,0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].comp*(pr(dn)||0):0),0),fc.map(dn=>'preço da barra '+(dn==='150'?'150/160':dn))));
+  const bv=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec-tub[dn].comp:0),0),nc=Math.round(bv*(cxv('cx_fu')||0)/100);
+  reuso.push(R('Consertar barras velhas furadas',`${fmt(nc)} de ${fmt(bv)} barras (${cxv('cx_fu')||0}%)`,nc*(cxv('cx_cd')||0),nc*(cxv('cx_cm')||0),nc&&cxv('cx_cm')==null?['material do conserto']:[]));
+  const qa=cxv('cx_qa'),an=cxv('cx_an')||1,nq=Math.round((qa||0)*an);
+  reuso.push(R('Quebras pelo trator na valeta rasa',qa==null?'—':`${fmt(nq)} em ${String(an).replace('.',',')} ${an>1?'anos':'ano'}`,0,nq*(cxv('cx_qc')||0),qa==null?['quebras por ano']:nq&&cxv('cx_qc')==null?['custo por quebra']:[]));
+  // novo
+  const bn=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec:0),0),fn=DN.filter(dn=>tub[dn]&&tub[dn].prec&&pr(dn)==null);
+  novo.push(R('Comprar todas as barras novas',DN.filter(dn=>tub[dn]).map(dn=>`${fmt(tub[dn].prec)} × ${dn==='150'?'150/160':dn}`).join(' · '),0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec*(pr(dn)||0):0),0),fn.map(dn=>'preço da barra '+(dn==='150'?'150/160':dn))));
+  const vm=cxv('cx_vm'),vf=cxv('cx_vf');
+  novo.push(vm!=null?R('Abrir a valeta funda com máquina',`${fmt(mT)} m × ${brl(vm)}`,0,mT*vm):vf?R('Abrir a valeta funda à mão',`${fmt(mT)} m`,mT/vf):R('Abrir a valeta funda',`${fmt(mT)} m`,0,0,['valeta funda']));
+  novo.push(R('Montar e fechar na valeta funda',`${fmt(mT)} m`,mT/cxv('cx_mf')));
+  const T=L=>({di:L.reduce((a,x)=>a+x.di,0),rs:L.reduce((a,x)=>a+x.rs,0),falta:[...new Set(L.flatMap(x=>x.falta))]});
+  return {reuso,novo,tr:T(reuso),tn:T(novo),dia}}
+function renderCusto(){const el=document.getElementById('cxTab');if(!el)return;const C=custo(),rs=v=>brl(Math.round(v)),di=v=>v?fmt(Math.ceil(v)):'—';
+  const lin=x=>`<tr><td>${x.nm}<small>${x.q}</small></td><td class="n">${di(x.di)}</td><td class="n">${x.falta.length?'<small>falta '+x.falta.join(', ')+'</small>':rs(x.rs)}</td></tr>`;
+  el.innerHTML='<tr><th>Item</th><th class="n">Diárias</th><th class="n">Custo</th></tr>'+
+    '<tr class="bh"><td colspan="3">Reaproveitar os tubos velhos</td></tr>'+C.reuso.map(lin).join('')+`<tr class="tot"><td>Total reaproveitando</td><td class="n">${di(C.tr.di)}</td><td class="n">${C.tr.falta.length?'—':rs(C.tr.rs)}</td></tr>`+
+    '<tr class="bh"><td colspan="3">Material novo na profundidade certa</td></tr>'+C.novo.map(lin).join('')+`<tr class="tot"><td>Total com material novo</td><td class="n">${di(C.tn.di)}</td><td class="n">${C.tn.falta.length?'—':rs(C.tn.rs)}</td></tr>`;
+  const fal=[...new Set([...C.tr.falta,...C.tn.falta])],ok=!fal.length,d=C.tn.rs-C.tr.rs;
+  document.getElementById('cxBig').innerHTML=`<div><b>${ok?rs(C.tr.rs):'—'}</b><span>reaproveitando</span></div><div><b>${ok?rs(C.tn.rs):'—'}</b><span>material novo</span></div>`;
+  document.getElementById('cxMsg').innerHTML=ok?(Math.abs(d)<1?'As duas saem pelo mesmo valor.':`<b>${d>0?'Reaproveitar':'Material novo'} sai ${rs(Math.abs(d))} mais barato</b> (${Math.round(100*Math.abs(d)/Math.max(C.tr.rs,C.tn.rs))}% de diferença). `+(d>0?'Lembre que o novo fica na profundidade certa e não deve dar conserto nem quebra depois.':'Além de mais barato, o novo fica na profundidade certa.')):
+    `Para fechar a comparação, preencha abaixo: <b>${fal.join(', ')}</b>.`;
+  const f=document.getElementById('cxForm');
+  if(!f.children.length)f.innerHTML=CXD.map(x=>x[0]==='g'?`<tr class="bh"><td colspan="2">${x[1]}</td></tr>`:`<tr><td><label for="cx-${x[0]}">${x[1]}</label></td><td><input type="number" id="cx-${x[0]}" data-f="${x[0]}" min="0" step="any"${x[3]!=null?` placeholder="${String(x[3]).replace('.',',')}"`:''}> <small>${x[2]}</small></td></tr>`).join('');
+  f.querySelectorAll('input').forEach(i=>{if(document.activeElement!==i)i.value=ST.est[i.dataset.f]??''})}
+document.getElementById('cxForm').addEventListener('change',ev=>{const i=ev.target;if(!i.dataset||!i.dataset.f)return;const k=i.dataset.f,s=String(i.value).trim().replace(',','.');
+  const v=s===''?null:Math.max(0,+s||0);if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano()});
+document.getElementById('cxForm').addEventListener('focusout',()=>setTimeout(depoisDeOcupado,50));
+document.getElementById('cxPlano').onclick=()=>{const up={ra:Math.round(cxv('cx_ra')/6*10)/10,rt:cxv('cx_rm')};Object.assign(ST.est,up);save();sync({'est.ra':up.ra,'est.rt':up.rt});renderPlano();
+  document.getElementById('cxPlMsg').textContent=`Pronto: no plano, arrancar ${String(up.ra).replace('.',',')} barras e montar ${fmt(up.rt)} m por pessoa por dia.`};
 // tabela da equipe: pessoas e rendimento por pessoa em cada etapa
 function renderEquipe(C){const tb=document.querySelector('#plEq tbody'),H=histDias(),T=C.E.find(x=>x.k==='t'),ok=k=>{const e=k==='c'?T:C.E.find(x=>x.k===k);return e&&e.st==='ok'};
   if(!tb.children.length)tb.innerHTML=EQ.map(([k,n,un])=>`<tr data-k="${k}"><td>${n}</td><td>${k==='c'?'<small>a mesma dos tubos</small>':`<input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}">`}</td><td><input type="number" min="0" step="any" data-f="r${k}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join('');
@@ -1405,7 +1468,7 @@ document.querySelectorAll('button[data-op]').forEach(b=>b.onclick=()=>{const n=+
   ST.edT=Date.now();save();sync({op:n,ed:ST.ed?JSON.stringify(ST.ed):null,edT:ST.edT});map.closePopup();redraw()});
 renderOp();
 // ---------- telas (barra de ícones) e rotas: #mapa, #rega, #plano, #arranque, ...
-const ROTA={mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],estoque:['material'],mais:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
+const ROTA={custo:['plano','custo'],mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],estoque:['material'],mais:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
 const TIT={mapa:'Mapa',rega:'Rega · turnos e opções',plano:'Plano de execução',material:'Material e planilha',mais:'Mais'};
 const SCR={};let rotaAt=null;
 function abrir(h,inicio){h=String(h||'').replace('#','');if(!ROTA[h])h='mapa';const [t,sb]=ROTA[h],chave=t+(sb||'');
