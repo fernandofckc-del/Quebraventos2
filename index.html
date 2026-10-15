@@ -167,7 +167,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v26</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v28</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -324,6 +324,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 <div class="tab wrap" id="tab-material">
 <div class="grid" id="material">
   <section class="card"><h2>Resumo</h2><div class="big"><div><b id="kTubo"></b><span>tubulação</span></div><div><b id="kFita"></b><span>fita</span></div><div><b id="kTom"></b><span>tomadas</span></div></div></section>
+  <section class="card"><h2>150 soldável ou 160 DeFoFo, trecho a trecho</h2><p class="note" style="margin-top:0">São tubos diferentes e não encaixam direto: onde um encontra o outro entra um adaptador. Em "Automático" o app divide os trechos para usar o que já existe (160 DeFoFo solto e enterrado no cacau, e 150 soldável solto) e comprar o mínimo.</p><p class="note" id="m160Res"></p><div class="tbl"><table id="tM160"></table></div></section>
   <section class="card"><h2>Tubulação por diâmetro</h2><table id="tTubo"><tr><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th></tr></table></section>
   <section class="card"><h2>Fita gotejadora</h2><table id="tFita"></table></section>
   <section class="card"><h2>Conexões</h2><table id="tCon"></table></section>
@@ -657,7 +658,7 @@ let tuboL=[],tubeP=[];
 function drawNet(){drawLay();
   lTubo.clearLayers();lNos.clearLayers();lReg.clearLayers();tuboL=[];tubeP=[];
   D.tubos.map((t,i)=>[t,i]).sort((a,b)=>b[0].dm-a[0].dm).forEach(([t,i])=>{
-    const p=L.polyline(ll(t.q),{color:DC[t.dm],weight:W[t.dm],lineCap:'round'}).bindTooltip(()=>`${DL(t.dm)} mm · ${t.d} · ${tLen(t)} m`,{sticky:true}).addTo(lTubo);
+    const p=L.polyline(ll(t.q),{color:DC[t.dm],weight:W[t.dm],lineCap:'round'}).bindTooltip(()=>`${DLt(t)} mm · ${t.d} · ${tLen(t)} m`,{sticky:true}).addTo(lTubo);
     p._d=t;p.on('click',e=>{if(!ED)return;L.DomEvent.stop(e);if(DR)drawAdd(e.latlng);else tubePop(i,e.latlng)});tuboL.push(p);tubeP[i]=p});
   if(D.nos.length!==G.nos.length)conLista().forEach(x=>{const t=x.nm.startsWith('Saída')?'saida':x.nm.startsWith('Final')?'fim':x.nm.startsWith('Redução')?'red':x.nm=='Curva'?'curva':null;if(t)L.circleMarker(LL(x.p),{radius:t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[t],fillOpacity:1,interactive:!ED}).bindTooltip(x.nm).addTo(lNos)});
   else G.nos.forEach((n,i)=>{if(n.t==='tee'||(n.t==='curva'&&n.nm.includes('registro')))return;L.circleMarker(LL(D.nos[i]),{radius:n.t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[n.t],fillOpacity:1,interactive:!ED}).bindTooltip(n.nm).addTo(lNos)});
@@ -784,14 +785,15 @@ function pontosLigados(net){const N=new Map(),add=(a,b)=>{if(!N.has(a))N.set(a,[
 function conLista(net){const D0=D;if(net)D=net;try{return conLista0()}finally{D=D0}}
 function conLista0(){
   const N=new Map(),nd=p=>{const k=KY(p);if(!N.has(k))N.set(k,{p,e:[]});return N.get(k)};
-  D.tubos.forEach(t=>t.q.forEach((p,j)=>{const n=nd(p);if(j>0)n.e.push({dm:t.dm,d:t.d,ln:t.ln,to:t.q[j-1]});if(j<t.q.length-1)n.e.push({dm:t.dm,d:t.d,ln:t.ln,to:t.q[j+1]})}));
+  const MT=matTub();D.tubos.forEach((t,ti)=>{const mt=t.dm==160&&MT[ti]?MT[ti].m:null;t.q.forEach((p,j)=>{const n=nd(p);if(j>0)n.e.push({dm:t.dm,d:t.d,ln:t.ln,to:t.q[j-1],mt});if(j<t.q.length-1)n.e.push({dm:t.dm,d:t.d,ln:t.ln,to:t.q[j+1],mt})})});
   const isP=new Set(D.P.filter((p,i)=>!(D.Poff&&D.Poff[i])).map(KY)),RP=regPts(D),isR=new Set(RP.map(([k,p])=>KY(p))),rI=new Map(RP.map(([k,p])=>[KY(p),k])),out=[];
   // desvio da direção no ponto (graus): 0 = reto, 90 = curva de 90°
   const defl=(n,a,b)=>{const cs=Math.cos(n.p[1]*Math.PI/180),v=x=>[(x[0]-n.p[0])*cs,x[1]-n.p[1]],A=v(a),B=v(b);
     return 180-Math.acos(Math.max(-1,Math.min(1,(A[0]*B[0]+A[1]*B[1])/(Math.hypot(...A)*Math.hypot(...B)||1))))*180/Math.PI};
   N.forEach((n,k)=>{const d=n.e.length,r=isR.has(k),mx=Math.max(...n.e.map(e=>e.dm)),onde=[...new Set(n.e.map(e=>e.d))].join(' / ');let sq=0;
     const rl=rI.get(k),re=n.e.filter(e=>e.ln===rl),rdm=r?Math.min(...(re.length?re:n.e).map(e=>e.dm)):null;
-    const add=(nm,dm,x)=>out.push({k:SK(k)+'_'+(sq++),nm,dm:dm||DL(mx)+' mm',p:n.p,onde,mx,rdm,lin:r&&/registro/i.test(nm)?rl:null,...(x||{})});
+    const ms=[...new Set(n.e.filter(e=>e.mt).map(e=>e.mt))].sort().join('');// 's', 'd' ou 'ds' (os dois se encontram aqui)
+    const add=(nm,dm,x)=>out.push({k:SK(k)+'_'+(sq++),nm,dm:dm||DL(mx)+' mm',p:n.p,onde,mx,rdm,mt:ms,lin:r&&/registro/i.test(nm)?rl:null,...(x||{})});
     if(isP.has(k)){add('Saída do sistema existente + registro');if(d>=2){n.e.filter(e=>e.dm<mx).forEach(e=>add(`Redução ${mx}→${e.dm} mm`,`${DL(mx)} → ${DL(e.dm)} mm`));add(d==2?'Tê':'Cruzeta')}return}
     if(d==1){add('Final de linha (tampão p/ lavagem)');if(r)add('Registro de linha',DL(rdm)+' mm');return}
     n.e.filter(e=>e.dm<mx).forEach(e=>add(`Redução ${mx}→${e.dm} mm`,`${DL(mx)} → ${DL(e.dm)} mm`));
@@ -862,7 +864,7 @@ function renderPassos(){
   const T=document.getElementById('tubList');T.innerHTML='<tr><th>Feito</th><th>Trecho</th><th class="n">Metros</th><th></th></tr>'+
     tl.map((x,j)=>`<tr class="${ST.tub[x.k]?'done':''}"><td class="ck2"><label><input type="checkbox" data-c="mar" data-k="${x.k}" aria-label="Trecho marcado para escavar: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.mar[x.k]?'checked':''}>marcado</label><label><input type="checkbox" data-c="tub" data-k="${x.k}" aria-label="Tubo instalado: ${x.t.d} ${DL(x.t.dm)} mm" ${ST.tub[x.k]?'checked':''}>instalado</label></td><td><span class="sw" style="background:${DC[x.t.dm]}"></span>${x.t.d}<br><small>${DL(x.t.dm)} mm · ${x.t.o?'Ponto '+x.t.o.slice(1):'—'} · ${Math.ceil(x.L/6)} barras</small></td><td class="n">${fmt(x.L)}</td><td><button data-i="${j}">Mapa</button></td></tr>`).join('');
   T.querySelectorAll('input').forEach(i=>i.onchange=()=>toggleChk(i.dataset.c,i.dataset.k));
-  T.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=tl[+b.dataset.i];verNoMapa(ll(x.t.q),`<b>${x.t.d}</b><br>${DL(x.t.dm)} mm · ${fmt(x.L)} m<br>${ST.mar[x.k]?'marcado':'falta marcar'} · ${ST.tub[x.k]?'instalado':'falta instalar'}`)});
+  T.querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=tl[+b.dataset.i];verNoMapa(ll(x.t.q),`<b>${x.t.d}</b><br>${DLt(x.t)} mm · ${fmt(x.L)} m<br>${ST.mar[x.k]?'marcado':'falta marcar'} · ${ST.tub[x.k]?'instalado':'falta instalar'}`)});
   const cl=conLista(),cd=cl.filter(x=>ST.con[x.k]).length,pc=cl.length?100*cd/cl.length:0;
   document.getElementById('cPct').textContent=Math.round(pc)+'%';document.getElementById('cSeg').textContent=`${cd}/${cl.length}`;document.getElementById('cBar').style.width=pc+'%';
   const C=document.getElementById('conList');C.innerHTML='<tr><th>Feito</th><th class="n">Nº</th><th>Conexão</th><th>Onde</th><th></th></tr>'+
@@ -894,6 +896,23 @@ function entQ(b,dn){const v=ovr('ent_'+b+'-'+dn),e=G.enterrado.find(e=>e.b==b&&e
 function ENT(){return G.enterrado.map(e=>({...e,barras:entQ(e.b,e.dn)}))}
 // tubo solto por diâmetro do projeto (o 150/160 soma o soldável e o DeFoFo)
 function soltoDN(dn){return String(dn)==='150'?soltoP('s150')+soltoP('d160'):soltoP(String(dn))}
+// 150 soldável e 160 DeFoFo são tubos diferentes: cada trecho de 150/160 do desenho é de um dos dois.
+// O trecho escolhido no app fica guardado; sem escolha, o app divide os trechos para gastar o estoque e comprar o mínimo
+const MTN={s:'150 mm soldável',d:'160 mm DeFoFo'};
+function matTub(){const L=tubLista().filter(x=>x.t.dm==160),out={},ch=x=>{const v=ST.est['mt_'+x.k];return v==='s'||v==='d'?v:null};
+  let d=soltoP('d160')+ENT().filter(e=>e.dn==150).reduce((a,e)=>a+e.barras,0),s=soltoP('s150');
+  L.filter(ch).forEach(x=>{if(ch(x)==='d')d-=x.L/6;else s-=x.L/6;out[x.i]={m:ch(x),auto:false,k:x.k}});
+  // trechos automáticos: a divisão que deixa menos barras para comprar (empate: mais DeFoFo)
+  const A=L.filter(x=>!ch(x));let best=null;
+  if(A.length<=14){for(let c=0;c<1<<A.length;c++){let bd=0,bs=0;A.forEach((x,j)=>{if(c>>j&1)bd+=x.L/6;else bs+=x.L/6});
+    const f=Math.max(0,bd-d)+Math.max(0,bs-s);if(!best||f<best.f-1e-9||(Math.abs(f-best.f)<1e-9&&bd>best.bd))best={c,f,bd}}}
+  else{let dd=d;best={c:0};A.forEach((x,j)=>{if(dd>0){best.c|=1<<j;dd-=x.L/6}})}
+  A.forEach((x,j)=>out[x.i]={m:best.c>>j&1?'d':'s',auto:true,k:x.k});return out}
+const matOf=t=>{if(t.dm!=160)return null;const i=D.tubos.indexOf(t),M=matTub();return M[i]?M[i].m:null};
+const DLt=t=>t.dm==160&&matOf(t)?MTN[matOf(t)].replace(' mm',''):DL(t.dm);
+// metros de 150/160 de cada material (proporcional ao comprimento dos trechos, fechando com o total do desenho)
+function split160(){const M=matTub(),tt=curTot()[160]||0;let ls=0,ld=0;D.tubos.forEach((t,i)=>{if(t.dm==160){if(M[i]&&M[i].m==='s')ls+=tLen(t);else ld+=tLen(t)}});
+  const lt=ls+ld||1;return {s:tt*ls/lt,d:tt*ld/lt}}
 // barras de cada válvula do coco pelo comprimento levantado, fechando com o total do bloco
 function calcAV(){const by={},out=[];G.pl.coco.forEach(([b,v,dn,l1,l2])=>(by[b+'-'+dn]=by[b+'-'+dn]||[]).push({b,v,dn,l1,l2,x:(l1+l2)/6}));
   Object.entries(by).forEach(([k,rs])=>{const [b,dn]=k.split('-'),tot=entQ(b,+dn),s0=rs.reduce((a,r)=>a+Math.floor(r.x),0),f=ovr('ent_'+k)!=null&&tot<s0?tot/s0:1;rs.forEach(r=>r.n=Math.floor(r.x*f));
@@ -948,8 +967,8 @@ function renderBal(){
     const arr=ent.reduce((a,e)=>a+arrQ(e.b,e.dn),0);const rest=ent.reduce((a,e)=>a+e.barras,0)-arr;
     const temos=solto+arr,prec=curPrec()[dn];const d=temos-prec;
     const sit=d>=0?`<span class="pill ok">Completo</span>`:(d+rest>=0?`<span class="pill warn">Faltam ${-d}: arrancar</span>`:`<span class="pill bad">Faltam ${-d}: comprar ${-(d+rest)}</span>`);
-    if(dn=='150')h+=`<tr><td><small>150 soldável</small></td><td class="n"><small>${soltoP('s150')}</small></td><td class="n"><small>—</small></td><td class="n"><small>${soltoP('s150')}</small></td><td></td><td class="n"><small>—</small></td><td></td></tr>`+
-      `<tr><td><small>160 DeFoFo</small></td><td class="n"><small>${soltoP('d160')}</small></td><td class="n"><small>${arr}</small></td><td class="n"><small>${soltoP('d160')+arr}</small></td><td></td><td class="n"><small>${rest}</small></td><td></td></tr>`;
+    if(dn=='150'){const sp=split160(),ps=Math.ceil(sp.s/6),pd=Math.ceil(sp.d/6);h+=`<tr><td><small>150 soldável</small></td><td class="n"><small>${soltoP('s150')}</small></td><td class="n"><small>—</small></td><td class="n"><small>${soltoP('s150')}</small></td><td class="n"><small>${ps}</small></td><td class="n"><small>—</small></td><td>${soltoP('s150')<ps?`<small>faltam ${ps-soltoP('s150')}</small>`:''}</td></tr>`+
+      `<tr><td><small>160 DeFoFo</small></td><td class="n"><small>${soltoP('d160')}</small></td><td class="n"><small>${arr}</small></td><td class="n"><small>${soltoP('d160')+arr}</small></td><td class="n"><small>${pd}</small></td><td class="n"><small>${rest}</small></td><td>${soltoP('d160')+arr+rest<pd?`<small>faltam ${pd-soltoP('d160')-arr-rest}</small>`:''}</td></tr>`}
     h+=`<tr><td>${dn=='150'?'150/160 (total)':'DN '+dn}</td><td class="n">${solto}</td><td class="n">${arr}</td><td class="n">${temos}</td><td class="n">${prec}</td><td class="n">${rest}</td><td>${sit}</td></tr>`});
   // 32 mm: estoque digitado em metros (não tem tubo enterrado)
   const e32=+ST.est['32']||0,p32=curTot()[32]||0,d32=e32-p32;
@@ -971,7 +990,7 @@ function renderEst(){const T=document.getElementById('tEst');if(!T)return;let h=
       if(k==='32'){if(v)ST.est['32']=v;else delete ST.est['32'];up['est.32']=v||null}
       else{if(v===null||v===def)delete ST.est[k];else ST.est[k]=v;up['est.'+k]=k in ST.est?ST.est[k]:null;
         // a lista de compras passa a usar o estoque: tira o "já tenho" digitado à mão no tubo desse diâmetro
-        const p=PRODS.find(x=>k==='sol_'+x.k)||PRODS.find(x=>x.k=='d160'&&/-150$/.test(k))||PRODS.find(x=>k.endsWith('-'+x.k)),sk=p?'c_'+SK(`Tubo PVC ${DL(p.dn=='150'?160:+p.dn)} mm`):null;
+        const p=PRODS.find(x=>k==='sol_'+x.k)||PRODS.find(x=>x.k=='d160'&&/-150$/.test(k))||PRODS.find(x=>k.endsWith('-'+x.k)),sk=p?'c_'+SK(p.k==='s150'?'Tubo PVC '+MTN.s:p.k==='d160'?'Tubo PVC '+MTN.d:`Tubo PVC ${p.dn} mm`):null;
         if(sk&&sk in ST.est){delete ST.est[sk];up['est.'+sk]=null}}
       save();sync(up);estoqueMudou()};
     i.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))})}
@@ -995,6 +1014,9 @@ function renderMat(){const tot=curTot(),ttot=Object.values(tot).reduce((a,b)=>a+
 document.getElementById('kTubo').textContent=fmt(ttot)+' m';document.getElementById('kFita').textContent=fmt(LY.L1+LY.L2)+' m';document.getElementById('kTom').textContent=LY.tom.length;
 const tt=document.getElementById('tTubo');tt.innerHTML='<tr><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th></tr>';let nt=0;
 Object.keys(tot).sort((a,b)=>b-a).forEach(k=>{const n=Math.ceil(tot[k]/6);nt+=n;tt.insertAdjacentHTML('beforeend',`<tr><td><span class="sw" style="background:${DC[k]}"></span>${DL(k)} mm</td><td class="n">${fmt(tot[k])} m</td><td class="n">${n}</td></tr>`)});
+if(tot[160]){const sp=split160();
+  const r160=[...tt.querySelectorAll('tr')].find(r=>r.textContent.startsWith('150/160'));if(r160)r160.insertAdjacentHTML('afterend',['d','s'].filter(m=>sp[m]>0).map(m=>`<tr><td><small>&nbsp;&nbsp;${MTN[m]}</small></td><td class="n"><small>${fmt(sp[m])} m</small></td><td class="n"><small>${Math.ceil(sp[m]/6)}</small></td></tr>`).join(''))}
+renderMat160();
 tt.insertAdjacentHTML('beforeend',`<tr class="tot"><td>Total</td><td class="n">${fmt(ttot)} m</td><td class="n">${nt}</td></tr>`);
 const c=conexoes(),reds=Object.entries(c).filter(([k])=>k.startsWith('Redução')).sort((a,b)=>parseInt(b[0].split(' ')[1])-parseInt(a[0].split(' ')[1]));
 document.getElementById('tCon').innerHTML=`<tr><td>Saída do sistema existente + registro</td><td class="n">${c['Saída do sistema existente + registro']||0}</td></tr><tr><td>${AUTO()?'Válvula automática de linha (no lugar do registro)':'Registro de linha (tê, curva ou reto)'}</td><td class="n">${(c['Tê + registro']||0)+(c['Curva + registro']||0)+(c['Cruzeta + registro']||0)+(c['Registro de linha']||0)}</td></tr>`+
@@ -1007,6 +1029,11 @@ document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="back
 <tr><td>Microtubo das tomadas</td><td class="n">${fmt(LY.tom.reduce((a,t)=>a+t.L,0))} m</td></tr><tr class="tot"><td>Total de fita</td><td class="n">${fmt(LY.L1+LY.L2)} m</td></tr>`;
 }
 renderMat();
+function renderMat160(){const T=document.getElementById('tM160');if(!T)return;const M=matTub(),L=tubLista().filter(x=>x.t.dm==160),sp=split160();
+  document.getElementById('m160Res').innerHTML=L.length?`<b>${fmt(sp.d)} m de 160 DeFoFo</b> (${Math.ceil(sp.d/6)} barras) e <b>${fmt(sp.s)} m de 150 soldável</b> (${Math.ceil(sp.s/6)} barras). Estoque: ${soltoP('d160')+ENT().filter(e=>e.dn==150).reduce((a,e)=>a+e.barras,0)} barras de DeFoFo e ${soltoP('s150')} de soldável.`:'Este desenho não tem trecho de 150/160.';
+  T.innerHTML=L.length?'<tr><th>Trecho</th><th class="n">Metros</th><th>Tubo</th></tr>'+L.map(x=>{const m=M[x.i],ch=ST.est['mt_'+x.k]||'';
+    return `<tr><td>${x.t.d}</td><td class="n">${fmt(x.L)}</td><td><select data-k="${x.k}" aria-label="Tubo do trecho ${x.t.d}"><option value=""${ch?'':' selected'}>Automático (${m.m==='s'?'150 soldável':'160 DeFoFo'})</option><option value="s"${ch==='s'?' selected':''}>150 mm soldável</option><option value="d"${ch==='d'?' selected':''}>160 mm DeFoFo</option></select></td></tr>`}).join(''):'';
+  T.querySelectorAll('select').forEach(e=>e.onchange=()=>{const k='mt_'+e.dataset.k,v=e.value||null;if(v)ST.est[k]=v;else delete ST.est[k];save();sync({['est.'+k]:v});renderMat();estoqueMudou()})}
 // ---------- planilha
 const PL=G.pl;const br=n=>Math.round(n).toLocaleString('pt-BR');
 const arrB=(b,dn)=>arrQ(b,dn);
@@ -1015,11 +1042,12 @@ function plData(p){
     const H=['Tubo','Solto (barras)','Enterrado (barras)','Total (barras)','Precisa (m)','Precisa (barras)','Já arrancado (barras)','Sobra/falta (barras)'];
     const en=dn=>E.filter(e=>String(e.dn)==dn),sm=(es,f)=>es.reduce((a,e)=>a+f(e),0);
     const e15=en('150'),ent15=sm(e15,e=>e.barras),ar15=sm(e15,e=>arrB(e.b,e.dn));
-    const rows=[['150 soldável',soltoP('s150'),0,soltoP('s150'),'','',0,''],['160 DeFoFo',soltoP('d160'),ent15,soltoP('d160')+ent15,'','',ar15,''],
+    const sp=split160(),ps=Math.ceil(sp.s/6),pd=Math.ceil(sp.d/6);
+    const rows=[['150 soldável',soltoP('s150'),0,soltoP('s150'),Math.round(sp.s),ps,0,soltoP('s150')-ps],['160 DeFoFo',soltoP('d160'),ent15,soltoP('d160')+ent15,Math.round(sp.d),pd,ar15,soltoP('d160')+ent15-pd],
       ['150/160 (total)',soltoDN(150),ent15,soltoDN(150)+ent15,tot[160]||0,pr[150],ar15,soltoDN(150)+ent15-pr[150]],
       ...['125','100','75'].map(dn=>{const es=en(dn),e=sm(es,x=>x.barras);return ['DN '+dn,soltoDN(dn),e,soltoDN(dn)+e,tot[dn]||0,pr[dn],sm(es,x=>arrB(x.b,x.dn)),soltoDN(dn)+e-pr[dn]]})];
     const T=['TOTAL'];for(let i=1;i<H.length;i++)T.push(rows.slice(2).reduce((a,r)=>a+(+r[i]||0),0));rows.push(T);
-    return {H,rows,note:'Barras de 6 m inteiras, pelo estoque de tubos (Material). Sobra/falta compara tudo o que existe (solto + enterrado) com o que o projeto precisa. O 150/160 do projeto pode ser 150 soldável ou 160 DeFoFo.'};}
+    return {H,rows,note:'Barras de 6 m inteiras, pelo estoque de tubos (Material). Sobra/falta compara tudo o que existe (solto + enterrado) com o que o projeto precisa. O 150/160 do projeto se divide entre 150 soldável e 160 DeFoFo trecho a trecho (Material).'};}
   if(p==='conexoes'){const H=['Nº','Conexão','Diâmetro','Onde','Latitude','Longitude','Instalada'];
     const cl=conLista(),rows=cl.map((x,j)=>[j+1,nmV(x),x.dm,x.onde,x.p[1].toFixed(7),x.p[0].toFixed(7),ST.con[x.k]?'sim':'não']);
     rows.push(['TOTAL',cl.length+' conexões','','','','',cl.filter(x=>ST.con[x.k]).length+' instaladas']);
@@ -1068,19 +1096,23 @@ function listaCompras(){const fol=1+Math.max(0,+ST.est.folga||0)/100,L=[];
   // tubos: o que já existe = solto + todo o enterrado (contando que tudo seja arrancado)
   const t=curTot(),dk={160:'150',125:'125',100:'100',75:'75'},gt='Tubos (barras de 6 m)';
   const E=ENT();[160,125,100,75].forEach(dm=>{const k=dk[dm],ent=E.filter(e=>String(e.dn)==k).reduce((a,e)=>a+e.barras,0),prec=Math.ceil((t[dm]||0)*fol/6);
-    if(prec)it(gt,`Tubo PVC ${DL(dm)} mm${dm==160?' (150 soldável ou 160 DeFoFo)':''}`,'barras',prec,soltoDN(k)+ent,'c_'+SK(`Tubo PVC ${DL(dm)} mm`))});
+    if(dm==160){const sp=split160();[['s',soltoP('s150')],['d',soltoP('d160')+ent]].forEach(([m,tem])=>{const pm=Math.ceil(sp[m]*fol/6);if(pm)it(gt,`Tubo PVC ${MTN[m]}`,'barras',pm,tem)});return}
+    if(prec)it(gt,`Tubo PVC ${DL(dm)} mm`,'barras',prec,soltoDN(k)+ent,'c_'+SK(`Tubo PVC ${DL(dm)} mm`))});
   if(t[50])it('Mangueira e tubo fino','Mangueira PE 50 mm','m',t[50]*fol,0);
   if(t[32])it('Mangueira e tubo fino','Tubo 32 mm','m',t[32]*fol,+ST.est['32']||0,'32');
   // conexões da tubulação, com o diâmetro de cada uma
   const gv='Registros e válvulas',gr='Conexões da tubulação',cg=new Map(),ad=(g,nm,n)=>{const k=g+'|'+nm;cg.set(k,(cg.get(k)||0)+(n||1))};
   const ang=g=>g>67.5?'90°':g>33.75?'45°':'22,5°';
-  conLista().forEach(x=>{const d=DL(x.mx)+' mm';
+  const d16=x=>x.mt==='s'?MTN.s:'160 mm DeFoFo';// onde os dois se encontram, a conexão é DeFoFo com adaptador
+  conLista().forEach(x=>{const d=x.mx==160?d16(x):DL(x.mx)+' mm';
     if(x.nm.startsWith('Saída'))ad(gv,`Saída do sistema existente + registro ${d}`);
-    else if(x.nm.startsWith('Redução'))ad(gr,x.nm.replace(/160/g,'150/160'));
+    else if(x.nm.startsWith('Redução'))ad(gr,x.nm.replace(/160→(\d+) mm/,(a,b)=>`${d16(x).replace(' mm','')}→${b} mm`));
     else if(x.nm.startsWith('Final'))ad(gr,`Tampão de final de linha ${d}`);
     else{if(x.nm.startsWith('Tê'))ad(gr,`Tê ${d}`);else if(x.nm.startsWith('Cruzeta'))ad(gr,`Cruzeta ${d}`);else if(x.nm.startsWith('Curva'))ad(gr,`Curva ${ang(x.ang||90)} ${d}`);
       if(/registro/i.test(x.nm)){if(AUTO()&&x.lin!=null){const pz=VPOL(QV(D,x.lin));ad(gv,`Válvula hidráulica ${pz} com solenoide`);ad(gr,`Adaptador para válvula ${pz} no tubo ${DL(x.rdm||x.mx)} mm`,2);ad(gv,'Ventosa 1″ (logo depois da válvula)')}
-        else ad(gv,`Registro ${DL(x.rdm||x.mx)} mm`)}}});
+        else ad(gv,`Registro ${(x.rdm||x.mx)==160?d16(x):DL(x.rdm||x.mx)+' mm'}`)}}});
+  // adaptador onde um trecho de 150 soldável encontra um de 160 DeFoFo
+  const nAd=new Set(conLista().filter(x=>x.mt==='ds').map(x=>KY(x.p))).size;if(nAd)ad(gr,'Adaptador 150 soldável × 160 DeFoFo',nAd);
   // pontos ligados: retenção na saída de cada ponto (a água não volta para o sistema do coco) e registro na interligação
   if(pontosLigados(D)){D.P.forEach((p,i)=>{if(D.Poff&&D.Poff[i])return;const k=KY(p),dm=Math.max(0,...D.tubos.filter(t=>t.q.some(q=>KY(q)===k)).map(t=>t.dm));if(dm)ad(gv,`Válvula de retenção ${DL(dm)} mm (saída do Ponto ${i+1})`)});
     D.tubos.filter(t=>/^interliga/i.test(t.d)).forEach(t=>ad(gv,`Registro ${DL(t.dm)} mm (na interligação)`))}
@@ -1192,13 +1224,13 @@ function txtPrazo(C,prazo){const q=equipePrazo(C,prazo),dd=`${pad(prazo.getDate(
   const it=q.E.map(e=>e.r.np?`${e.n}: ${e.r.np} → <b>${Math.ceil(e.r.np*q.f-1e-9)} pessoas</b>`:`${e.n}: ritmo de <b>${fmt(Math.ceil(e.r.usa*q.f))} ${e.un}/dia</b>`);
   return `<br><b>Para terminar até ${dd}</b>, as equipes precisam render cerca de ${Math.round((q.f-1)*100)}% a mais: `+it.join(' · ')+'.'}
 // mão de obra prevista para o que falta: pessoas × dias de trabalho, etapa por etapa
-function renderMo(C){const el=document.getElementById('plMo'),L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra&&e.dur),d=+ST.est.diaria||0;
+function renderMo(C){const el=document.getElementById('plMo'),L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra&&e.dur).concat(apoio().filter(a=>a.tot).map(a=>({...a,n:a.n+' <small>junto com as etapas</small>',dur:a.dur||'—'}))),d=+ST.est.diaria||0;
   if(!L.length){el.innerHTML='';return}
   const n=L.reduce((a,e)=>a+(e.dia||0),0),sem=L.filter(e=>!e.dia).map(e=>e.n);
   el.innerHTML=`<h3 style="margin-top:14px">Mão de obra do que falta</h3><div class="tbl"><table class="mot"><tr><th>Etapa</th><th class="n">Pessoas</th><th class="n">Dias</th><th class="n">Diárias</th>${d?'<th class="n">Custo</th>':''}</tr>`+
     L.map(e=>`<tr><td>${e.n}</td><td class="n">${e.r.np||'—'}</td><td class="n">${e.dur}</td><td class="n">${e.dia?fmt(e.dia):'—'}</td>${d?`<td class="n">${e.dia?brl(e.dia*d):'—'}</td>`:''}</tr>`).join('')+
     `<tr class="tot"><td>Total</td><td></td><td></td><td class="n">${fmt(n)}</td>${d?`<td class="n">${brl(n*d)}</td>`:''}</tr></table></div>`+
-    `<p class="note" style="margin:4px 0 0">Diárias = pessoas × dias de trabalho da etapa (1 diária = 1 pessoa trabalhando 1 dia).`+(d?` Custo = diárias × ${brl(d)}.`:' Informe o valor da diária em "Ajustar" para ver o custo.')+(sem.length?` Sem número de pessoas ainda: ${sem.join(', ')} (não entram no total).`:'')+` A comparação com material novo fica na aba <a href="#custo">Custo</a>.</p>`}
+    `<p class="note" style="margin:4px 0 0">Diárias = pessoas × dias de trabalho da etapa (1 diária = 1 pessoa trabalhando 1 dia).`+(d?` Custo = diárias × ${brl(d)}.`:' Informe o valor da diária em "Ajustar" para ver o custo.')+(sem.length?` Sem número de pessoas ou rendimento ainda: ${sem.map(x=>x.replace(/ <small>.*<\/small>/,'')).join(', ')} (não entram no total).`:'')+` Transporte e conserto correm junto com o arranque e a montagem e não mudam a data de término. A comparação com material novo fica na aba <a href="#custo">Custo</a>.</p>`}
 function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(ST.est.prazo):null,ds=+ST.est.dsem||6;
   const rows=C.E.map((e,i)=>{const pct=e.tot?Math.min(100,100*e.feito/e.tot):100,un=e.un;let lin1=`${fmt(e.feito)} de ${fmt(e.tot)} ${un}`+(e.feito<e.tot?` · faltam ${fmt(e.tot-e.feito)}`:''),lin2='';
     if(e.compra)lin1=`${fmt(e.feito)} de ${fmt(e.tot)} itens já em estoque · ${ST.est.solic?'solicitação enviada em '+dCurto(s2d(ST.est.solic)):'solicitação ainda não enviada'} · entrega em ${entrega()} dias`;
@@ -1232,10 +1264,11 @@ const CXD=[['g','Geral'],['diaria','Diária por pessoa','R$',null],
   ['cx_qb','Barras que quebram ao arrancar e transportar','%',5],['cx_fu','Barras velhas furadas que vão precisar de conserto','%',10],
   ['cx_cd','Conserto (quebra ou furo): diárias por barra consertada','diárias',0.25],['cx_cm','Conserto (quebra ou furo): material por barra consertada','R$',null],
   ['cx_qa','Quebras pelo trator por ano','quebras',null],['cx_qc','Custo de cada quebra (material e mão de obra)','R$',null],['cx_an','Tempo de uso do quebra-vento provisório','anos',1],
-  ['g','Material novo na profundidade certa'],['cx_p150','Barra nova 150/160 mm','R$',null],['cx_p125','Barra nova 125 mm','R$',null],['cx_p100','Barra nova 100 mm','R$',null],['cx_p75','Barra nova 75 mm','R$',null],
+  ['g','Material novo na profundidade certa'],['cx_p150','Barra nova 150 mm soldável','R$',null],['cx_p160','Barra nova 160 mm DeFoFo','R$',null],['cx_p125','Barra nova 125 mm','R$',null],['cx_p100','Barra nova 100 mm','R$',null],['cx_p75','Barra nova 75 mm','R$',null],
   ['cx_vm','Valeta funda com máquina: custo por metro (se preencher, vale este)','R$/m',null],['cx_vf','Valeta funda à mão: metros por pessoa por dia','m',null],['cx_mf','Montar e fechar na valeta funda: metros por pessoa por dia','m',40]];
 const cxv=k=>{const v=ST.est[k];if(v!=null&&v!=='')return +v;const d=CXD.find(x=>x[0]===k);return d&&d[3]!=null?d[3]:null};
-function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cxv('diaria'),DN=['150','125','100','75'];
+const cdia=()=>+ST.est.cx_cr>0?1/ST.est.cx_cr:cxv('cx_cd');// diárias por barra consertada
+function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cxv('diaria'),DN=['160','150','125','100','75'],dnN=dn=>dn==='150'?'150 soldável':dn==='160'?'160 DeFoFo':dn;
   const tub={};listaCompras().forEach(x=>{const m=x.nm.match(/^Tubo PVC (\d+)/);if(m)tub[m[1]]={prec:x.prec,comp:Math.max(0,x.prec-x.tem)}});
   const pr=dn=>cxv('cx_p'+dn),R=(nm,q,di,rs,falta)=>({nm,q,di:di||0,rs:(rs||0)+(di&&dia?di*dia:0),falta:[].concat(falta||[],di&&dia==null?['diária']:[])});
   const reuso=[],novo=[];
@@ -1243,24 +1276,28 @@ function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cx
   reuso.push(R('Arrancar os tubos enterrados',`${fmt(bA)} barras · ${fmt(bA*6)} m de valeta`,bA*6/cxv('cx_ra')));
   reuso.push(R('Montar na valeta rasa',`${fmt(mT)} m`,mT/cxv('cx_rm')));
   const bc=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].comp:0),0),fc=DN.filter(dn=>tub[dn]&&tub[dn].comp&&pr(dn)==null);
-  if(bc)reuso.push(R('Comprar as barras que faltam',`${fmt(bc)} barras`,0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].comp*(pr(dn)||0):0),0),fc.map(dn=>'preço da barra '+(dn==='150'?'150/160':dn))));
+  if(bc)reuso.push(R('Comprar as barras que faltam',`${fmt(bc)} barras`,0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].comp*(pr(dn)||0):0),0),fc.map(dn=>'preço da barra '+dnN(dn))));
   const bv=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec-tub[dn].comp:0),0),nc=Math.round(bv*(cxv('cx_fu')||0)/100),tb=cxv('cx_tb'),tf=cxv('cx_tf')||0;
   const transp=(nm,n)=>R(nm,`${fmt(n)} barras`,tb?n/tb:0,n*tf,tb?[]:['transporte dos tubos']);
   reuso.push(transp('Transportar os tubos até a montagem',bv));
   const nk=Math.round(bA*(cxv('cx_qb')||0)/100);
-  reuso.push(R('Consertar barras quebradas ao arrancar e transportar',`${fmt(nk)} de ${fmt(bA)} barras (${cxv('cx_qb')||0}%)`,nk*(cxv('cx_cd')||0),nk*(cxv('cx_cm')||0),nk&&cxv('cx_cm')==null?['material do conserto']:[]));
-  reuso.push(R('Consertar barras velhas furadas',`${fmt(nc)} de ${fmt(bv)} barras (${cxv('cx_fu')||0}%)`,nc*(cxv('cx_cd')||0),nc*(cxv('cx_cm')||0),nc&&cxv('cx_cm')==null?['material do conserto']:[]));
+  reuso.push(R('Consertar barras quebradas ao arrancar e transportar',`${fmt(nk)} de ${fmt(bA)} barras (${cxv('cx_qb')||0}%)`,nk*(cdia()||0),nk*(cxv('cx_cm')||0),nk&&cxv('cx_cm')==null?['material do conserto']:[]));
+  reuso.push(R('Consertar barras velhas furadas',`${fmt(nc)} de ${fmt(bv)} barras (${cxv('cx_fu')||0}%)`,nc*(cdia()||0),nc*(cxv('cx_cm')||0),nc&&cxv('cx_cm')==null?['material do conserto']:[]));
   const qa=cxv('cx_qa'),an=cxv('cx_an')||1,nq=Math.round((qa||0)*an);
   reuso.push(R('Quebras pelo trator na valeta rasa',qa==null?'—':`${fmt(nq)} em ${String(an).replace('.',',')} ${an>1?'anos':'ano'}`,0,nq*(cxv('cx_qc')||0),qa==null?['quebras por ano']:nq&&cxv('cx_qc')==null?['custo por quebra']:[]));
   // novo
   const bn=DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec:0),0),fn=DN.filter(dn=>tub[dn]&&tub[dn].prec&&pr(dn)==null);
-  novo.push(R('Comprar todas as barras novas',DN.filter(dn=>tub[dn]).map(dn=>`${fmt(tub[dn].prec)} × ${dn==='150'?'150/160':dn}`).join(' · '),0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec*(pr(dn)||0):0),0),fn.map(dn=>'preço da barra '+(dn==='150'?'150/160':dn))));
+  novo.push(R('Comprar todas as barras novas',DN.filter(dn=>tub[dn]).map(dn=>`${fmt(tub[dn].prec)} × ${dnN(dn)}`).join(' · '),0,DN.reduce((a,dn)=>a+(tub[dn]?tub[dn].prec*(pr(dn)||0):0),0),fn.map(dn=>'preço da barra '+dnN(dn))));
   novo.push(transp('Transportar os tubos novos até a montagem',bn));
   const vm=cxv('cx_vm'),vf=cxv('cx_vf');
   novo.push(vm!=null?R('Abrir a valeta funda com máquina',`${fmt(mT)} m × ${brl(vm)}`,0,mT*vm):vf?R('Abrir a valeta funda à mão',`${fmt(mT)} m`,mT/vf):R('Abrir a valeta funda',`${fmt(mT)} m`,0,0,['valeta funda']));
   novo.push(R('Montar e fechar na valeta funda',`${fmt(mT)} m`,mT/cxv('cx_mf')));
   const T=L=>({di:L.reduce((a,x)=>a+x.di,0),rs:L.reduce((a,x)=>a+x.rs,0),falta:[...new Set(L.flatMap(x=>x.falta))]});
-  return {reuso,novo,tr:T(reuso),tn:T(novo),dia}}
+  return {reuso,novo,tr:T(reuso),tn:T(novo),dia,ap:{tr:bv,cq:nk+nc}}}
+// serviços de apoio do plano: correm junto com o arranque e a montagem
+const APO=[['tr','Transporte dos tubos','barras','cx_tb'],['cq','Conserto de tubos quebrados e furados','barras','cx_cr']];
+function apoio(){const A=custo().ap;return APO.map(([k,n,un,f])=>{const np=pessoas(k),rp=k==='cq'?(cdia()>0?1/cdia():0):+cxv(f)||0,tot=A[k],o={k,n,un,f,tot,r:{np,rp,usa:rp*(np||1)}};
+  if(tot&&o.r.usa>0){o.dur=Math.max(1,Math.ceil(tot/o.r.usa));if(np)o.dia=np*o.dur}return o})}
 function renderCusto(){const el=document.getElementById('cxTab');if(!el)return;const C=custo(),rs=v=>brl(Math.round(v)),di=v=>v?fmt(Math.ceil(v)):'—';
   const lin=x=>`<tr><td>${x.nm}<small>${x.q}</small></td><td class="n">${di(x.di)}</td><td class="n">${x.falta.length?'<small>falta '+x.falta.join(', ')+'</small>':rs(x.rs)}</td></tr>`;
   el.innerHTML='<tr><th>Item</th><th class="n">Diárias</th><th class="n">Custo</th></tr>'+
@@ -1281,7 +1318,10 @@ document.getElementById('cxPlano').onclick=()=>{const up={ra:Math.round(cxv('cx_
 // tabela da equipe: pessoas e rendimento por pessoa em cada etapa
 function renderEquipe(C){const tb=document.querySelector('#plEq tbody'),H=histDias(),T=C.E.find(x=>x.k==='t'),ok=k=>{const e=k==='c'?T:C.E.find(x=>x.k===k);return e&&e.st==='ok'};
   if(!tb.children.length)tb.innerHTML=EQ.map(([k,n,un])=>`<tr data-k="${k}"><td>${n}</td><td>${k==='c'?'<small>a mesma dos tubos</small>':`<input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}">`}</td><td><input type="number" min="0" step="any" data-f="r${k}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join('');
-  tb.querySelectorAll('tr').forEach(tr=>{const k=tr.dataset.k,e=C.E.find(x=>x.k===k)||{},r=k==='c'?(T&&T.sub?ritmo(T.sub,H):null):e.r,un=EQ.find(x=>x[0]===k)[2];
+  if(!tb.querySelector('[data-ap]'))tb.insertAdjacentHTML('beforeend','<tr class="bh"><td colspan="4"><small>Serviços de apoio (correm junto com o arranque e a montagem)</small></td></tr>'+APO.map(([k,n,un,f])=>`<tr data-ap="${k}"><td>${n}</td><td><input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}"></td><td><input type="number" min="0" step="any" data-f="${f}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join(''));
+  apoio().forEach(a=>{const tr=tb.querySelector(`[data-ap="${a.k}"]`);tr.querySelectorAll('input').forEach(i=>{if(document.activeElement!==i)i.value=ST.est[i.dataset.f]||'';if(i.dataset.f==='cx_cr')i.placeholder=String(Math.round(1/(cxv('cx_cd')||1)*10)/10).replace('.',',');if(i.dataset.f==='cx_tb')i.placeholder='ex.: 60'});
+    tr.querySelector('[data-o]').innerHTML=a.r.usa>0?`<b>${fmt(a.r.usa)}</b> ${a.un}/dia<small>${fmt(a.tot)} ${a.un} no total</small>`:`—<small>${fmt(a.tot)} ${a.un} no total</small>`});
+  tb.querySelectorAll('tr[data-k]').forEach(tr=>{const k=tr.dataset.k,e=C.E.find(x=>x.k===k)||{},r=k==='c'?(T&&T.sub?ritmo(T.sub,H):null):e.r,un=EQ.find(x=>x[0]===k)[2];
     tr.querySelectorAll('input').forEach(i=>{if(document.activeElement!==i)i.value=ST.est[i.dataset.f]||''});
     tr.querySelector('[data-o]').innerHTML=ok(k)?'<small>concluída</small>':r&&r.usa>0?`<b>${fmt(r.usa)}</b> ${un}/dia`+(r.man>0&&r.med>0?`<small>medido: ${fmt(r.med)}/dia</small>`:r.man>0?'':'<small>medido</small>'):'—'})}
 document.querySelector('#plEq tbody').addEventListener('change',ev=>{const i=ev.target;if(!i.dataset||!i.dataset.f)return;const k=i.dataset.f,s=String(i.value).trim().replace(',','.');
