@@ -144,8 +144,9 @@ textarea{width:100%;min-height:70px;font:.8rem var(--f-num);background:var(--pap
 select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
 #opCmp small{font-size:.76rem;color:var(--mut);white-space:normal}#opCmp{font-size:.84rem}#opCmp td,#opCmp th{padding:5px 3px 5px 0}#opCmp .pill{padding:1px 6px;font-size:.8rem}
 #opCmp tr.rl{display:none}
-@media(max-width:600px){#opCmp tr.rl{display:table-row}#opCmp tr.rl td{border-bottom:none;padding:8px 0 0;font-weight:600}#opCmp .lb{display:none}#opCmp td.n,#opCmp th.n{padding:2px 2px 6px}#opCmp th.n{white-space:normal}}
-@media(max-width:380px){#opCmp{font-size:.74rem}#opCmp th{letter-spacing:0;font-size:.66rem}#opCmp .pill{font-size:.72rem;padding:1px 4px}.mapui #mapOp{gap:4px}.mapui #mapOp button{min-width:34px;padding:7px 4px}}
+@media(max-width:600px){#opCmp tr.rl{display:table-row}#opCmp tr.rl td{border-bottom:none;padding:8px 0 0;font-weight:600}#opCmp .lb{display:none}#opCmp td.n,#opCmp th.n{padding:2px 1px 6px}#opCmp th.n{white-space:normal}#opCmp{font-size:.76rem}#opCmp th{letter-spacing:0;font-size:.66rem}#opCmp .pill{font-size:.72rem;padding:1px 3px}#opCmp small{font-size:.68rem}}
+@media(max-width:520px){.mapui #mapOp{gap:4px}.mapui #mapOp button{min-width:34px;padding:7px 4px}}
+@media(max-width:380px){.mapui .oplb{display:none!important}#opCmp{font-size:.68rem}#opCmp th{letter-spacing:0;font-size:.6rem}#opCmp .pill{font-size:.66rem;padding:1px 2px}.mapui #mapOp{gap:4px}.mapui #mapOp button{min-width:34px;padding:7px 4px}}
 #tAV td.mut{color:var(--mut)}#tAV td.done{background:var(--okbg)}#tAV .avn{width:58px}#tAV small{font-size:.76rem;color:var(--mut)}
 #tAV tr.bh td{font-weight:700;background:var(--paper);padding-top:10px}#tAV label{white-space:nowrap}
 .vh{background:#fff;border:2px solid #111;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.6);cursor:move}
@@ -165,13 +166,13 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v22</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v23</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
   <div id="map"></div>
   <div class="mapui">
-    <div class="chips" id="mapOp" aria-label="Opção de tubulação"><span class="oplb" aria-hidden="true">Opção</span><button data-op="1" aria-label="Opção 1"><span class="lg">Opção</span>1</button><button data-op="2" aria-label="Opção 2"><span class="lg">Opção</span>2</button><button data-op="3" aria-label="Opção 3"><span class="lg">Opção</span>3</button><button data-op="4" aria-label="Opção 4"><span class="lg">Opção</span>4</button><button data-op="5" aria-label="Opção 5"><span class="lg">Opção</span>5</button></div>
+    <div class="chips" id="mapOp" aria-label="Opção de tubulação"><span class="oplb" aria-hidden="true">Opção</span><button data-op="1" aria-label="Opção 1"><span class="lg">Opção</span>1</button><button data-op="2" aria-label="Opção 2"><span class="lg">Opção</span>2</button><button data-op="3" aria-label="Opção 3"><span class="lg">Opção</span>3</button><button data-op="4" aria-label="Opção 4"><span class="lg">Opção</span>4</button><button data-op="5" aria-label="Opção 5"><span class="lg">Opção</span>5</button><button data-op="6" aria-label="Opção 6"><span class="lg">Opção</span>6</button></div>
     <div class="mapbar chips"><button id="bAll" class="on">Tudo</button><button data-t="0">T1</button><button data-t="1">T2</button><button data-t="2">T3</button><button id="bGps" aria-label="Minha posição"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>GPS</span></button><button id="bEd">Editar</button></div>
     <span class="note" id="gpsMsg"></span>
   </div>
@@ -189,7 +190,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 
 <div class="tab wrap" id="tab-rega">
 <div class="card edbar" id="opBar">
-  <div class="mapbar" style="margin:0"><b>Opção de tubulação</b><button data-op="1">Opção 1 · original</button><button data-op="2">Opção 2 · pelo meio</button><button data-op="3">Opção 3 · pontos ligados</button><button data-op="4">Opção 4 · entrada no V4</button><button data-op="5">Opção 5 · principal na lateral</button></div>
+  <div class="mapbar" style="margin:0"><b>Opção de tubulação</b><button data-op="1">Opção 1 · original</button><button data-op="2">Opção 2 · pelo meio</button><button data-op="3">Opção 3 · pontos ligados</button><button data-op="4">Opção 4 · entrada no V4</button><button data-op="5">Opção 5 · principal na lateral</button><button data-op="6">Opção 6 · ramais da lateral</button></div>
   <p class="note" id="opMsg" style="margin:0"></p>
   <div class="tbl"><table id="opCmp"></table></div>
 </div>
@@ -204,7 +205,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
     <b>Pressão que chega</b>
     <span class="pgrp"><label for="pP1">Ponto 1</label><input type="number" id="pP1" min="0" max="10" step="0.1" value="2.5"><span>bar</span></span>
     <span class="pgrp"><label for="pP2">Ponto 2</label><input type="number" id="pP2" min="0" max="10" step="0.1" value="2.5"><span>bar</span></span>
-    <span class="pgrp"><label for="pP3">Ponto 3 <small>(opções 4 e 5)</small></label><input type="number" id="pP3" min="0" max="10" step="0.1" value="2.5"><span>bar</span></span>
+    <span class="pgrp"><label for="pP3">Ponto 3 <small>(opções 4 a 6)</small></label><input type="number" id="pP3" min="0" max="10" step="0.1" value="2.5"><span>bar</span></span>
   </div>
   <p class="note" style="margin:0 0 12px">Medida com água correndo. Digite 0 para ver o que acontece com o ponto parado.</p>
   <div class="mapbar" style="margin-bottom:4px" id="turSel"><b>Turnos</b><button data-tur="p">Do projeto · H1+H5 · H2+H4 · H3</button><button data-tur="e">Equilibrados · H1+H4 · H2+H5 · H3</button></div>
@@ -502,16 +503,25 @@ const esri=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Wor
 const ll=q=>q.map(p=>[p[1],p[0]]);
 const lSet=L.featureGroup(),lLbl=L.layerGroup(),lTubo=L.layerGroup(),lNos=L.layerGroup(),lF1=L.layerGroup(),lF2=L.layerGroup(),lTom=L.layerGroup(),lMon=L.layerGroup(),lReg=L.layerGroup(),lEd=L.layerGroup();
 const segBy={};G.segs.forEach(g=>segBy[g.id]=g);
-const qvName=g=>`Quebra-vento ${g.id} · ${g.adj.length>1?'entre '+g.adj.map(n=>'S'+pad(n)).join(' e '):'borda externa de S'+pad(g.adj[0])}`;
+const qvName=g=>`Quebra-vento ${g.id} · ${g.meio?'no meio do setor S'+pad(g.adj[0]):g.adj.length>1?'entre '+g.adj.map(n=>'S'+pad(n)).join(' e '):'borda externa de S'+pad(g.adj[0])}`;
 G.setores.forEach(s=>{
   const pol=L.polygon(ll(s.H),{color:'#ffe600',weight:2.5,fillColor:'#ffe600',fillOpacity:.12}).addTo(lSet);
-  pol.bindPopup(()=>{const rows=s.adj.map(id=>{const g=segBy[id];return `<tr><td>${id}</td><td>${g.L} m</td><td>${ST.inst[id]?'montado':'pendente'}</td></tr>`}).join('');
+  pol.bindPopup(()=>{const rows=[...s.adj,...(layOf(D).id==='V'?['M'+pad(s.n)]:[])].map(id=>{const g=segBy[id];return `<tr><td>${id}</td><td>${g.L} m</td><td>${ST.inst[id]?'montado':'pendente'}</td></tr>`}).join('');
     return `<div class="pop"><b>Setor S${pad(s.n)} · 7,5 ha</b><br>Quebra-vento em volta:<table>${rows}</table></div>`},{maxHeight:300});
   L.marker([s.c[1],s.c[0]],{icon:L.divIcon({className:'sl',html:'S'+pad(s.n),iconSize:[44,18]}),interactive:false}).addTo(lLbl);
 });
-const fitaL=[],tomL=[];
-G.fitas.forEach(f=>{const p=L.polyline(ll(f.q),{color:f.r==1?'#2ecc40':'#00e5ff',weight:2.5}).bindTooltip(`${qvName(segBy[f.s])}<br>Fita linha ${f.r} · ${f.de} → ${f.ate} · ${f.L} m<br>Alimentada pela linha ${G.linhas[f.ln].id}`,{sticky:true}).addTo(f.r==1?lF1:lF2);p._d=f;fitaL.push(p)});
-G.tom.forEach(t=>{const p=L.polyline(ll(t.q),{color:'#ffffff',weight:1.5,dashArray:'3 3'}).bindTooltip(`Tomada ${t.s} · ${t.f} · linha ${G.linhas[t.ln].id}`,{sticky:true}).addTo(lTom);p._d=t;tomL.push(p)});
+// fitas, tomadas e trechos de montagem do traçado da opção (redesenha quando o traçado muda)
+let fitaL=[],tomL=[],monL={},layAt=null;
+function drawLay(){const LY=layOf(D);if(LY===layAt)return;layAt=LY;
+  [lF1,lF2,lTom,lMon].forEach(l=>l.clearLayers());fitaL=[];tomL=[];monL={};const un=LY.un;
+  LY.fitas.forEach(f=>{const p=L.polyline(ll(f.q),{color:f.r==1?'#2ecc40':'#00e5ff',weight:2.5}).bindTooltip(`${qvName(segBy[f.s])}<br>Fita linha ${f.r} · ${f.de} → ${f.ate} · ${f.L} m<br>Alimentada pel${un=='ramal'?'o':'a'} ${un} ${LY.linhas[f.ln].id}`,{sticky:true}).addTo(f.r==1?lF1:lF2);p._d=f;fitaL.push(p)});
+  LY.tom.forEach(t=>{const p=L.polyline(ll(t.q),{color:'#ffffff',weight:1.5,dashArray:'3 3'}).bindTooltip(`Tomada ${t.s} · ${t.f} · ${un} ${LY.linhas[t.ln].id}`,{sticky:true}).addTo(lTom);p._d=t;tomL.push(p)});
+  LY.segs.forEach(g=>{
+    const p=L.polyline(ll(g.q),{weight:9,opacity:.75,color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'}).addTo(lMon);
+    p.bindPopup(()=>{const d=document.createElement('div');d.className='pop';d.innerHTML=`<b>${qvName(g)}</b><br>${g.L} m · ${LY.fitas.filter(f=>f.s==g.id).length} fitas · ${LY.tom.filter(t=>t.s==g.id).length} tomada(s)<br>`;
+      const b=document.createElement('button');b.textContent=ST.inst[g.id]?'Desmarcar':'Marcar como montado';b.onclick=()=>{toggleSeg(g.id);p.closePopup()};d.appendChild(b);return d});
+    monL[g.id]=p});
+  if(typeof mkTChips==='function')mkTChips()}
 const NC={tee:'#ff3b30',curva:'#ff3b30',red:'#ffe600',fim:'#ff4dff',saida:'#2f80ff'};
 // ---------- desenho editável (tubulação, conexões, registros e pontos)
 const LL=p=>[p[1],p[0]],fromLL=l=>[+l.lng.toFixed(7),+l.lat.toFixed(7)];
@@ -525,13 +535,64 @@ const LP=G.linhas.map((l,k)=>{const q=[].concat(...G.tubos.filter(t=>t.ln===k).m
 // mesmo caminho do outro lado do carreador (8 m para o lado oposto ao tubo da linha)
 const LO=LP.map((P,k)=>{const sg=G.segs.find(g=>g.id==G.linhas[k].id+'-5'),c=[(sg.q[0][0]+sg.q[1][0])/2,(sg.q[0][1]+sg.q[1][1])/2],o=[P[1][0]-c[0],P[1][1]-c[1]];
   return P.map(p=>[+(p[0]-2*o[0]).toFixed(7),+(p[1]-2*o[1]).toFixed(7)])});
+// ---------- traçados da rega
+// H (opções 1 a 5): linhas H1 a H5, com tomadas no meio dos trechos H e nas pontas dos trechos V (projeto original)
+// V (opção 6): ramais pelos carreadores V1 a V6 saindo da principal na lateral esquerda; fitas para os dois lados e quebra-vento novo no meio de cada setor
+const TDEM=G.tom.map(t=>({p:t.q[0],ln:t.ln,q:G.fitas.filter(f=>f.s==t.s&&f.ln==t.ln&&(t.f=='meio'?f.de=='meio':f.de==t.f)).reduce((a,f)=>a+f.L,0)}));
+G.linhas.forEach((l,i)=>{const s=TDEM.filter(d=>d.ln==i).reduce((a,d)=>a+d.q,0);TDEM.forEach(d=>{if(d.ln==i&&s)d.q*=l.fita/s})});
+// multiplicador de atrito dos tubos de cada linha (H1..H5), calibrado para o desenho original dar as perdas do projeto
+const RM=[0.848,1.026,1.062,1.004,1.002];
+const LAYH={id:'H',un:'linha',linhas:G.linhas,tom:G.tom,fitas:G.fitas,segs:G.segs,TDEM,RM,L1:G.L1,L2:G.L2,
+  tur:{p:{n:'Do projeto',lb:'H1+H5 · H2+H4 · H3',s:[[4,0],[3,1],[2]]},e:{n:'Equilibrados',lb:'H1+H4 · H2+H5 · H3',s:[[0,3],[1,4],[2]]}}};
+const LAYV=(()=>{const o=G.setores[0].c,kx=111320*Math.cos(o[1]*Math.PI/180),ky=110574;
+  const X=p=>[(p[0]-o[0])*kx,(p[1]-o[1])*ky],GP=v=>[+(v[0]/kx+o[0]).toFixed(7),+(v[1]/ky+o[1]).toFixed(7)];
+  const sb=(a,b)=>[a[0]-b[0],a[1]-b[1]],ad=(a,b)=>[a[0]+b[0],a[1]+b[1]],ml=(a,k)=>[a[0]*k,a[1]*k],un=a=>{const l=Math.hypot(a[0],a[1]);return [a[0]/l,a[1]/l]},ds=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]),pr=u=>[-u[1],u[0]];
+  const cr=(p,u,q,v)=>{const d=u[0]*v[1]-u[1]*v[0];return ad(p,ml(u,((q[0]-p[0])*v[1]-(q[1]-p[1])*v[0])/d))};// cruzamento de duas retas
+  const sg=id=>G.segs.find(g=>g.id===id);
+  // centro das fileiras H (NW→SE) e V (NE→SW) e linha do meio entre duas fileiras H
+  const Hr=[1,2,3,4,5].map(a=>{const A=X(sg('H'+a+'-1').q[0]),B=X(sg('H'+a+'-5').q[1]);return {p:A,u:un(sb(B,A))}});
+  const Vr=[1,2,3,4,5,6].map(j=>{const A=X(sg('V'+j+'-1').q[0]),B=X(sg('V'+j+'-4').q[1]);return {p:A,u:un(sb(B,A))}});
+  const Mr=[1,2,3,4].map(k=>({p:ml(ad(Hr[k-1].p,Hr[k].p),.5),u:Hr[k-1].u}));
+  // principal na mesma posição da opção 5 (por fora da H5); tubo de cada ramal 4 m ao lado do centro do carreador, do lado de dentro
+  const m0=X(LO[4][0]),mu=un(sb(X(LO[4][10]),m0)),se=Math.sign(pr(Vr[0].u)[0]*(Vr[5].p[0]-Vr[0].p[0])+pr(Vr[0].u)[1]*(Vr[5].p[1]-Vr[0].p[1]));
+  const ram=Vr.map((v,j)=>{const p=ad(v.p,ml(pr(v.u),se*(j<5?4:-4))),xs=[5,4,3,2,1].map(a=>cr(p,v.u,Hr[a-1].p,Hr[a-1].u)),ms=[4,3,2,1].map(k=>cr(p,v.u,Mr[k-1].p,Mr[k-1].u));
+    return {q:[cr(p,v.u,m0,mu),xs[0],ms[0],xs[1],ms[1],xs[2],ms[2],xs[3],ms[3],xs[4]].map(GP),X:xs,M:ms}});
+  // quebra-vento novo no meio de cada setor, no sentido da principal (entre os dois trechos H do setor)
+  const setor=(k,c)=>G.setores.find(x=>x.adj.includes('V'+c+'-'+k)&&x.adj.includes('V'+(c+1)+'-'+k));
+  const MS=[];for(let k=1;k<=4;k++)for(let c=1;c<=5;c++){const t=setor(k,c),a=sg('H'+k+'-'+c),b=sg('H'+(k+1)+'-'+c),q=[0,1].map(i=>GP(ml(ad(X(a.q[i]),X(b.q[i])),.5)));
+    MS.push({id:'M'+pad(t.n),adj:[t.n],meio:1,L:Math.round(ds(X(q[0]),X(q[1]))),q,k,c})}
+  // fitas: as dos trechos H e do meio saem do ramal de cada ponta e vão até o meio; as dos trechos V saem do meio, junto do ramal
+  const F=[];
+  G.fitas.forEach(f=>{const id=f.s.split('-'),c=+id[1];
+    if(f.s[0]=='H')F.push({s:f.s,r:f.r,de:'ponta '+f.ate,ate:'meio',q:f.q.slice().reverse(),L:f.L,ln:f.ate=='NO'?c-1:c});
+    else F.push({s:f.s,r:f.r,de:'meio',ate:f.de,q:f.q.slice().reverse(),L:f.L,ln:+id[0].slice(1)-1})});
+  MS.forEach(g=>{const A=X(g.q[0]),B=X(g.q[1]),u=un(sb(B,A)),m=ml(ad(A,B),.5),L=Math.round(ds(A,B)/2-.5);
+    [1,2].forEach(r=>{const of=ml(pr(u),r==1?1.25:-1.25);
+      F.push({s:g.id,r,de:'ponta NO',ate:'meio',q:[GP(ad(A,of)),GP(ad(sb(m,ml(u,.5)),of))],L,ln:g.c-1});
+      F.push({s:g.id,r,de:'ponta SE',ate:'meio',q:[GP(ad(B,of)),GP(ad(ad(m,ml(u,.5)),of))],L,ln:g.c})})});
+  // tomadas no tubo do ramal: em cada fileira H (uma para cada lado) e no meio de cada trecho V (fitas do V e do quebra-vento do meio dos dois lados)
+  const T=[],tom=(sid,fd,pt,j)=>{const fs=F.filter(x=>x.s===sid&&x.de===fd);if(!fs.length)return;const P=X(pt),st=[];
+    fs.forEach(x=>{const a=X(x.q[0]);if(!st.some(b=>ds(a,b)<1))st.push(a)});st.sort((a,b)=>ds(P,a)-ds(P,b));
+    const q=[P,...st];T.push({s:sid,f:fd,q:q.map(GP),L:+q.slice(1).reduce((a,b,i)=>a+ds(q[i],b),0).toFixed(1),ln:j,p:GP(P),fm:fs.reduce((a,x)=>a+x.L,0)})};
+  ram.forEach((r,j)=>{const c=j+1;
+    [5,4,3,2,1].forEach((a,i)=>{if(c>1)tom('H'+a+'-'+(c-1),'ponta SE',GP(r.X[i]),j);if(c<6)tom('H'+a+'-'+c,'ponta NO',GP(r.X[i]),j)});
+    [4,3,2,1].forEach((k,i)=>{const p=GP(r.M[i]);tom('V'+c+'-'+k,'meio',p,j);if(c>1)tom('M'+pad(setor(k,c-1).n),'ponta SE',p,j);if(c<6)tom('M'+pad(setor(k,c).n),'ponta NO',p,j)})});
+  const linhas=ram.map((r,j)=>{const fita=F.filter(x=>x.ln===j).reduce((a,x)=>a+x.L,0);return {id:'V'+(j+1),nome:'Ramal no V'+(j+1),ponto:'P3',fita,Q:+(fita*.004).toFixed(1),reg:r.q[0]}});
+  const segs=[...G.segs,...MS.map(({k,c,...g})=>g)];MS.forEach(g=>segBy[g.id]=g);
+  return {id:'V',un:'ramal',linhas,tom:T,fitas:F,segs,TDEM:T.map(t=>({p:t.p,ln:t.ln,q:t.fm})),RM:linhas.map(()=>1),
+    L1:F.filter(x=>x.r==1).reduce((a,x)=>a+x.L,0),L2:F.filter(x=>x.r==2).reduce((a,x)=>a+x.L,0),ramais:ram.map(r=>r.q),
+    tur:{p:{n:'3 turnos',lb:'V1+V4 · V2+V5 · V3+V6',s:[[0,3],[1,4],[2,5]]},e:{n:'6 turnos',lb:'um ramal por vez',s:[[0],[1],[2],[3],[4],[5]]}}}})();
+function layOf(net){return net&&net.lay==='V'?LAYV:LAYH}
 // ponto novo da opção 4: no prolongamento do carreador V4, 41 m para fora da linha H5 (onde a mão aponta na foto da tela)
 const P3=[-43.0463629,-10.939913];
 const OPS={1:{n:'Opção 1 · original',tx:'Projeto original: cabeceira no carreador SE e cada linha alimentada pela ponta, do SE até o NW.'},
   2:{n:'Opção 2 · pelo meio',tx:'Cada linha é alimentada no meio, no carreador V4, e corre para os dois lados (3 trechos para NW e 2 para SE). Tubo de adução de 150/160 pelo lado oposto do carreador das linhas H5 (Ponto 1) e H3 (Ponto 2) até o V4, e tronco de 125 subindo pelo V4. A perda de pressão cai quase pela metade, mas vai mais tubo grande, que precisa ser comprado.'},
   3:{n:'Opção 3 · pontos ligados',tx:'Igual ao original, com a cabeceira do Ponto 1 ligada à do Ponto 2 por ~106 m de tubo 125, com registro na interligação e válvula de retenção na saída de cada ponto. Os dois pontos dividem a água em todos os turnos; se um ponto parar ou tiver menos pressão, o outro segura as linhas. Com os turnos equilibrados (em Turnos), os três turnos aguentam até um ponto parado. Custa ~18 barras de 125 a mais que o original.'},
   4:{n:'Opção 4 · entrada no V4',tx:'A água entra por um ponto novo, o Ponto 3, no carreador V4, 41 m para fora da linha H5 (onde está a mão na foto). Um tubo de 150/160 leva a água até a H5 e o tronco sobe pelo V4: 150/160 até a H3 e 125 até a H1. Cada linha é alimentada no meio, no V4, e corre para os dois lados: para NW com 125 no primeiro trecho e 100 até a ponta; para SE com 100 e 75 no fim. Os pontos 1 e 2, os trechos no coqueiral e a cabeceira SE não entram. O tubo sai todo do estoque (solto + arrancado). Como tudo depende de um ponto só, se o Ponto 3 parar nenhum turno funciona. Meça a pressão no Ponto 3 com água correndo e digite em Turnos.'},
-  5:{n:'Opção 5 · principal na lateral',tx:'Principal de 150/160 em toda a lateral esquerda, por fora da linha H5, com a água entrando no Ponto 3 (o mesmo da opção 4). Da principal saem duas derivações para dentro, pelos carreadores V2 e V5, até a H1: 125 até a H3 e 100 até a H1. Cada linha recebe água em dois lugares, no V2 e no V5, e por isso pode ser toda de 75. Em compensação, cada linha tem dois registros (ou duas válvulas). As pontas da principal, do V1 ao V2 e do V5 ao V6, não levam água neste desenho: dá para deixar para depois. Os diâmetros foram escolhidos pelo cálculo, sem olhar o estoque. Se o Ponto 3 parar, nenhum turno funciona.'}};
+  5:{n:'Opção 5 · principal na lateral',tx:'Principal de 150/160 em toda a lateral esquerda, por fora da linha H5, com a água entrando no Ponto 3 (o mesmo da opção 4). Da principal saem duas derivações para dentro, pelos carreadores V2 e V5, até a H1: 125 até a H3 e 100 até a H1. Cada linha recebe água em dois lugares, no V2 e no V5, e por isso pode ser toda de 75. Em compensação, cada linha tem dois registros (ou duas válvulas). As pontas da principal, do V1 ao V2 e do V5 ao V6, não levam água neste desenho: dá para deixar para depois. Os diâmetros foram escolhidos pelo cálculo, sem olhar o estoque. Se o Ponto 3 parar, nenhum turno funciona.'},
+  6:{n:'Opção 6 · ramais da lateral',tx:'Principal de 150/160 na lateral esquerda, na mesma posição da opção 5, com a água entrando no Ponto 3. Todos os registros (ou válvulas) ficam na lateral esquerda, um na saída de cada ramal. Os ramais seguem para dentro pelos carreadores V1 a V6 até a H1, e as mangueiras saem do ramal para um lado e para o outro: nas fileiras H e no quebra-vento novo do meio de cada setor, cada mangueira vai do ramal até o meio do trecho; no próprio carreador, a mangueira sai do meio do trecho. Não usa as linhas H1 a H5. Inclui o quebra-vento novo no meio dos 20 setores, no mesmo sentido da principal. Turnos: 3 turnos de 2 ramais ou 6 turnos de um ramal. Diâmetros pelo cálculo, sem olhar o estoque. Se o Ponto 3 parar, nenhum turno funciona.'}};
+// diâmetros de cada ramal da opção 6, por trecho: [ponto de início, ponto de fim, mm] nos 10 pontos do ramal (saída, H5, meio, H4, meio, H3, meio, H2, meio, H1)
+const RDM=j=>j==0||j==5?[[0,5,100],[5,9,75]]:[[0,4,125],[4,8,100],[8,9,75]];
 function opcao(n){const b=base0();if(n==3){b.tubos.push({o:null,d:'Interligação dos pontos 1 e 2',dm:125,q:[G.linhas[3].reg.slice(),G.tubos[15].q[1].slice()],ln:null,L0:null});return b}
   const T=[],tb=(o,d,dm,q,ln)=>T.push({o,d,dm,q:q.map(p=>p.slice()),ln,L0:null});
   if(n==4){// só o Ponto 3 dá água; os pontos 1 e 2 ficam fora do desenho (dá para religar na edição)
@@ -543,6 +604,10 @@ function opcao(n){const b=base0();if(n==3){b.tubos.push({o:null,d:'Interligaçã
       tb('P3',l.nome+' · lado NW',125,P.slice(4,6),k);tb('P3',l.nome+' · lado NW',100,P.slice(5),k);
       tb('P3',l.nome+' · lado SE',100,P.slice(4-s,5).reverse(),k);tb('P3',l.nome+' · lado SE',75,P.slice(0,5-s).reverse(),k)});
     return {tubos:T,nos:[],reg:LP.map(P=>P[4].slice()),P:[...G.P.map(p=>p.slice()),P3.slice()],Poff:[true,true,false]}}
+  if(n==6){// principal na lateral esquerda (igual à opção 5) e um ramal por carreador, V1 a V6, com o registro (ou válvula) na saída da principal
+    const R=LAYV.ramais;tb('P3','Adução do Ponto 3',160,[P3,R[3][0]],null);tb('P3','Principal na lateral',160,R.map(q=>q[0]),null);
+    R.forEach((q,j)=>RDM(j).forEach(([a,b,dm])=>tb('P3','Ramal no V'+(j+1),dm,q.slice(a,b+1),j)));
+    return {tubos:T,nos:[],reg:R.map(q=>q[0].slice()),P:[...G.P.map(p=>p.slice()),P3.slice()],Poff:[true,true,false],lay:'V'}}
   if(n==5){// principal de 150/160 em toda a lateral esquerda (por fora da H5) e duas derivações para dentro, no V2 e no V5
     tb('P3','Adução do Ponto 3',160,[P3,LO[4][4]],null);
     tb('P3','Principal na lateral',160,LO[4],null);
@@ -568,25 +633,19 @@ let D=ST.ed||base();
 const hav=q=>{let s=0;for(let k=1;k<q.length;k++){const a=q[k-1],b=q[k],r=Math.PI/180;s+=6371008.8*Math.hypot((b[0]-a[0])*r*Math.cos((a[1]+b[1])/2*r),(b[1]-a[1])*r)}return s};
 const tLen=t=>t.mod||t.L0==null?Math.round(hav(t.q)):t.L0;
 let tuboL=[],tubeP=[];
-function drawNet(){
+function drawNet(){drawLay();
   lTubo.clearLayers();lNos.clearLayers();lReg.clearLayers();tuboL=[];tubeP=[];
   D.tubos.map((t,i)=>[t,i]).sort((a,b)=>b[0].dm-a[0].dm).forEach(([t,i])=>{
     const p=L.polyline(ll(t.q),{color:DC[t.dm],weight:W[t.dm],lineCap:'round'}).bindTooltip(()=>`${DL(t.dm)} mm · ${t.d} · ${tLen(t)} m`,{sticky:true}).addTo(lTubo);
     p._d=t;p.on('click',e=>{if(!ED)return;L.DomEvent.stop(e);if(DR)drawAdd(e.latlng);else tubePop(i,e.latlng)});tuboL.push(p);tubeP[i]=p});
   if(D.nos.length!==G.nos.length)conLista().forEach(x=>{const t=x.nm.startsWith('Saída')?'saida':x.nm.startsWith('Final')?'fim':x.nm.startsWith('Redução')?'red':x.nm=='Curva'?'curva':null;if(t)L.circleMarker(LL(x.p),{radius:t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[t],fillOpacity:1,interactive:!ED}).bindTooltip(x.nm).addTo(lNos)});
   else G.nos.forEach((n,i)=>{if(n.t==='tee'||(n.t==='curva'&&n.nm.includes('registro')))return;L.circleMarker(LL(D.nos[i]),{radius:n.t=='saida'?9:6,color:'#111',weight:2,fillColor:NC[n.t],fillOpacity:1,interactive:!ED}).bindTooltip(n.nm).addTo(lNos)});
-  regPts(D).forEach(([i,rp])=>{const l=G.linhas[i],q=QV(D,i),n=nReg(D,i);L.marker(LL(rp),{icon:L.divIcon({className:'rg',html:(AUTO()?'V-':'R-')+l.id,iconSize:[38,18]}),interactive:!ED}).bindTooltip(`${AUTO()?'Válvula automática '+VPOL(q):'Registro'} da linha ${l.id}${n>1?` (${n} na linha)`:''} · ${f1(q)} m³/h${(ps=>ps.length?` · Ponto${ps.length>1?'s':''} ${ps.map(j=>j+1).join(' e ')}`:'')(pontosDe(D,rp))}`).addTo(lReg)});
+  regPts(D).forEach(([i,rp])=>{const l=layOf(D).linhas[i],q=QV(D,i),n=nReg(D,i);L.marker(LL(rp),{icon:L.divIcon({className:'rg',html:(AUTO()?'V-':'R-')+l.id,iconSize:[38,18]}),interactive:!ED}).bindTooltip(`${AUTO()?'Válvula automática '+VPOL(q):'Registro'} d${layOf(D).un=='ramal'?'o ramal':'a linha'} ${l.id}${n>1?` (${n} na linha)`:''} · ${f1(q)} m³/h${(ps=>ps.length?` · Ponto${ps.length>1?'s':''} ${ps.map(j=>j+1).join(' e ')}`:'')(pontosDe(D,rp))}`).addTo(lReg)});
   D.P.forEach((p,i)=>{const off=D.Poff&&D.Poff[i],nr=naRede(D,p);if(off&&!nr&&!ED)return;
     const w=off?150:70,esq=i===2;// o Ponto 3 fica do lado de fora da H5: nome à esquerda
     L.marker(LL(p),{icon:L.divIcon({className:'sl'+(esq?' esq':''),html:'Ponto '+(i+1)+(off?nr?' (desligado)':' (sem uso)':''),iconSize:[w,18],iconAnchor:[esq?w+10:-10,9]}),interactive:false}).addTo(lNos)});
   if(curT!==null)showTurno(curT);
 }
-const monL={};
-G.segs.forEach(g=>{
-  const p=L.polyline(ll(g.q),{weight:9,opacity:.75,color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'}).addTo(lMon);
-  p.bindPopup(()=>{const d=document.createElement('div');d.className='pop';d.innerHTML=`<b>${qvName(g)}</b><br>${g.L} m · ${G.fitas.filter(f=>f.s==g.id).length} fitas · ${G.tom.filter(t=>t.s==g.id).length} tomada(s)<br>`;
-    const b=document.createElement('button');b.textContent=ST.inst[g.id]?'Desmarcar':'Marcar como montado';b.onclick=()=>{toggleSeg(g.id);p.closePopup()};d.appendChild(b);return d});
-  monL[g.id]=p});
 [lSet,lLbl,lTubo,lF1,lF2,lTom,lNos,lReg].forEach(l=>l.addTo(map));
 L.control.layers({'Satélite Google':goo,'Satélite Esri':esri},{'Setores 7,5 ha':lSet,'Nomes':lLbl,'Tubulação':lTubo,'Registros':lReg,'Fita linha 1':lF1,'Fita linha 2':lF2,'Tomadas':lTom,'Conexões':lNos,'Montagem (toque p/ marcar)':lMon},{collapsed:window.innerWidth<800}).addTo(map);
 const lg=L.control({position:'bottomleft'});
@@ -609,6 +668,9 @@ function showTurno(ti){curT=ti;
 }
 document.getElementById('bAll').onclick=()=>showTurno(null);
 document.querySelectorAll('.mapbar button[data-t]').forEach(b=>b.onclick=()=>showTurno(+b.dataset.t));
+function mkTChips(){const a0=document.getElementById('bAll'),n=TUR().length,bs=a0.parentElement.querySelectorAll('button[data-t]');if(bs.length===n)return;
+  bs.forEach(b=>b.remove());let at=a0;for(let i=0;i<n;i++){const b=document.createElement('button');b.dataset.t=i;b.textContent='T'+(i+1);b.onclick=()=>showTurno(i);at.after(b);at=b}
+  if(curT!==null)showTurno(curT<n?curT:null)}
 // ---------- GPS
 let gpsM=null,gpsW=null;
 document.getElementById('bGps').onclick=()=>{const msg=document.getElementById('gpsMsg');
@@ -623,22 +685,18 @@ document.getElementById('bGps').onclick=()=>{const msg=document.getElementById('
 // ---------- hidráulica pelo desenho (Hazen-Williams C=120, resolve rede com ou sem anel;
 // um fator por linha faz o desenho original dar exatamente os números do projeto)
 const HC=120,DI={160:.150,125:.120,100:.097,75:.072,50:.044,32:.028};
-const TDEM=G.tom.map(t=>({p:t.q[0],ln:t.ln,q:G.fitas.filter(f=>f.s==t.s&&f.ln==t.ln&&(t.f=='meio'?f.de=='meio':f.de==t.f)).reduce((a,f)=>a+f.L,0)}));
-G.linhas.forEach((l,i)=>{const s=TDEM.filter(d=>d.ln==i).reduce((a,d)=>a+d.q,0);TDEM.forEach(d=>{if(d.ln==i&&s)d.q*=l.fita/s})});
-// multiplicador de atrito dos tubos de cada linha (H1..H5), calibrado para o desenho original dar as perdas do projeto
-const RM=[0.848,1.026,1.062,1.004,1.002];
 // válvula automática no lugar do registro de cada linha: tamanho pela vazão da linha e Kv típico de válvula hidráulica plástica
 function AUTO(){return +ST.est.auto===1}
 // registros de cada linha no desenho: o principal (reg) e os extras (rx), quando a linha recebe água em mais de um lugar
 function regPts(net){return [...(net.reg||[]).map((p,k)=>[k,p]),...(net.rx||[]).map(x=>[x.k,x.p])].filter(([k,p])=>p)}
 function nReg(net,k){return 1+(net.rx||[]).filter(x=>x.k===k).length}
 // vazão que passa em cada registro (ou válvula) da linha
-function QV(net,k){return G.linhas[k].Q/nReg(net,k)}
+function QV(net,k){return layOf(net).linhas[k].Q/nReg(net,k)}
 function VPOL(Q){return Q<=15?'2″':Q<=45?'3″':'4″'}
 function VKV(Q){return Q<=15?30:Q<=45?75:130}
 function VPERDA(Q){return Math.pow(Q/VKV(Q),2)}
 // pressão fixa em cada ponto (mca); um ponto que receberia água de volta é fechado (como válvula de retenção)
-function hidr(net,act,H,RMx){H=H||[0,0];const rm=RMx||RM;
+function hidr(net,act,H,RMx){H=H||[0,0];const LY=layOf(net),rm=RMx||LY.RM;
   const ix=new Map(),pts=[],id=p=>{const k=KY(p);if(!ix.has(k)){ix.set(k,pts.length);pts.push(p)}return ix.get(k)};
   const E=[];net.tubos.forEach((t,ti)=>{if(!(t.ln==null||act.includes(t.ln)))return;for(let j=1;j<t.q.length;j++){const a=id(t.q[j-1]),b=id(t.q[j]);if(a==b)continue;
     const D=DI[t.dm]||.1,L=Math.max(hav([t.q[j-1],t.q[j]]),.1);E.push({a,b,D,ti,ln:t.ln,Q:1e-3,r:(t.ln!=null&&rm[t.ln]||1)*10.67*L/(Math.pow(HC,1.852)*Math.pow(D,4.87))})}});
@@ -650,7 +708,7 @@ function hidr(net,act,H,RMx){H=H||[0,0];const rm=RMx||RM;
     const src=net.P.map((p,i)=>off[i]?-1:ix.get(KY(p)));
     const ok=new Uint8Array(n),st=src.filter(s=>s>=0);st.forEach(s=>ok[s]=1);while(st.length){const x=st.pop();adj[x].forEach(y=>{if(!ok[y]){ok[y]=1;st.push(y)}})}
     const q=new Float64Array(n),tom=[];let longe=0,seca=0;
-    TDEM.filter(d=>act.includes(d.ln)).forEach(d=>{const cand=new Set();E.forEach(e=>{if(e.ln===d.ln){cand.add(e.a);cand.add(e.b)}});
+    LY.TDEM.filter(d=>act.includes(d.ln)).forEach(d=>{const cand=new Set();E.forEach(e=>{if(e.ln===d.ln){cand.add(e.a);cand.add(e.b)}});
       let best=-1,bd=1e9;(cand.size?[...cand]:pts.map((_,i)=>i)).forEach(i=>{const m=hav([d.p,pts[i]]);if(m<bd){bd=m;best=i}});
       if(best<0||!ok[best]){seca++;return}if(bd>15)longe++;q[best]+=d.q*0.004/3600;tom.push({i:best,ln:d.ln})});
     const h=new Float64Array(n),isS=new Uint8Array(n);src.forEach((s,i)=>{if(s>=0){isS[s]=1;h[s]=H[i]||0}});
@@ -666,23 +724,22 @@ function hidr(net,act,H,RMx){H=H||[0,0];const rm=RMx||RM;
       for(let r=m-1;r>=0;r--){let s=b[r];for(let k=r+1;k<m;k++)s-=A[r][k]*h[Rn[k]];h[Rn[r]]=A[r][r]?s/A[r][r]:0}
       let dq=0;E.forEach(e=>{if(!ok[e.a])return;const Qn=e.g*(h[e.a]-h[e.b]);dq=Math.max(dq,Math.abs(Qn-e.Q));e.Q=(e.Q+Qn)/2});if(dq<1e-8)break}
     const Q=src.map(s=>{if(s<0)return 0;let t=0;E.forEach(e=>{if(!ok[e.a])return;if(e.a==s)t+=e.Q;if(e.b==s)t-=e.Q});return t*3600});
-    const pmin={};tom.forEach(t=>{const k=G.linhas[t.ln].id;pmin[k]=Math.min(pmin[k]??1e9,h[t.i])});
+    const pmin={};tom.forEach(t=>{const k=LY.linhas[t.ln].id;pmin[k]=Math.min(pmin[k]??1e9,h[t.i])});
     const Hon=Math.max(...H.filter((x,i)=>src[i]>=0),0),per={};Object.keys(pmin).forEach(k=>per[k]=Hon-pmin[k]);
     const tq={};E.forEach(e=>{if(!ok[e.a])return;const v=e.Q*3600;if(!(e.ti in tq)||Math.abs(v)>Math.abs(tq[e.ti]))tq[e.ti]=v});
     R0={per,pmin,Q,tq,fech:fech.slice(),v:Math.max(0,...E.filter(e=>ok[e.a]).map(e=>Math.abs(e.Q)/(Math.PI*e.D*e.D/4))),longe,seca};
     const back=Q.findIndex((x,i)=>src[i]>=0&&x<-0.05);if(back<0)break;off[back]=true;fech[back]=true}
   return R0}
 // turnos: os do projeto ou equilibrados (com os pontos ligados, os equilibrados aguentam um ponto parado)
-const TURP={p:{n:'Do projeto',s:[[4,0],[3,1],[2]]},e:{n:'Equilibrados',s:[[0,3],[1,4],[2]]}};
-function TUR(){return TURP[ST.est.tur==='e'?'e':'p'].s.map((idx,i)=>({n:'Turno '+(i+1),idx,lin:idx.map(k=>G.linhas[k].id)}))}
+function TUR(net){const LY=layOf(net||D);return LY.tur[ST.est.tur==='e'?'e':'p'].s.map((idx,i)=>({n:'Turno '+(i+1),idx,lin:idx.map(k=>LY.linhas[k].id)}))}
 // pressão que chega em cada ponto (bar), medida com água correndo; 0 = ponto parado
 function PB(){return [1,2,3].map(i=>{const v=ST.est['p'+i];return v==null||v===''?(+ST.est.pbar||2.5):+v})}
 const HCACHE=new Map();
-function hidrNet(net,pb,semJ){pb=pb||PB();const T=TUR();
-  const k=JSON.stringify([net.tubos.map(t=>[t.dm,t.ln,t.q]),net.P,net.Poff||null,net.reg||null,net.rx||null,pb,T.map(t=>t.idx),!!semJ,AUTO()]);if(HCACHE.has(k))return HCACHE.get(k);
+function hidrNet(net,pb,semJ){pb=pb||PB();const T=TUR(net),LY=layOf(net);
+  const k=JSON.stringify([net.tubos.map(t=>[t.dm,t.ln,t.q]),net.P,net.Poff||null,net.reg||null,net.rx||null,LY.id,pb,T.map(t=>t.idx),!!semJ,AUTO()]);if(HCACHE.has(k))return HCACHE.get(k);
   const n2={...net,Poff:net.P.map((p,i)=>!!(net.Poff&&net.Poff[i])||!(pb[i]>0))},H=pb.map(b=>b*10);
   const fim=r=>{const v=Object.values(r.pmin);r.pm=v.length?Math.min(...v):null;r.sobra=r.pm==null?null:(r.pm-10)/10;return r};
-  const out={t:T.map(t=>fim(hidr(n2,t.idx,H))),j:semJ?null:fim(hidr(n2,[0,1,2,3,4],H)),pb};
+  const out={t:T.map(t=>fim(hidr(n2,t.idx,H))),j:semJ?null:fim(hidr(n2,LY.linhas.map((l,i)=>i),H)),pb};
   if(HCACHE.size>60)HCACHE.clear();HCACHE.set(k,out);return out}
 // o ponto está em algum tubo do desenho?
 function naRede(net,p){if(!p)return false;const k=KY(p);return net.tubos.some(t=>t.q.some(q=>KY(q)===k))}
@@ -727,7 +784,8 @@ function conexoes(net){if(!net&&!alt())return G.cnt;const c={};conLista(net).for
 // trechos de tubo do desenho, com chave fixa pelo nome, ponto e diâmetro
 function tubLista(){const vis={};return D.tubos.map((t,i)=>{const b=SK(`${t.o||'N'}_${t.d}_${t.dm}`);vis[b]=(vis[b]||0)+1;return {k:b+(vis[b]>1?'_'+vis[b]:''),t,i,L:tLen(t)}})}
 const sobPill=s=>s==null?'<span class="pill bad">Sem água</span>':s>=.5?`<span class="pill ok">Sobra ${f1(s)} bar</span>`:s>=0?`<span class="pill warn">No limite: sobra ${f1(s)} bar</span>`:`<span class="pill bad">Falta ${f1(-s)} bar</span>`;
-function renderTurnos(){const T=TUR(),H=hidrNet(D),pb=H.pb;
+function renderTurnos(){const T=TUR(),H=hidrNet(D),pb=H.pb,LY=layOf(D),UN=LY.un=='ramal'?'Ramal':'Linha';mkTChips();
+  document.querySelectorAll('#turSel button[data-tur]').forEach(b=>{const t=LY.tur[b.dataset.tur];b.textContent=t.n+' · '+t.lb});
   ['pP1','pP2','pP3'].forEach((id,i)=>{const e=document.getElementById(id);if(document.activeElement!==e)e.value=pb[i]});const PR=ptsRede(D);
   const tk=ST.est.tur==='e'?'e':'p';document.querySelectorAll('#turSel button[data-tur]').forEach(b=>b.classList.toggle('on',b.dataset.tur===tk));
   const min=Math.max(5,+document.getElementById('dur').value||60);const h=min/60;
@@ -735,9 +793,9 @@ function renderTurnos(){const T=TUR(),H=hidrNet(D),pb=H.pb;
   const ints=D.tubos.map((t,i)=>[t,i]).filter(([t])=>/^interliga/i.test(t.d)).map(([t,i])=>({t,i,a:ladoPonto(D,t.q[0],i),b:ladoPonto(D,t.q[t.q.length-1],i)}));
   const qtx=(r,i)=>D.Poff&&D.Poff[i]?'desligado no desenho':!(pb[i]>0)?'parado':r.fech[i]?'fechado: o outro ponto tem mais pressão':r.Q[i]>.05?f1(r.Q[i])+' m³/h':'não entrega água';
   document.getElementById('tTurnos').innerHTML=T.map((t,ti)=>{const r=H.t[ti];
-    const pre=AUTO()?'V-':'R-',nr=Math.max(...t.idx.map(i=>nReg(D,i))),regs=t.lin.map(x=>pre+x).join(' e ')+(nr>1?` (os ${nr} de cada linha)`:''),fech=G.linhas.filter(l=>!t.lin.includes(l.id)).map(l=>pre+l.id).join(', ');
+    const pre=AUTO()?'V-':'R-',nr=Math.max(...t.idx.map(i=>nReg(D,i))),regs=t.lin.map(x=>pre+x).join(' e ')+(nr>1?` (os ${nr} de cada linha)`:''),fech=LY.linhas.filter(l=>!t.lin.includes(l.id)).map(l=>pre+l.id).join(', ');
     const vp=AUTO()?Math.max(...t.idx.map(i=>VPERDA(QV(D,i)))):0;
-    const fita=t.idx.reduce((a,i)=>a+G.linhas[i].fita,0),pior=r.pm==null?'':Object.entries(r.pmin).sort((a,b)=>a[1]-b[1])[0][0];
+    const fita=t.idx.reduce((a,i)=>a+LY.linhas[i].fita,0),pior=r.pm==null?'':Object.entries(r.pmin).sort((a,b)=>a[1]-b[1])[0][0];
     const av=[r.seca?`<span class="pill bad">${r.seca} tomada(s) sem água: linha sem ligação com um ponto</span>`:'',r.longe?`<span class="pill warn">${r.longe} tomada(s) a mais de 15 m do tubo</span>`:'',r.v>2?`<span class="pill warn">Velocidade alta no tubo: ${f1(r.v)} m/s</span>`:''].filter(Boolean).join(' ');
     const us=PR.filter(i=>r.Q[i]>.05);
     const reg=r.sobra!=null&&r.sobra>=.5&&us.length?`<p class="note" style="margin:0">A fita mais perto ${AUTO()?'da válvula':'do registro'} recebe quase a pressão do ponto. Se a fita não aguenta isso (veja o máximo na embalagem), ${AUTO()?'ajuste o piloto regulador da válvula, se tiver, ou feche um pouco o registro da saída':'feche um pouco '+(us.length>1?'os registros':'o registro')} até o manômetro marcar ${us.map(i=>`~${f1(Math.max(0,pb[i]-(r.sobra-.5)))} bar no Ponto ${i+1}`).join(' e ')}.</p>`:'';
@@ -749,18 +807,18 @@ function renderTurnos(){const T=TUR(),H=hidrNet(D),pb=H.pb;
      ${AUTO()?`<span>Válvulas ${[...new Set(t.idx.map(i=>VPOL(QV(D,i))))].join('/')} (perda)</span><span>~${f1(vp)} bar</span>`:''}
      <span>Menor pressão na fita</span><span>${r.pm==null?'—':f1(r.pm/10)+' bar'+(pior?' ('+pior+')':'')}</span></div>
      <div>${sobPill(r.sobra)}</div>${reg}
-     <div class="kv">${Object.entries(r.pmin).map(([k,v])=>`<span>Linha ${k} · última tomada</span><span>${f1(v/10)} bar</span>`).join('')}</div>
+     <div class="kv">${Object.entries(r.pmin).map(([k,v])=>`<span>${UN} ${k} · última tomada</span><span>${f1(v/10)} bar</span>`).join('')}</div>
      ${it?`<p class="note" style="margin:0">${it}</p>`:''}${av?`<div>${av}</div>`:''}
      <button data-t="${ti}">Ver no mapa</button></div>`}).join('');
   document.querySelectorAll('#tTurnos button[data-t]').forEach(b=>b.onclick=()=>{irMapa();showTurno(+b.dataset.t)});
   if(typeof renderTestes==='function')try{renderTestes()}catch(e){}
   const ak=AUTO();document.querySelectorAll('#ctlSel button[data-ctl]').forEach(b=>b.classList.toggle('on',(b.dataset.ctl==='a')===ak));
   {const lr=document.getElementById('lgReg');if(lr)lr.textContent=ak?'Válvula automática de linha':'Registro de linha';
-   const nv=conLista().filter(x=>x.lin!=null).length,mx=Math.max(...G.linhas.map((l,k)=>nReg(D,k))),qv=G.linhas.map((l,k)=>QV(D,k)),tam=[...new Set(qv.map(VPOL))].join(' / ');
-   document.getElementById('ctlMsg').innerHTML=ak?`<b>${nv} válvulas automáticas</b>, ${mx>1?`${mx} em cada linha, uma em cada lugar onde a linha recebe água`:'uma na entrada de cada linha'} (${G.linhas.map(l=>'V-'+l.id).join(', ')}), no lugar dos registros: tamanho ${tam} pela vazão que passa em cada uma (${f1(Math.min(...qv))} a ${f1(Math.max(...qv))} m³/h). Cada turno abre as válvulas das suas linhas e fecha as outras. A perda da válvula (até ~${f1(Math.max(...qv.map(VPERDA)))} bar) já entra na conta. Para comandar por rádio com bateria e painel solar, peça solenoide <b>latch 12 V DC</b>; por fio, 24 VAC. Com <b>piloto regulador de pressão</b>, a própria válvula segura a pressão certa para a fita. A saída de cada ponto e a interligação continuam com registro manual.`:
-    `${mx>1?`Cada linha tem ${mx} registros manuais, um em cada lugar onde recebe água`:'Cada linha tem um registro manual na entrada'} (${G.linhas.map(l=>'R-'+l.id).join(', ')}); para trocar de turno, alguém abre e fecha os registros no campo. Toque em "Válvula automática" para ver a montagem com válvulas.`}
-  const j=H.j,qt=G.linhas.reduce((a,l)=>a+l.Q,0);
-  document.getElementById('turMsg').innerHTML=tk==='e'?'<b>Turnos equilibrados:</b> cada turno de duas linhas puxa 42,8 m³/h, em vez de 36,2 / 49,4 / 24,7 nos turnos do projeto. Com os pontos ligados (opção 3) e 2,5 bar nos pontos, os três turnos ainda funcionam com um ponto parado, alguns no limite (veja a comparação das opções). Sem a ligação, cada ponto precisa dar conta das suas linhas.':'<b>Turnos do projeto:</b> o Turno 2 (H2 + H4) é o mais pesado, 49,4 m³/h. Com os pontos ligados, vale testar os turnos equilibrados.';
+   const nv=conLista().filter(x=>x.lin!=null).length,mx=Math.max(...LY.linhas.map((l,k)=>nReg(D,k))),qv=LY.linhas.map((l,k)=>QV(D,k)),tam=[...new Set(qv.map(VPOL))].join(' / ');
+   document.getElementById('ctlMsg').innerHTML=ak?`<b>${nv} válvulas automáticas</b>, ${mx>1?`${mx} em cada linha, uma em cada lugar onde a linha recebe água`:LY.id=='V'?'uma na saída de cada ramal, todas na lateral esquerda':'uma na entrada de cada linha'} (${LY.linhas.map(l=>'V-'+l.id).join(', ')}), no lugar dos registros: tamanho ${tam} pela vazão que passa em cada uma (${f1(Math.min(...qv))} a ${f1(Math.max(...qv))} m³/h). Cada turno abre as válvulas d${LY.id=='V'?'os seus ramais':'as suas linhas'} e fecha as outras. A perda da válvula (até ~${f1(Math.max(...qv.map(VPERDA)))} bar) já entra na conta. Para comandar por rádio com bateria e painel solar, peça solenoide <b>latch 12 V DC</b>; por fio, 24 VAC. Com <b>piloto regulador de pressão</b>, a própria válvula segura a pressão certa para a fita. A saída de cada ponto e a interligação continuam com registro manual.`:
+    `${mx>1?`Cada linha tem ${mx} registros manuais, um em cada lugar onde recebe água`:LY.id=='V'?'Cada ramal tem um registro manual na saída da principal, todos na lateral esquerda':'Cada linha tem um registro manual na entrada'} (${LY.linhas.map(l=>'R-'+l.id).join(', ')}); para trocar de turno, alguém abre e fecha os registros no campo. Toque em "Válvula automática" para ver a montagem com válvulas.`}
+  const j=H.j,qt=LY.linhas.reduce((a,l)=>a+l.Q,0),qtu=T.map(t=>t.idx.reduce((a,i)=>a+LY.linhas[i].Q,0));
+  document.getElementById('turMsg').innerHTML=LY.id=='V'?(tk==='e'?`<b>6 turnos, um ramal por vez:</b> de ${f1(Math.min(...qtu))} a ${f1(Math.max(...qtu))} m³/h por turno. O Ponto 3 precisa dar menos água, mas a rega do dia leva o dobro do tempo.`:`<b>3 turnos de 2 ramais:</b> ${T.map((t,i)=>t.lin.join('+')+' '+f1(qtu[i])+' m³/h').join(' · ')}. Os ramais da ponta (V1 e V6) regam só um lado, por isso vão junto com um ramal do meio.`):tk==='e'?'<b>Turnos equilibrados:</b> cada turno de duas linhas puxa 42,8 m³/h, em vez de 36,2 / 49,4 / 24,7 nos turnos do projeto. Com os pontos ligados (opção 3) e 2,5 bar nos pontos, os três turnos ainda funcionam com um ponto parado, alguns no limite (veja a comparação das opções). Sem a ligação, cada ponto precisa dar conta das suas linhas.':'<b>Turnos do projeto:</b> o Turno 2 (H2 + H4) é o mais pesado, 49,4 m³/h. Com os pontos ligados, vale testar os turnos equilibrados.';
   document.getElementById('juntoMsg').innerHTML=(alt()?`<b>Calculado pelo desenho ${ST.ed?'editado':'da '+OPS[ST.op].n}.</b> `:'')+`Abrindo tudo junto (${f1(qt)} m³/h), a menor pressão na fita seria ${j.pm==null?'—':f1(j.pm/10)+' bar'}: ${j.sobra!=null&&j.sobra>=.5?'daria para abrir tudo junto.':'<b>não dá para abrir tudo junto</b>; rode os turnos separados.'}`;
 }
 document.getElementById('dur').addEventListener('input',renderTurnos);document.getElementById('dur').addEventListener('blur',()=>setTimeout(depoisDeOcupado,50));
@@ -794,12 +852,12 @@ function renderPassos(){
 }
 function toggleSeg(id){ST.inst[id]=!ST.inst[id];if(!ST.inst[id])delete ST.inst[id];save();sync({['inst.'+id]:ST.inst[id]?true:null});marcaDia();renderMont()}
 function renderMont(){
-  const done=G.segs.filter(g=>ST.inst[g.id]);const Lt=G.segs.reduce((a,g)=>a+g.L,0),Ld=done.reduce((a,g)=>a+g.L,0);
-  const fit=G.fitas.filter(f=>ST.inst[f.s]).reduce((a,f)=>a+f.L,0);
-  document.getElementById('mPct').textContent=Math.round(100*Ld/Lt)+'%';document.getElementById('mSeg').textContent=`${done.length}/${G.segs.length}`;
+  const LY=layOf(D),done=LY.segs.filter(g=>ST.inst[g.id]);const Lt=LY.segs.reduce((a,g)=>a+g.L,0),Ld=done.reduce((a,g)=>a+g.L,0);
+  const fit=LY.fitas.filter(f=>ST.inst[f.s]).reduce((a,f)=>a+f.L,0);
+  document.getElementById('mPct').textContent=Math.round(100*Ld/Lt)+'%';document.getElementById('mSeg').textContent=`${done.length}/${LY.segs.length}`;
   document.getElementById('mFita').textContent=fmt(fit)+' m';document.getElementById('mBar').style.width=(100*Ld/Lt)+'%';
   const list=document.getElementById('segList');list.innerHTML='';
-  G.segs.forEach(g=>{const lb=document.createElement('label');lb.className=ST.inst[g.id]?'done':'';const cb=document.createElement('input');cb.type='checkbox';cb.id='sg-'+g.id;cb.checked=!!ST.inst[g.id];cb.onchange=()=>toggleSeg(g.id);
+  LY.segs.forEach(g=>{const lb=document.createElement('label');lb.className=ST.inst[g.id]?'done':'';const cb=document.createElement('input');cb.type='checkbox';cb.id='sg-'+g.id;cb.checked=!!ST.inst[g.id];cb.onchange=()=>toggleSeg(g.id);
     lb.appendChild(cb);lb.appendChild(document.createTextNode(`${g.id} · ${g.L} m`));lb.title=qvName(g);list.appendChild(lb);
     monL[g.id].setStyle({color:ST.inst[g.id]?'#2ecc40':'#ff4d4d'})});
   renderPassos();renderTestes();renderPlano();
@@ -876,8 +934,8 @@ function curTot(net){const t={...G.tot};if(!net&&!alt())return t;
   G.tubos.forEach(x=>t[x.dm]-=x.L);(net||D).tubos.forEach(x=>t[x.dm]=(t[x.dm]||0)+tLen(x));
   Object.keys(t).forEach(k=>{t[k]=Math.round(t[k]);if(t[k]<=0)delete t[k]});return t}
 function curPrec(net){if(!net&&!alt())return G.precisa;const t=curTot(net),b=k=>Math.ceil((t[k]||0)/6);return {75:b(75),100:b(100),125:b(125),150:b(160)}}
-function renderMat(){const tot=curTot(),ttot=Object.values(tot).reduce((a,b)=>a+b,0);
-document.getElementById('kTubo').textContent=fmt(ttot)+' m';document.getElementById('kFita').textContent=fmt(G.L1+G.L2)+' m';document.getElementById('kTom').textContent=G.tom.length;
+function renderMat(){const tot=curTot(),ttot=Object.values(tot).reduce((a,b)=>a+b,0),LY=layOf(D);
+document.getElementById('kTubo').textContent=fmt(ttot)+' m';document.getElementById('kFita').textContent=fmt(LY.L1+LY.L2)+' m';document.getElementById('kTom').textContent=LY.tom.length;
 const tt=document.getElementById('tTubo');tt.innerHTML='<tr><th>Diâmetro</th><th class="n">Metros</th><th class="n">Barras 6 m</th></tr>';let nt=0;
 Object.keys(tot).sort((a,b)=>b-a).forEach(k=>{const n=Math.ceil(tot[k]/6);nt+=n;tt.insertAdjacentHTML('beforeend',`<tr><td><span class="sw" style="background:${DC[k]}"></span>${DL(k)} mm</td><td class="n">${fmt(tot[k])} m</td><td class="n">${n}</td></tr>`)});
 tt.insertAdjacentHTML('beforeend',`<tr class="tot"><td>Total</td><td class="n">${fmt(ttot)} m</td><td class="n">${nt}</td></tr>`);
@@ -885,13 +943,13 @@ const c=conexoes(),reds=Object.entries(c).filter(([k])=>k.startsWith('Redução'
 document.getElementById('tCon').innerHTML=`<tr><td>Saída do sistema existente + registro</td><td class="n">${c['Saída do sistema existente + registro']||0}</td></tr><tr><td>${AUTO()?'Válvula automática de linha (no lugar do registro)':'Registro de linha (tê, curva ou reto)'}</td><td class="n">${(c['Tê + registro']||0)+(c['Curva + registro']||0)+(c['Cruzeta + registro']||0)+(c['Registro de linha']||0)}</td></tr>`+
  [['Tê','Tê (sem registro)'],['Cruzeta','Cruzeta (sem registro)'],['Curva','Curva']].filter(([k])=>c[k]||k=='Curva').map(([k,n])=>`<tr><td>${n}</td><td class="n">${c[k]||0}</td></tr>`).join('')+
  reds.map(([k,v])=>`<tr><td>${k.replace('160','150/160')}</td><td class="n">${v}</td></tr>`).join('')+
- `<tr><td>Final de linha (tampão p/ lavagem)</td><td class="n">${c['Final de linha (tampão p/ lavagem)']||0}</td></tr><tr><td>Tomadas (conector + microtubo)</td><td class="n">${G.tom.length}</td></tr><tr><td>Início de fita (conector)</td><td class="n">${G.fitas.length}</td></tr><tr><td>Final de fita (fechamento)</td><td class="n">${G.fitas.length}</td></tr>`;
+ `<tr><td>Final de linha (tampão p/ lavagem)</td><td class="n">${c['Final de linha (tampão p/ lavagem)']||0}</td></tr><tr><td>Tomadas (conector + microtubo)</td><td class="n">${LY.tom.length}</td></tr><tr><td>Início de fita (conector)</td><td class="n">${LY.fitas.length}</td></tr><tr><td>Final de fita (fechamento)</td><td class="n">${LY.fitas.length}</td></tr>`;
+const maxF=Math.max(...LY.fitas.map(f=>f.L)),minF=Math.min(...LY.fitas.map(f=>f.L)),nM=LY.segs.filter(g=>g.meio).length;
+document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="background:#2ecc40"></span>Linha 1</td><td class="n">${fmt(LY.L1)} m</td></tr><tr><td><span class="sw" style="background:#00e5ff"></span>Linha 2 (a 2,5 m da linha 1)</td><td class="n">${fmt(LY.L2)} m</td></tr>
+<tr><td>Trechos de quebra-vento${nM?` (${nM} no meio dos setores)`:''}</td><td class="n">${LY.segs.length}</td></tr><tr><td>Fitas</td><td class="n">${LY.fitas.length}</td></tr><tr><td>Comprimento de cada fita</td><td class="n">${minF}–${maxF} m</td></tr>
+<tr><td>Microtubo das tomadas</td><td class="n">${fmt(LY.tom.reduce((a,t)=>a+t.L,0))} m</td></tr><tr class="tot"><td>Total de fita</td><td class="n">${fmt(LY.L1+LY.L2)} m</td></tr>`;
 }
 renderMat();
-const maxF=Math.max(...G.fitas.map(f=>f.L)),minF=Math.min(...G.fitas.map(f=>f.L));
-document.getElementById('tFita').innerHTML=`<tr><td><span class="sw" style="background:#2ecc40"></span>Linha 1</td><td class="n">${fmt(G.L1)} m</td></tr><tr><td><span class="sw" style="background:#00e5ff"></span>Linha 2 (a 2,5 m da linha 1)</td><td class="n">${fmt(G.L2)} m</td></tr>
-<tr><td>Trechos de quebra-vento</td><td class="n">${G.segs.length}</td></tr><tr><td>Fitas</td><td class="n">${G.fitas.length}</td></tr><tr><td>Comprimento de cada fita</td><td class="n">${minF}–${maxF} m</td></tr>
-<tr><td>Microtubo das tomadas</td><td class="n">${fmt(G.tom.reduce((a,t)=>a+t.L,0))} m</td></tr><tr class="tot"><td>Total de fita</td><td class="n">${fmt(G.L1+G.L2)} m</td></tr>`;
 // ---------- planilha
 const PL=G.pl;const br=n=>Math.round(n).toLocaleString('pt-BR');
 const arrB=(b,dn)=>arrQ(b,dn);
@@ -974,12 +1032,12 @@ function listaCompras(){const fol=1+Math.max(0,+ST.est.folga||0)/100,L=[];
   [...cg.entries()].map(([k,n])=>{const[g,nm]=k.split('|');return {g,nm,n}}).sort((a,b)=>(a.g==gv?0:1)-(b.g==gv?0:1)||tipo(a.nm)-tipo(b.nm)||num(a.nm)-num(b.nm)||a.nm.localeCompare(b.nm)).forEach(x=>it(x.g,x.nm,'un.',x.n,0));
   // tomadas e fita
   const gf='Tomadas e fita',td={};
-  G.tom.forEach(t=>{let best=null,bd=1e9;D.tubos.forEach(x=>{for(let j=1;j<x.q.length;j++){const d=dSeg(t.q[0],x.q[j-1],x.q[j]);if(d<bd){bd=d;best=x}}});const k=best?best.dm:0;td[k]=(td[k]||0)+1});
+  const LY=layOf(D);LY.tom.forEach(t=>{let best=null,bd=1e9;D.tubos.forEach(x=>{for(let j=1;j<x.q.length;j++){const d=dSeg(t.q[0],x.q[j-1],x.q[j]);if(d<bd){bd=d;best=x}}});const k=best?best.dm:0;td[k]=(td[k]||0)+1});
   Object.keys(td).sort((a,b)=>b-a).forEach(dm=>it(gf,`Conector de tomada no tubo ${DL(+dm)} mm`,'un.',td[dm],0));
-  it(gf,'Microtubo das tomadas','m',G.tom.reduce((a,t)=>a+t.L,0)*fol,0);
-  it(gf,'Conector de início de fita','un.',G.fitas.length,0);
-  it(gf,'Fechamento de final de fita','un.',G.fitas.length,0);
-  const fm=(G.L1+G.L2)*fol,ro=+ST.est.rolo||0;it(gf,ro?`Fita gotejadora 4 L/h por metro (rolo de ${fmt(ro)} m)`:'Fita gotejadora 4 L/h por metro',ro?'rolos':'m',ro?fm/ro:fm,0,ro?'c_fita_rolos':'c_fita_m');
+  it(gf,'Microtubo das tomadas','m',LY.tom.reduce((a,t)=>a+t.L,0)*fol,0);
+  it(gf,'Conector de início de fita','un.',LY.fitas.length,0);
+  it(gf,'Fechamento de final de fita','un.',LY.fitas.length,0);
+  const fm=(LY.L1+LY.L2)*fol,ro=+ST.est.rolo||0;it(gf,ro?`Fita gotejadora 4 L/h por metro (rolo de ${fmt(ro)} m)`:'Fita gotejadora 4 L/h por metro',ro?'rolos':'m',ro?fm/ro:fm,0,ro?'c_fita_rolos':'c_fita_m');
   return L}
 function renderCompras(){const L=listaCompras(),T=document.getElementById('tCompra');let g0='',h='<tr><th>Item</th><th class="n">Precisa</th><th class="n">Já tenho</th><th class="n">Comprar</th></tr>';
   L.forEach((x,i)=>{if(x.g!==g0){g0=x.g;h+=`<tr class="bh"><td colspan="4">${x.g}</td></tr>`}const c=Math.max(0,x.prec-x.tem);
@@ -1022,7 +1080,7 @@ function etapas(){const P=planoAV(),pr=curPrec(),need={...P.need,150:Math.max(0,
   let tA=0,dA=0,rA=0;[150,125,100,75].forEach(dn=>{const es=G.enterrado.filter(e=>e.dn==dn),ent=es.reduce((a,e)=>a+e.barras,0),ar=es.reduce((a,e)=>a+arrQ(e.b,e.dn),0),alvo=Math.min(need[dn]||0,ent);tA+=alvo;dA+=Math.min(alvo,ar);rA+=ar});
   const LC=listaCompras(),okLC=LC.filter(x=>x.tem>=x.prec).length;
   const tl=tubLista(),Lt=tl.reduce((a,x)=>a+x.L,0),dm=tl.filter(x=>ST.mar[x.k]).reduce((a,x)=>a+x.L,0),dt=tl.filter(x=>ST.tub[x.k]).reduce((a,x)=>a+x.L,0),cl=conLista(),dc=cl.filter(x=>ST.con[x.k]).length;
-  const Le=G.segs.reduce((a,g)=>a+g.L,0),de=G.segs.filter(g=>ST.inst[g.id]).reduce((a,g)=>a+g.L,0);
+  const SG=layOf(D).segs,Le=SG.reduce((a,g)=>a+g.L,0),de=SG.filter(g=>ST.inst[g.id]).reduce((a,g)=>a+g.L,0);
   const TS=listaTestes(),dx=TS.filter(feitoT).length;
   return [{k:'a',n:'Arrancar tubos',un:'barras',tot:tA,feito:dA,raw:rA,href:'#arranque'},
     {k:'p',n:'Solicitação de compra de material',un:'itens',tot:LC.length,feito:okLC,raw:okLC,href:'#compras',compra:true},
@@ -1122,14 +1180,14 @@ document.querySelector('#plEq tbody').addEventListener('focusout',()=>setTimeout
     if(v==null)delete ST.est[k];else ST.est[k]=v;save();sync({['est.'+k]:v});renderPlano();if(id==='plEn')renderCompras()});
   e.addEventListener('blur',()=>setTimeout(depoisDeOcupado,50))});
 // ---------- 6. testes do sistema
-function listaTestes(){const L=[],H=hidrNet(D),T=TUR();
-  G.linhas.forEach((l,i)=>{const ti=T.findIndex(t=>t.idx.includes(i)),r=ti>=0?H.t[ti]:null,prev=r&&r.pmin[l.id]!=null?r.pmin[l.id]/10:null,g='Linha '+l.id;
-    L.push({k:'lav_'+l.id,g,nm:`Lavagem: abrir o final da linha ${l.id}, deixar sair a sujeira e fechar`});
-    L.push({k:'vaz_'+l.id,g,nm:`Linha ${l.id} em pressão sem vazamento (tubo, conexões e tomadas)`});
-    L.push({k:'pp_'+l.id,g,nm:`Pressão na última tomada da linha ${l.id}, com o turno aberto`,num:1,prev});
+function listaTestes(){const L=[],H=hidrNet(D),T=TUR(),LY=layOf(D),R=LY.un=='ramal',UN=R?'Ramal':'Linha',da=R?'do ramal':'da linha',pf=LY.id=='V'?'v':'';
+  LY.linhas.forEach((l,i)=>{const ti=T.findIndex(t=>t.idx.includes(i)),r=ti>=0?H.t[ti]:null,prev=r&&r.pmin[l.id]!=null?r.pmin[l.id]/10:null,g=UN+' '+l.id;
+    L.push({k:'lav_'+l.id,g,nm:`Lavagem: abrir o final ${da} ${l.id}, deixar sair a sujeira e fechar`});
+    L.push({k:'vaz_'+l.id,g,nm:`${UN} ${l.id} em pressão sem vazamento (tubo, conexões e tomadas)`});
+    L.push({k:'pp_'+l.id,g,nm:`Pressão na última tomada ${da} ${l.id}, com o turno aberto`,num:1,prev});
     if(AUTO()){const n=nReg(D,i);L.push({k:'val_'+l.id,g,nm:n>1?`As ${n} válvulas V-${l.id} abrem e fecham pelo comando`:`Válvula V-${l.id} abre e fecha pelo comando`})}});
-  T.forEach((t,ti)=>{const g=`${t.n} (${t.lin.join(' + ')})`;L.push({k:'tur_'+(ti+1),g,nm:'Todas as fitas do turno molhando até a ponta'});
-    H.t[ti].Q.forEach((q,i)=>{if(q>.05)L.push({k:`pt_${ti+1}_${i+1}`,g,nm:`Pressão no Ponto ${i+1} com o turno aberto`,num:1,prev:H.pb[i],ponto:i})})});
+  T.forEach((t,ti)=>{const g=`${t.n} (${t.lin.join(' + ')})`;L.push({k:pf+'tur_'+(ti+1),g,nm:'Todas as fitas do turno molhando até a ponta'});
+    H.t[ti].Q.forEach((q,i)=>{if(q>.05)L.push({k:`${pf}pt_${ti+1}_${i+1}`,g,nm:`Pressão no Ponto ${i+1} com o turno aberto`,num:1,prev:H.pb[i],ponto:i})})});
   return L}
 function feitoT(t){const v=ST.tst[t.k];return t.num?v!=null&&v!=='':!!v}
 function renderTestes(){const L=listaTestes(),T=document.getElementById('tstList');if(!T)return;let g0='',h='';
@@ -1204,7 +1262,7 @@ function moveEnd(){MV=null;document.body.classList.remove('movendo');drawEd();ed
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MV)moveEnd()});
 map.on('zoomend',()=>{if(ED)drawEd()});
 function vertPop(g){const d=document.createElement('div');d.className='pop';
-  const nm=g.refs.map(r=>r.k=='P'?'Ponto '+(r.i+1):r.k=='r'?'Registro R-'+G.linhas[r.i].id:r.k=='x'?'Registro R-'+G.linhas[D.rx[r.i].k].id:r.k=='n'?G.nos[r.i].nm:null).filter(Boolean);
+  const nm=g.refs.map(r=>r.k=='P'?'Ponto '+(r.i+1):r.k=='r'?'Registro R-'+layOf(D).linhas[r.i].id:r.k=='x'?'Registro R-'+layOf(D).linhas[D.rx[r.i].k].id:r.k=='n'?G.nos[r.i].nm:null).filter(Boolean);
   const tr=g.refs.filter(r=>r.k=='t'),meio=tr.filter(r=>r.j>0&&r.j<D.tubos[r.i].q.length-1);
   d.innerHTML=`<b>${nm.length?[...new Set(nm)].join('<br>'):'Ponto da linha'}</b><br>${tr.length} linha(s) passam aqui<br>`;
   const bt=(txt,fn)=>{const b=document.createElement('button');b.textContent=txt;b.onclick=()=>{map.closePopup();push();fn();commit()};d.appendChild(b)};
@@ -1272,29 +1330,32 @@ document.getElementById('eSair').onclick=()=>edMode(false);
 document.getElementById('eAj').onclick=()=>{const pn=document.getElementById('edBar'),a=pn.classList.toggle('aberta');document.getElementById('eAj').setAttribute('aria-expanded',a);document.getElementById('eAj').textContent=a?'Fechar ajuda':'Ajuda'};
 // ---------- escolha e comparação das opções
 function renderOp(){document.querySelectorAll('button[data-op]').forEach(b=>b.classList.toggle('on',+b.dataset.op===ST.op));
-  const eo=[1,2,3,4,5].filter(n=>n!==ST.op&&ST.eds[n]);document.getElementById('opMsg').innerHTML=OPS[ST.op].tx+(ST.ed?' <b>Esta opção foi editada no mapa.</b>':'')+' Toque em outra opção para ver no mapa; turnos, material, conexões, compras e planilha mudam junto. A edição de cada opção fica guardada: trocar de opção não apaga nada.'+(eo.length?` Também editada: opção ${eo.join(' e ')}.`:'');
-  const tem=dn=>(G.solto[dn]||0)+G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0),T=TUR(),pb=PB();
-  const conta=h=>{const b=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=.5).length,l=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=0&&r.sobra<.5).length;return {b,l}};
-  const col=[1,2,3,4,5].map(n=>{const edn=n===ST.op?!!ST.ed:!!ST.eds[n],net=n===ST.op?D:ST.eds[n]||opcao(n),orig=n==1&&!edn;
+  const OPN=Object.keys(OPS).map(Number),eo=OPN.filter(n=>n!==ST.op&&ST.eds[n]);document.getElementById('opMsg').innerHTML=OPS[ST.op].tx+(ST.ed?' <b>Esta opção foi editada no mapa.</b>':'')+' Toque em outra opção para ver no mapa; turnos, material, conexões, compras e planilha mudam junto. A edição de cada opção fica guardada: trocar de opção não apaga nada.'+(eo.length?` Também editada: opção ${eo.join(' e ')}.`:'');
+  const tem=dn=>(G.solto[dn]||0)+G.enterrado.filter(e=>String(e.dn)==dn).reduce((a,e)=>a+e.barras,0),pb=PB();
+  const conta=h=>{const b=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=.5).length,l=h.t.filter(r=>!r.seca&&r.sobra!=null&&r.sobra>=0&&r.sobra<.5).length;return {b,l,n:h.t.length}};
+  const col=OPN.map(n=>{const edn=n===ST.op?!!ST.ed:!!ST.eds[n],net=n===ST.op?D:ST.eds[n]||opcao(n),orig=n==1&&!edn;
     const t=orig?G.tot:curTot(net),pr=orig?G.precisa:curPrec(net),c=orig?G.cnt:conexoes(net),nc=Object.values(c).reduce((a,b)=>a+b,0);
     const H=hidrNet(net,pb,true),rb=[0,1,2].map(i=>naRede(net,net.P[i])&&!(net.Poff&&net.Poff[i])?conta(hidrNet(net,pb.map((v,j)=>j===i?0:v),true)):null);
     // com a mesma pressão em todos os pontos as vazões não mudam: a pressão mínima sai direto da pior sobra
     const Hu=hidrNet(net,[2.5,2.5,2.5],true),su=Hu.t.some(r=>r.seca||r.sobra==null)?null:Math.min(...Hu.t.map(r=>r.sobra)),pmin=su==null?null:Math.ceil((2.5-su+.5)*10-1e-6)/10;
     const falta=['150','125','100','75'].reduce((a,dn)=>a+Math.max(0,pr[dn]-tem(dn)),0);
     const nv=conLista(net).filter(x=>x.lin!=null).length;
-    return {t,nc,H,rb,pmin,falta,edn,nv,tot:Object.values(t).reduce((a,b)=>a+b,0)}});
+    const LY=layOf(net);return {t,nc,H,rb,pmin,falta,edn,nv,tot:Object.values(t).reduce((a,b)=>a+b,0),T:TUR(net),fita:LY.L1+LY.L2}});
   // no celular o nome de cada linha da tabela vai numa linha própria, em cima dos números das opções
   const row=(nm,f)=>`<tr class="rl"><td colspan="${col.length}">${nm}</td></tr><tr><td class="lb">${nm}</td>${col.map((c,i)=>`<td class="n"${i+1===ST.op?' style="font-weight:700"':''}>${f(c)}</td>`).join('')}</tr>`;
   const sob=s=>s==null?'<span class="pill bad">sem água</span>':`<span class="pill ${s>=.5?'ok':s>=0?'warn':'bad'}">${s>0?'+':''}${f1(s)}</span>`;
-  const rob=x=>{const n=x.b+x.l;return `<span class="pill ${n===T.length?(x.l?'warn':'ok'):n?'warn':'bad'}">${n} de ${T.length}</span>${x.l?`<br><small>${x.l} no limite</small>`:''}`};
-  document.getElementById('opCmp').innerHTML='<tr><th class="lb"></th>'+[1,2,3,4,5].map(n=>`<th class="n">Opção ${n}${col[n-1].edn?'<br><small>editada</small>':''}</th>`).join('')+'</tr>'+
+  const rob=x=>{const n=x.b+x.l;return `<span class="pill ${n===x.n?(x.l?'warn':'ok'):n?'warn':'bad'}">${n} de ${x.n}</span>${x.l?`<br><small>${x.l} no limite</small>`:''}`};
+  // cada opção com os seus turnos; quando as linhas do turno mudam (opção 6), aparecem embaixo do número
+  const NT=Math.max(...col.map(c=>c.T.length)),lin=t=>t?t.lin.join('+'):'',sobT=[...Array(NT).keys()].map(ti=>{const l0=lin(col[0].T[ti]);
+    return row(`Sobra Turno ${ti+1}${l0?' ('+l0+')':''}, bar`,c=>c.H.t[ti]?sob(c.H.t[ti].sobra)+(lin(c.T[ti])!==l0?`<br><small>${lin(c.T[ti])}</small>`:''):'—')}).join('');
+  document.getElementById('opCmp').innerHTML='<tr><th class="lb"></th>'+OPN.map((n,i)=>`<th class="n">Opção ${n}${col[i].edn?'<br><small>editada</small>':''}</th>`).join('')+'</tr>'+
     [160,125,100,75,50,32].filter(dm=>dm>=75||col.some(c=>c.t[dm])).map(dm=>row(`Tubo ${DL(dm)} (m)`,c=>fmt(c.t[dm]||0))).join('')+row('Tubo total (m)',c=>fmt(c.tot))+row('Conexões',c=>c.nc)+
-    T.map((tu,ti)=>row(`Sobra ${tu.n} (${tu.lin.join('+')}), bar`,c=>sob(c.H.t[ti].sobra))).join('')+
+    row('Fita gotejadora (m)',c=>fmt(c.fita))+sobT+
     [0,1,2].map(i=>row(`Turnos ok se o Ponto ${i+1} parar`,c=>c.rb[i]?rob(c.rb[i]):'<small>não usa</small>')).join('')+
     row('Pressão mínima nos pontos',c=>c.pmin==null?'—':f1(c.pmin)+' bar')+
     (AUTO()?row('Válvulas automáticas',c=>c.nv):'')+
     row('Barras a comprar',c=>c.falta?`<span class="pill bad">${c.falta}</span>`:'<span class="pill ok">0</span>')+
-    `<tr><td colspan="6"><small>Sobra = pressão acima de 1 bar na tomada mais fraca, com ${f1(pb[0])} bar no Ponto 1, ${f1(pb[1])} bar no Ponto 2 e ${f1(pb[2])} bar no Ponto 3 (troque em Turnos). "No limite" = sobra menor que 0,5 bar. Pressão mínima = a menor pressão nos pontos da opção, medida com água correndo, para todos os turnos terem 0,5 bar de sobra.</small></td></tr>`}
+    `<tr><td colspan="${OPN.length+1}"><small>Sobra = pressão acima de 1 bar na tomada mais fraca, com ${f1(pb[0])} bar no Ponto 1, ${f1(pb[1])} bar no Ponto 2 e ${f1(pb[2])} bar no Ponto 3 (troque em Turnos). "No limite" = sobra menor que 0,5 bar. Pressão mínima = a menor pressão nos pontos da opção, medida com água correndo, para todos os turnos terem 0,5 bar de sobra. A opção 6 rega também o quebra-vento novo do meio dos setores (mais fita).</small></td></tr>`}
 document.querySelectorAll('button[data-op]').forEach(b=>b.onclick=()=>{const n=+b.dataset.op;if(n===ST.op)return;
   if(DR)drMode(false);if(MV)moveEnd();
   ST.op=n;if(ST.eds[n])ST.ed=JSON.parse(JSON.stringify(ST.eds[n]));else delete ST.ed;D=ST.ed?JSON.parse(JSON.stringify(ST.ed)):base();hist=[];
