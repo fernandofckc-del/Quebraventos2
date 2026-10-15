@@ -167,7 +167,7 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </style>
 </head>
 <body data-tab="mapa">
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v26</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v27</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
 <nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
@@ -1192,13 +1192,13 @@ function txtPrazo(C,prazo){const q=equipePrazo(C,prazo),dd=`${pad(prazo.getDate(
   const it=q.E.map(e=>e.r.np?`${e.n}: ${e.r.np} → <b>${Math.ceil(e.r.np*q.f-1e-9)} pessoas</b>`:`${e.n}: ritmo de <b>${fmt(Math.ceil(e.r.usa*q.f))} ${e.un}/dia</b>`);
   return `<br><b>Para terminar até ${dd}</b>, as equipes precisam render cerca de ${Math.round((q.f-1)*100)}% a mais: `+it.join(' · ')+'.'}
 // mão de obra prevista para o que falta: pessoas × dias de trabalho, etapa por etapa
-function renderMo(C){const el=document.getElementById('plMo'),L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra&&e.dur),d=+ST.est.diaria||0;
+function renderMo(C){const el=document.getElementById('plMo'),L=C.E.filter(e=>(e.st==='and'||e.st==='esp')&&!e.compra&&e.dur).concat(apoio().filter(a=>a.tot).map(a=>({...a,n:a.n+' <small>junto com as etapas</small>',dur:a.dur||'—'}))),d=+ST.est.diaria||0;
   if(!L.length){el.innerHTML='';return}
   const n=L.reduce((a,e)=>a+(e.dia||0),0),sem=L.filter(e=>!e.dia).map(e=>e.n);
   el.innerHTML=`<h3 style="margin-top:14px">Mão de obra do que falta</h3><div class="tbl"><table class="mot"><tr><th>Etapa</th><th class="n">Pessoas</th><th class="n">Dias</th><th class="n">Diárias</th>${d?'<th class="n">Custo</th>':''}</tr>`+
     L.map(e=>`<tr><td>${e.n}</td><td class="n">${e.r.np||'—'}</td><td class="n">${e.dur}</td><td class="n">${e.dia?fmt(e.dia):'—'}</td>${d?`<td class="n">${e.dia?brl(e.dia*d):'—'}</td>`:''}</tr>`).join('')+
     `<tr class="tot"><td>Total</td><td></td><td></td><td class="n">${fmt(n)}</td>${d?`<td class="n">${brl(n*d)}</td>`:''}</tr></table></div>`+
-    `<p class="note" style="margin:4px 0 0">Diárias = pessoas × dias de trabalho da etapa (1 diária = 1 pessoa trabalhando 1 dia).`+(d?` Custo = diárias × ${brl(d)}.`:' Informe o valor da diária em "Ajustar" para ver o custo.')+(sem.length?` Sem número de pessoas ainda: ${sem.join(', ')} (não entram no total).`:'')+` A comparação com material novo fica na aba <a href="#custo">Custo</a>.</p>`}
+    `<p class="note" style="margin:4px 0 0">Diárias = pessoas × dias de trabalho da etapa (1 diária = 1 pessoa trabalhando 1 dia).`+(d?` Custo = diárias × ${brl(d)}.`:' Informe o valor da diária em "Ajustar" para ver o custo.')+(sem.length?` Sem número de pessoas ou rendimento ainda: ${sem.map(x=>x.replace(/ <small>.*<\/small>/,'')).join(', ')} (não entram no total).`:'')+` Transporte e conserto correm junto com o arranque e a montagem e não mudam a data de término. A comparação com material novo fica na aba <a href="#custo">Custo</a>.</p>`}
 function renderPlano(){const C=cronograma(),H=histDias(),prazo=ST.est.prazo?s2d(ST.est.prazo):null,ds=+ST.est.dsem||6;
   const rows=C.E.map((e,i)=>{const pct=e.tot?Math.min(100,100*e.feito/e.tot):100,un=e.un;let lin1=`${fmt(e.feito)} de ${fmt(e.tot)} ${un}`+(e.feito<e.tot?` · faltam ${fmt(e.tot-e.feito)}`:''),lin2='';
     if(e.compra)lin1=`${fmt(e.feito)} de ${fmt(e.tot)} itens já em estoque · ${ST.est.solic?'solicitação enviada em '+dCurto(s2d(ST.est.solic)):'solicitação ainda não enviada'} · entrega em ${entrega()} dias`;
@@ -1235,6 +1235,7 @@ const CXD=[['g','Geral'],['diaria','Diária por pessoa','R$',null],
   ['g','Material novo na profundidade certa'],['cx_p150','Barra nova 150/160 mm','R$',null],['cx_p125','Barra nova 125 mm','R$',null],['cx_p100','Barra nova 100 mm','R$',null],['cx_p75','Barra nova 75 mm','R$',null],
   ['cx_vm','Valeta funda com máquina: custo por metro (se preencher, vale este)','R$/m',null],['cx_vf','Valeta funda à mão: metros por pessoa por dia','m',null],['cx_mf','Montar e fechar na valeta funda: metros por pessoa por dia','m',40]];
 const cxv=k=>{const v=ST.est[k];if(v!=null&&v!=='')return +v;const d=CXD.find(x=>x[0]===k);return d&&d[3]!=null?d[3]:null};
+const cdia=()=>+ST.est.cx_cr>0?1/ST.est.cx_cr:cxv('cx_cd');// diárias por barra consertada
 function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cxv('diaria'),DN=['150','125','100','75'];
   const tub={};listaCompras().forEach(x=>{const m=x.nm.match(/^Tubo PVC (\d+)/);if(m)tub[m[1]]={prec:x.prec,comp:Math.max(0,x.prec-x.tem)}});
   const pr=dn=>cxv('cx_p'+dn),R=(nm,q,di,rs,falta)=>({nm,q,di:di||0,rs:(rs||0)+(di&&dia?di*dia:0),falta:[].concat(falta||[],di&&dia==null?['diária']:[])});
@@ -1248,8 +1249,8 @@ function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cx
   const transp=(nm,n)=>R(nm,`${fmt(n)} barras`,tb?n/tb:0,n*tf,tb?[]:['transporte dos tubos']);
   reuso.push(transp('Transportar os tubos até a montagem',bv));
   const nk=Math.round(bA*(cxv('cx_qb')||0)/100);
-  reuso.push(R('Consertar barras quebradas ao arrancar e transportar',`${fmt(nk)} de ${fmt(bA)} barras (${cxv('cx_qb')||0}%)`,nk*(cxv('cx_cd')||0),nk*(cxv('cx_cm')||0),nk&&cxv('cx_cm')==null?['material do conserto']:[]));
-  reuso.push(R('Consertar barras velhas furadas',`${fmt(nc)} de ${fmt(bv)} barras (${cxv('cx_fu')||0}%)`,nc*(cxv('cx_cd')||0),nc*(cxv('cx_cm')||0),nc&&cxv('cx_cm')==null?['material do conserto']:[]));
+  reuso.push(R('Consertar barras quebradas ao arrancar e transportar',`${fmt(nk)} de ${fmt(bA)} barras (${cxv('cx_qb')||0}%)`,nk*(cdia()||0),nk*(cxv('cx_cm')||0),nk&&cxv('cx_cm')==null?['material do conserto']:[]));
+  reuso.push(R('Consertar barras velhas furadas',`${fmt(nc)} de ${fmt(bv)} barras (${cxv('cx_fu')||0}%)`,nc*(cdia()||0),nc*(cxv('cx_cm')||0),nc&&cxv('cx_cm')==null?['material do conserto']:[]));
   const qa=cxv('cx_qa'),an=cxv('cx_an')||1,nq=Math.round((qa||0)*an);
   reuso.push(R('Quebras pelo trator na valeta rasa',qa==null?'—':`${fmt(nq)} em ${String(an).replace('.',',')} ${an>1?'anos':'ano'}`,0,nq*(cxv('cx_qc')||0),qa==null?['quebras por ano']:nq&&cxv('cx_qc')==null?['custo por quebra']:[]));
   // novo
@@ -1260,7 +1261,11 @@ function custo(){const E=etapas(),bA=E[0].tot,mT=E.find(e=>e.k==='t').tot,dia=cx
   novo.push(vm!=null?R('Abrir a valeta funda com máquina',`${fmt(mT)} m × ${brl(vm)}`,0,mT*vm):vf?R('Abrir a valeta funda à mão',`${fmt(mT)} m`,mT/vf):R('Abrir a valeta funda',`${fmt(mT)} m`,0,0,['valeta funda']));
   novo.push(R('Montar e fechar na valeta funda',`${fmt(mT)} m`,mT/cxv('cx_mf')));
   const T=L=>({di:L.reduce((a,x)=>a+x.di,0),rs:L.reduce((a,x)=>a+x.rs,0),falta:[...new Set(L.flatMap(x=>x.falta))]});
-  return {reuso,novo,tr:T(reuso),tn:T(novo),dia}}
+  return {reuso,novo,tr:T(reuso),tn:T(novo),dia,ap:{tr:bv,cq:nk+nc}}}
+// serviços de apoio do plano: correm junto com o arranque e a montagem
+const APO=[['tr','Transporte dos tubos','barras','cx_tb'],['cq','Conserto de tubos quebrados e furados','barras','cx_cr']];
+function apoio(){const A=custo().ap;return APO.map(([k,n,un,f])=>{const np=pessoas(k),rp=k==='cq'?(cdia()>0?1/cdia():0):+cxv(f)||0,tot=A[k],o={k,n,un,f,tot,r:{np,rp,usa:rp*(np||1)}};
+  if(tot&&o.r.usa>0){o.dur=Math.max(1,Math.ceil(tot/o.r.usa));if(np)o.dia=np*o.dur}return o})}
 function renderCusto(){const el=document.getElementById('cxTab');if(!el)return;const C=custo(),rs=v=>brl(Math.round(v)),di=v=>v?fmt(Math.ceil(v)):'—';
   const lin=x=>`<tr><td>${x.nm}<small>${x.q}</small></td><td class="n">${di(x.di)}</td><td class="n">${x.falta.length?'<small>falta '+x.falta.join(', ')+'</small>':rs(x.rs)}</td></tr>`;
   el.innerHTML='<tr><th>Item</th><th class="n">Diárias</th><th class="n">Custo</th></tr>'+
@@ -1281,7 +1286,10 @@ document.getElementById('cxPlano').onclick=()=>{const up={ra:Math.round(cxv('cx_
 // tabela da equipe: pessoas e rendimento por pessoa em cada etapa
 function renderEquipe(C){const tb=document.querySelector('#plEq tbody'),H=histDias(),T=C.E.find(x=>x.k==='t'),ok=k=>{const e=k==='c'?T:C.E.find(x=>x.k===k);return e&&e.st==='ok'};
   if(!tb.children.length)tb.innerHTML=EQ.map(([k,n,un])=>`<tr data-k="${k}"><td>${n}</td><td>${k==='c'?'<small>a mesma dos tubos</small>':`<input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}">`}</td><td><input type="number" min="0" step="any" data-f="r${k}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join('');
-  tb.querySelectorAll('tr').forEach(tr=>{const k=tr.dataset.k,e=C.E.find(x=>x.k===k)||{},r=k==='c'?(T&&T.sub?ritmo(T.sub,H):null):e.r,un=EQ.find(x=>x[0]===k)[2];
+  if(!tb.querySelector('[data-ap]'))tb.insertAdjacentHTML('beforeend','<tr class="bh"><td colspan="4"><small>Serviços de apoio (correm junto com o arranque e a montagem)</small></td></tr>'+APO.map(([k,n,un,f])=>`<tr data-ap="${k}"><td>${n}</td><td><input type="number" min="0" step="1" data-f="q${k}" aria-label="Pessoas em ${n}"></td><td><input type="number" min="0" step="any" data-f="${f}" aria-label="Quanto cada pessoa rende por dia em ${n}"> <small>${un}</small></td><td data-o></td></tr>`).join(''));
+  apoio().forEach(a=>{const tr=tb.querySelector(`[data-ap="${a.k}"]`);tr.querySelectorAll('input').forEach(i=>{if(document.activeElement!==i)i.value=ST.est[i.dataset.f]||'';if(i.dataset.f==='cx_cr')i.placeholder=String(Math.round(1/(cxv('cx_cd')||1)*10)/10).replace('.',',');if(i.dataset.f==='cx_tb')i.placeholder='ex.: 60'});
+    tr.querySelector('[data-o]').innerHTML=a.r.usa>0?`<b>${fmt(a.r.usa)}</b> ${a.un}/dia<small>${fmt(a.tot)} ${a.un} no total</small>`:`—<small>${fmt(a.tot)} ${a.un} no total</small>`});
+  tb.querySelectorAll('tr[data-k]').forEach(tr=>{const k=tr.dataset.k,e=C.E.find(x=>x.k===k)||{},r=k==='c'?(T&&T.sub?ritmo(T.sub,H):null):e.r,un=EQ.find(x=>x[0]===k)[2];
     tr.querySelectorAll('input').forEach(i=>{if(document.activeElement!==i)i.value=ST.est[i.dataset.f]||''});
     tr.querySelector('[data-o]').innerHTML=ok(k)?'<small>concluída</small>':r&&r.usa>0?`<b>${fmt(r.usa)}</b> ${un}/dia`+(r.man>0&&r.med>0?`<small>medido: ${fmt(r.med)}/dia</small>`:r.man>0?'':'<small>medido</small>'):'—'})}
 document.querySelector('#plEq tbody').addEventListener('change',ev=>{const i=ev.target;if(!i.dataset||!i.dataset.f)return;const k=i.dataset.f,s=String(i.value).trim().replace(',','.');
