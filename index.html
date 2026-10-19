@@ -35,7 +35,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-head)
 #tabTit{font-size:.9rem;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:600px){#tabTit{display:none}}
 .novaver{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + 12px + env(safe-area-inset-bottom,0px));z-index:5000;width:max-content;max-width:calc(100% - 32px);background:var(--brand);color:#fff;padding:10px 12px 10px 16px;border-radius:12px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.3);font:600 .92rem var(--f-head)}.novaver button{font:700 .9rem var(--f-head);color:var(--brand);background:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
-.appnav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);z-index:3000;background:var(--sheet);border-top:1px solid var(--rule);display:grid;grid-template-columns:repeat(5,1fr)}
+.appnav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);z-index:3000;background:var(--sheet);border-top:1px solid var(--rule);display:grid;grid-template-columns:repeat(6,1fr)}
 .appnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);text-decoration:none;font:600 .72rem var(--f-head);-webkit-tap-highlight-color:transparent}
 .appnav .ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;transition:background .15s,color .15s}
 .appnav a:hover .ico{background:var(--paper)}
@@ -43,11 +43,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-head)
 .appnav a[aria-current="page"]{color:var(--ink);font-weight:700}
 .appnav a[aria-current="page"] .ico{background:var(--brand);color:#fff}
 body{padding:var(--hdr) 0 calc(var(--nav) + env(safe-area-inset-bottom,0px))}
-.tab.wrap,#tab-mapa{display:none}
+.tab.wrap,#tab-mapa,#tab-reservatorio{display:none}
 body[data-tab="rega"] #tab-rega,body[data-tab="plano"] #tab-plano,body[data-tab="material"] #tab-material,body[data-tab="mais"] #tab-mais{display:flex}
-body[data-tab="mapa"] #tab-mapa{display:block}
-body[data-tab="mapa"]{overflow:hidden}
-#tab-mapa{position:fixed;top:var(--hdr);left:var(--rail);right:0;bottom:calc(var(--nav) + env(safe-area-inset-bottom,0px))}
+body[data-tab="mapa"] #tab-mapa,body[data-tab="reservatorio"] #tab-reservatorio{display:block}
+body[data-tab="mapa"],body[data-tab="reservatorio"]{overflow:hidden}
+#tab-mapa,#tab-reservatorio{position:fixed;top:var(--hdr);left:var(--rail);right:0;bottom:calc(var(--nav) + env(safe-area-inset-bottom,0px))}
+#tab-reservatorio{background:var(--paper)}
+#resFrame{position:absolute;inset:0;z-index:1;width:100%;height:100%;border:0;display:block;background:transparent}
+#resWait{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:var(--mut);font:600 .95rem var(--f-head)}
 @media (min-width:900px){:root{--rail:88px;--nav:0px}
   .appnav{top:var(--hdr);bottom:0;right:auto;width:var(--rail);height:auto;padding:14px 0;border-top:none;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:8px}
   .appnav a{padding:4px 0;font-size:.78rem}
@@ -169,8 +172,8 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
 </head>
 <body data-tab="mapa">
 <div class="novaver" id="novaVer" role="status" hidden><span id="novaVerTx"></span><button type="button" id="novaVerBt">Atualizar</button></div>
-<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v33</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
-<nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
+<header class="appbar"><b>Quebra-vento Peirot <small class="ver" title="Versão do app">v34</small></b><span id="tabTit"></span><span id="sync" title="Sincronização entre aparelhos"><i></i><span id="syncTx">Conectando…</span></span></header>
+<nav class="appnav" aria-label="Telas do app"><a href="#mapa" data-tab="mapa"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="lb">Mapa</span></a><a href="#rega" data-tab="rega"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s-6 7-6 11.5a6 6 0 0 0 12 0C18 10 12 3 12 3z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></svg></span><span class="lb">Rega</span></a><a href="#plano" data-tab="plano"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="m8.5 13 2.5 2.5 4.5-5"/></svg></span><span class="lb">Plano</span></a><a href="#material" data-tab="material"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9"/><path d="M12 12v9"/></svg></span><span class="lb">Material</span></a><a href="#reservatorio" data-tab="reservatorio"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8h4l3 9h6l3-9h4"/><path d="M7.5 12.5c1.2-.8 2.3-.8 3.5 0s2.3.8 3.5 0 2.3-.8 3 0"/><path d="M5 20h14"/></svg></span><span class="lb">Reservatório</span></a><a href="#mais" data-tab="mais"><span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="lb">Mais</span></a></nav>
 <main>
 <section class="tab" id="tab-mapa" aria-label="Mapa">
   <div id="map"></div>
@@ -354,6 +357,11 @@ select,input[type=date]{font:500 .95rem var(--f-head);padding:5px 6px;border:1.5
   <p class="note" id="plNote"></p>
 </section>
 </div>
+
+<section class="tab" id="tab-reservatorio" aria-label="Reservatório 3D">
+  <p id="resWait">Abrindo o reservatório 3D…</p>
+  <iframe id="resFrame" title="Reservatórios 1 e 2: modelo 3D e irrigação"></iframe>
+</section>
 
 <div class="tab wrap" id="tab-mais">
 <section class="card" id="sobre">
@@ -1613,8 +1621,8 @@ document.querySelectorAll('button[data-op]').forEach(b=>b.onclick=()=>{const n=+
   ST.edT=Date.now();save();sync({op:n,ed:ST.ed?JSON.stringify(ST.ed):null,edT:ST.edT});map.closePopup();redraw()});
 renderOp();
 // ---------- telas (barra de ícones) e rotas: #mapa, #rega, #plano, #arranque, ...
-const ROTA={custo:['plano','custo'],mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],estoque:['material'],mais:['mais'],conta:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
-const TIT={mapa:'Mapa',rega:'Rega · turnos e opções',plano:'Plano de execução',material:'Material e planilha',mais:'Mais'};
+const ROTA={custo:['plano','custo'],mapa:['mapa'],rega:['rega'],turnos:['rega'],plano:['plano','plano'],arranque:['plano','arranque'],compras:['plano','compras'],tubos:['plano','tubos'],conexoes:['plano','tubos'],mangueiras:['plano','mangueiras'],testes:['plano','testes'],material:['material'],planilha:['material'],estoque:['material'],reservatorio:['reservatorio'],reservatorios:['reservatorio'],mais:['mais'],conta:['mais'],sobre:['mais'],detalhe:['mais'],montar:['mais']};
+const TIT={mapa:'Mapa',rega:'Rega · turnos e opções',plano:'Plano de execução',material:'Material e planilha',reservatorio:'Reservatório 3D · irrigação',mais:'Mais'};
 const SCR={};let rotaAt=null;
 function abrir(h,inicio){h=String(h||'').replace('#','');if(!ROTA[h])h='mapa';const [t,sb]=ROTA[h],chave=t+(sb||'');
   if(rotaAt)SCR[rotaAt]=window.scrollY;
@@ -1625,9 +1633,15 @@ function abrir(h,inicio){h=String(h||'').replace('#','');if(!ROTA[h])h='mapa';co
     document.querySelectorAll('.subtabs a').forEach(a=>{if(a.dataset.sub===sb)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
   try{localStorage.setItem('peirot_tab',h)}catch(e){}
   if(t==='mapa')map.invalidateSize();
+  telaReservatorio(t==='reservatorio');
   rotaAt=chave;
   const alvo=document.getElementById(h),raiz=h===t||(t==='plano'&&h===sb)||h==='turnos';
   if(!inicio&&alvo&&!raiz&&t!=='mapa')setTimeout(()=>alvo.scrollIntoView({block:'start'}),0);else if(t!=='mapa')window.scrollTo(0,SCR[chave]||0)}
+function telaReservatorio(vis){const fr=document.getElementById('resFrame');
+  if(vis&&!fr.src){fr.onload=()=>{document.getElementById('resWait').hidden=true;avisaRes()};fr.src='reservatorio.html'}
+  avisaRes()}
+function avisaRes(){const fr=document.getElementById('resFrame');
+  try{if(fr.src&&fr.contentWindow)fr.contentWindow.postMessage({resVisivel:document.body.dataset.tab==='reservatorio'},location.origin)}catch(e){}}
 function irPara(h){if(location.hash!=='#'+h)history.pushState(null,'','#'+h);abrir(h)}
 function irMapa(){if(document.body.dataset.tab!=='mapa')irPara('mapa')}
 window.addEventListener('hashchange',()=>abrir(location.hash));
