@@ -1381,6 +1381,10 @@ const DEF={qc:IRR.design.qC*1000,qt:IRR.design.qT*1000};
    Estado de cálculo (vazões, tempos) — usado nas tabelas e no 3D
    ==================================================================== */
 const S={lam:5,cic:2,qc:DEF.qc,qt:DEF.qt,sector:1};
+// dentro do app Quebra-vento, a tela avisa quando esta aba fica escondida (o 3D para de desenhar)
+let hostVisible=true, onHostShow=null;
+addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&typeof e.data.resVisivel==='boolean'){hostVisible=e.data.resVisivel;if(hostVisible&&onHostShow) onHostShow();}});
+if(window.parent!==window){try{parent.postMessage({resPronto:true},location.origin);}catch(e){}}
 function headQ(h){return h.q*(h.row==='borda'?S.qc/DEF.qc:S.qt/DEF.qt);}
 function sectorCalc(k){
   const s=IRR.sectors[k]; const hs=HEADS.filter(h=>h.sector===k);
@@ -2170,10 +2174,9 @@ function init3D(){
     sprayU.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
   new ResizeObserver(resize).observe(viewer); resize();
   setLevel(405.5); setView('3d',true);
-  const v3=new THREE.Vector3(); const clock=new THREE.Clock(); let simT=0, first=true, onScreen=true, hostVisible=true;
+  const v3=new THREE.Vector3(); const clock=new THREE.Clock(); let simT=0, first=true, onScreen=true;
   new IntersectionObserver(en=>{onScreen=en[0].isIntersecting;}).observe(viewer);
-  // dentro do app Quebra-vento, a tela avisa quando esta aba fica escondida
-  addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&typeof e.data.resVisivel==='boolean'){hostVisible=e.data.resVisivel;if(hostVisible) resize();}});
+  onHostShow=resize;
   (function loop(){
     if((!onScreen||!hostVisible||document.hidden)&&!first){clock.getDelta();requestAnimationFrame(loop);return;}
     const dt=Math.min(0.05,clock.getDelta());
