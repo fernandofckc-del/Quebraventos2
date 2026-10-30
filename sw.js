@@ -1,5 +1,5 @@
 // versão do app: mudar junto com o "vN" do topo do index.html
-const V='peirot-qv-v39';
+const V='peirot-qv-v40';
 const CORE=['./','./index.html','./reservatorio.html','./manifest.webmanifest','./icon-192.png','./icon-512.png',
  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js','https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'];
 // no-cache: confere com o servidor e só baixa o que mudou; se a cópia nova não chegar (sinal fraco), fica a da versão anterior
